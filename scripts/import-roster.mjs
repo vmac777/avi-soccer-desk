@@ -111,8 +111,12 @@ function toRow(r) {
     name,
     slug: slugify(name),
     tenure: r.tenure || null,
-    current_club: mark('currentClub', currentClub, 'verified'),
-    league: mark('league', currentLeague, 'verified'),
+    // `league` and `current_club` are NOT NULL DEFAULT '' in the inherited
+    // schema — this codebase uses empty string, not null, for "unknown". A free
+    // agent has neither, and `tenure = 'free_agent'` is what carries that
+    // meaning; writing null here just violates the constraint.
+    current_club: mark('currentClub', currentClub, 'verified') ?? '',
+    league: mark('league', currentLeague, 'verified') ?? '',
     owner_club: mark('ownerClub', r.owner_club || null, 'verified'),
     owner_league: r.owner_league || null,
     loan_club: mark('loanClub', r.loan_club || null, 'verified'),
