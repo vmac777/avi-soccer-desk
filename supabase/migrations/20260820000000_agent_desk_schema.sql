@@ -25,18 +25,21 @@
 
 DO $$
 DECLARE
-  job text;
+  -- Named v_jobname, not `job`: pg_cron stores its schedule in a table called
+  -- cron.job, so a variable called `job` makes `WHERE jobname = job` ambiguous
+  -- and the whole block fails to parse.
+  v_jobname text;
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
-    FOREACH job IN ARRAY ARRAY[
+    FOREACH v_jobname IN ARRAY ARRAY[
       'daily-news-digest',
       'digest-retry',
       'retry-super-urgent',
       'cleanup-rate-limits',
       'tr-competition-snapshot-daily'
     ] LOOP
-      IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = job) THEN
-        PERFORM cron.unschedule(job);
+      IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = v_jobname) THEN
+        PERFORM cron.unschedule(v_jobname);
       END IF;
     END LOOP;
   END IF;
