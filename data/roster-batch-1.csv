@@ -1,96 +1,96 @@
-name,position_pt,position,age,nationality,second_nationality,league,contract_year,contract_option,market_value_eur
-Vini Souza,Volante,DM,27,BR,,2. Bundesliga,2030,,7000000
-Matheus Bidu,Lateral Esq.,LB,27,BR,,,2027,,7000000
-Helinho,Ponta Direita,RW,26,BR,,Liga MX Apertura,2028,,6500000
-Rodriguinho,Meia Ofensivo,AM,22,BR,,,2030,,6000000
-Khellven,Lateral Dir.,RB,25,BR,,,2030,,6000000
-Matheus Alves,Meia Ofensivo,AM,21,BR,,Premier Liga,2030,,6000000
-Alexsander,Volante,DM,22,BR,,,2029,,5500000
-Lucas Fasson,Zagueiro,CB,25,BR,IT,Premier Liga,2030,,5000000
-Diego Carlos,Zagueiro,CB,33,BR,ES,Süper Lig,2028,,5000000
-John Victor,Goleiro,GK,30,BR,PT,Premier League,2028,,5000000
-Gustavo Martins,Zagueiro,CB,24,BR,,,2027,,4000000
-Thalys,Centroavante,CF,21,BR,,LaLiga2,2031,,4000000
-JP Chermont,Lateral Dir.,RB,20,BR,,,2026,,4000000
-Luis Benedetti,Zagueiro,CB,20,BR,,,2029,,4000000
-Dell,Centroavante,CF,18,BR,,,2028,,4000000
-Vinicius Lira,Lateral Esq.,LB,18,BR,,,2027,,4000000
-Brenner,Centroavante,CF,26,BR,,,2029,,4000000
-Dieguinho,Ponta Direita,RW,18,BR,,,2029,,4000000
-Henrique Carmo,Ponta Direita,RW,19,BR,,Premier Liga,2030,,3500000
-Deivid Washington,Centroavante,CF,21,BR,,Premier League 2,2030,opção do clube 1 ano,3000000
-Luis Otávio,Volante,DM,19,BR,,,2028,opção do clube 1 ano,3000000
-Alerrandro,Centroavante,CF,26,BR,,,2026,,3000000
-Igor Gomes (AM),Meia Ofensivo,AM,27,BR,,,2026,,2500000
-Thiago Maia,Volante,DM,29,BR,,,2026,,2500000
-Allan,Volante,DM,29,BR,,,2026,,2500000
-Reinier,Meia Ofensivo,AM,24,BR,,,2029,,2000000
-Lima,Meia Ofensivo,AM,30,BR,,Liga MX Apertura,2026,opção de compra,2000000
-Gabriel Pirani,Meia Ofensivo,AM,24,BR,,,2026,,1500000
-Patrick,Volante,DM,22,BR,,,2028,opção do clube 1 ano,1500000
-David Ruíz,Volante,DM,22,HN,US,,2028,opção do clube 1 ano,1500000
-Igor Gomes (CB),Zagueiro,CB,25,BR,AE,UAE Pro League,,,1500000
-Kaiky,Zagueiro,CB,22,BR,,UAE Pro League,,,1500000
-Gabriel Vareta,Zagueiro,CB,21,BR,,UAE Pro League,,,1200000
-Raul,Volante,DM,30,BR,,,2026,,1000000
-Derrick Luckassen,Zagueiro,CB,31,NL,,Super liga Srbije,2029,,1000000
-Neto,Goleiro,GK,37,BR,IT,,,,900000
-Sandry,Volante,DM,23,BR,,,2026,,900000
-Rafael Lobato,Ponta Direita,RW,20,BR,,Liga Portugal,2029,,800000
-Cleiton,Zagueiro,CB,23,BR,,2. Bundesliga,2030,,800000
-Filipe Bordon,Zagueiro,CB,21,BR,IT,Serie A,2028,,750000
-Pedro Cobra,Goleiro,GK,20,BR,,,2030,,600000
-Luisão,Zagueiro,CB,22,BR,,,2026,,500000
-Ian Luccas,Volante,DM,23,BR,,Liga Portugal,2030,,500000
-Léo Mana,Lateral Dir.,RB,22,BR,,,2029,,500000
-Lincoln,Centroavante,CF,25,BR,,Prva liga Srbije,2027,,400000
-Marcelo Pitaluga,Goleiro,GK,23,BR,DE,,2028,,200000
-David Luiz,Zagueiro,CB,39,BR,,Cyprus League,2027,mais um ano,175000
-Lyncon,Zagueiro,CB,21,BR,,,2026,,100000
-Filipe,Ponta Esquerda,LW,20,BR,,,2027,,
-David Martins,Meia Ofensivo,AM,18,BR,,,,,
-João Pedro,Goleiro,GK,18,BR,,,2027,,
-Kayke Ayrton,Ponta Direita,RW,18,BR,,,,,
-Luis Eduardo,Zagueiro,CB,18,BR,,,2028,,
-Italo,Meia Ofensivo,AM,18,BR,,,,,
-Nicolas,Lateral Esq.,LB,19,BR,CH,,2029,,
-Gustavo Zabarelli,Seg. Atacante,SS,17,BR,,,,,
-Gabriel,Zagueiro,CB,28,BR,,Premier League,2029,,75000000
-Matheus Cunha,Centroavante,CF,27,BR,,Premier League,2030,mais um ano,75000000
-Bruno Guimarães,Meia Central,CM,28,BR,ES,Premier League,2030,,70000000
-Andrey Santos,Volante,DM,22,BR,,Premier League,2031,opção do clube 1 ano,40000000
-Danilo,Meia Central,CM,25,BR,,,2029,,32000000
-Omari Hutchinson,Ponta Direita,RW,22,EN,JM,Premier League,2030,,30000000
-Marquinhos,Zagueiro,CB,32,BR,PT,Ligue 1,2028,,28000000
-Kaio Jorge,Centroavante,CF,24,BR,,,2030,,25000000
-David Neres,Ponta Direita,RW,29,BR,,Serie A,2028,mais um ano,23000000
-Galeno,Ponta Esquerda,LW,28,BR,PT,Saudi Pro League,2028,,20000000
-Pedro (CF),Centroavante,CF,29,BR,,,2027,,20000000
-Pedro (LW),Ponta Esquerda,LW,20,BR,,Premier Liga (RU),2030,,20000000
-Vanderson,Lateral Dir.,RB,25,BR,,Ligue 1,2028,,18000000
-Douglas Luiz,Meia Central,CM,28,BR,,Serie A,2029,,18000000
-Dodô,Lateral Dir.,RB,27,BR,,Serie A,2027,,16000000
-Jair Cunha,Zagueiro,CB,21,BR,,Premier League,2030,,15000000
-Jhon Jhon,Meia Ofensivo,AM,23,BR,,Premier Liga (RU),2031,,15000000
-Felipe Augusto,Centroavante,CF,22,BR,,Premier Liga (RU),2030,,15000000
-Ângelo,Ponta Direita,RW,21,BR,,Saudi Pro League,2029,,15000000
-Morato,Zagueiro,CB,25,BR,,Premier League,2029,,14000000
-Andreas Pereira,Meia Central,CM,30,BR,BE,,2028,,14000000
-Christian,Meia Direita,RW,25,BR,,Premier Liga (RU),2030,,12000000
-Joaquín Piquerez,Lateral Esq.,LB,27,UY,IT,,2030,,12000000
-Souza,Lateral Esq.,LB,20,BR,,Premier League,2031,,12000000
-Gabriel Brazão,Goleiro,GK,25,BR,,,2028,,12000000
-Caio Henrique,Lateral Esq.,LB,29,BR,ES,Eredivisie,2030,,12000000
-Luca Meirelles,Centroavante,CF,19,BR,,Premier Liga (UA),2030,,10000000
-Facundo Torres,Ponta Direita,RW,26,UY,,,2030,opção do clube 1 ano,10000000
-Cuiabano,Lateral Esq.,LB,23,BR,,,2026,opção de compra,10000000
-Pedrinho,Ponta Direita,RW,28,BR,,Premier Liga (UA),2029,,10000000
-Robert Renan,Zagueiro,CB,22,BR,,,2026,,10000000
-Emerson,Lateral Esq.,LB,32,BR,IT,Ligue 1,2027,opção do clube 1 ano,9000000
-John Kennedy,Centroavante,CF,24,BR,,,2027,,9000000
-Matheuzinho,Lateral Dir.,RB,25,BR,,,2028,,8000000
-Ricardo Mathias,Centroavante,CF,20,BR,,Saudi Pro League,2030,,7500000
-Newerton,Ponta Esquerda,LW,21,BR,,Premier Liga (UA),2028,,7000000
-Gabriel Silva,Meia Esquerda,LW,24,BR,,Liga Portugal,2031,,7000000
-Everton,Ponta Esquerda,LW,30,BR,,,2026,,7000000
-Carlos Miguel,Goleiro,GK,27,BR,,,2030,,7000000
+name,tenure,owner_club,owner_league,contract_end,loan_club,loan_league,loan_contract_end,position,position_pt,age,nationality,second_nationality,tm_contract_year,contract_option,market_value_eur,tm_link
+Gabriel,permanent,Arsenal,Premier League,2029-06-30,,,,CB,Zagueiro,28,BR,,2029,,75000000,transfermarkt.com.br/gabriel/profil/spieler/435338
+Matheus Cunha,permanent,Manchester United,Premier League,2030-06-30,,,,CF,Centroavante,27,BR,,2030,mais um ano,75000000,https://www.transfermarkt.com.br/matheus-cunha/profil/spieler/517894
+Bruno Guimarães,permanent,Arsenal,Premier League,2030-06-30,,,,CM,Meia Central,28,BR,ES,2030,,70000000,https://www.transfermarkt.com.br/bruno-guimaraes/profil/spieler/520624
+Andrey Santos,permanent,Manchester United,Premier League,2031-06-30,,,,DM,Volante,22,BR,,2031,opção do clube 1 ano,40000000,https://www.transfermarkt.com.br/andrey-santos/profil/spieler/743600
+Danilo,permanent,Botafogo FR,Série A - Brasil,2029-06-30,,,,CM,Meia Central,25,BR,,2029,,32000000,https://www.transfermarkt.com.br/danilo/profil/spieler/808509
+Omari Hutchinson,permanent,Notthigham Forest,Premier League,2030-06-30,,,,RW,Ponta Direita,22,EN,JM,2030,,30000000,https://www.transfermarkt.com.br/omari-hutchinson/profil/spieler/741238
+Marquinhos,permanent,Paris Saint Germain,Ligue 1,2028-06-30,,,,CB,Zagueiro,32,BR,PT,2028,,28000000,https://www.transfermarkt.com.br/marquinhos/profil/spieler/181767
+Kaio Jorge,permanent,Cruzeiro,Série A - Brasil,2030-12-31,,,,CF,Centroavante,24,BR,,2030,,25000000,https://www.transfermarkt.com.br/kaio-jorge/profil/spieler/620477
+David Neres,permanent,Napoli,Série A - Italia,2028-06-30,,,,RW,Ponta Direita,29,BR,,2028,mais um ano,23000000,https://www.transfermarkt.com.br/david-neres/profil/spieler/469822
+Galeno,permanent,Al-Ahli,Saudi Pro League,2028-06-30,,,,LW,Ponta Esquerda,28,BR,PT,2028,,20000000,https://www.transfermarkt.com.br/galeno/profil/spieler/454121
+Pedro (CF),permanent,Flamengo,Série A - Brasil,2027-12-31,,,,CF,Centroavante,29,BR,,2027,,20000000,https://www.transfermarkt.com.br/pedro/profil/spieler/432895
+Pedro (LW),permanent,Zenit,Premier Liga (RU),2030-06-30,,,,LW,Ponta Esquerda,20,BR,,2030,,20000000,https://www.transfermarkt.com.br/pedro/profil/spieler/1004741
+Vanderson,permanent,Monaco,Ligue 1,2028-06-30,,,,RB,Lateral Dir.,25,BR,,2028,,18000000,https://www.transfermarkt.com.br/vanderson/profil/spieler/789082
+Douglas Luiz,permanent,Juventus,Serie A,2029-06-30,,,,CM,Meia Central,28,BR,,2029,,18000000,https://www.transfermarkt.com.br/douglas-luiz/profil/spieler/447661
+Dodô,permanent,Fiorentina,Serie A,2027-06-30,,,,RB,Lateral Dir.,27,BR,,2027,,16000000,https://www.transfermarkt.com.br/dodo/profil/spieler/401529
+Jair Cunha,permanent,Notthigham Forest,Premier League,2030-06-30,,,,CB,Zagueiro,21,BR,,2030,,15000000,https://www.transfermarkt.com.br/jair-cunha/profil/spieler/984096
+Jhon Jhon,permanent,Zenit,Premier Liga (RU),2031-06-30,,,,AM,Meia Ofensivo,23,BR,,2031,,15000000,https://www.transfermarkt.com.br/jhon-jhon/profil/spieler/964582
+Felipe Augusto,permanent,Zenit,Premier Liga (RU),2030-06-30,,,,CF,Centroavante,22,BR,,2030,,15000000,https://www.transfermarkt.com.br/felipe-augusto/profil/spieler/834899
+Ângelo,permanent,Al-Nassr,Saudi Pro League,2029-06-30,,,,RW,Ponta Direita,21,BR,,2029,,15000000,https://www.transfermarkt.com.br/angelo/profil/spieler/743598
+Morato,permanent,Notthigham Forest,Premier League,2029-06-30,,,,CB,Zagueiro,25,BR,,2029,,14000000,https://www.transfermarkt.com.br/morato/profil/spieler/673492
+Andreas Pereira,permanent,Palmeiras,Série A - Brasil,2028-12-31,,,,CM,Meia Central,30,BR,BE,2028,,14000000,https://www.transfermarkt.com.br/andreas-pereira/profil/spieler/203394
+Christian,permanent,Krasnodar,Premier Liga (RU),2030-06-30,,,,RW,Meia Direita,25,BR,,2030,,12000000,https://www.transfermarkt.com.br/christian/profil/spieler/658678
+Joaquín Piquerez,permanent,Palmeiras,Série A - Brasil,2030-12-31,,,,LB,Lateral Esq.,27,UY,IT,2030,,12000000,https://www.transfermarkt.com.br/joaquin-piquerez/profil/spieler/496268
+Souza,permanent,Tottenham,Premier League,2031-06-30,,,,LB,Lateral Esq.,20,BR,,2031,,12000000,https://www.transfermarkt.com.br/souza/profil/spieler/1086258
+Gabriel Brazão,permanent,Santos FC,Série A - Brasil,2028-12-31,,,,GK,Goleiro,25,BR,,2028,,12000000,https://www.transfermarkt.com.br/gabriel-brazao/profil/spieler/371247
+Caio Henrique,permanent,Ajax,Eredivisie,2030-06-30,,,,LB,Lateral Esq.,29,BR,ES,2030,,12000000,https://www.transfermarkt.com.br/caio-henrique/profil/spieler/420064
+Luca Meirelles,permanent,Shakhtar,Premier Liga (UA),2030-06-30,,,,CF,Centroavante,19,BR,,2030,,10000000,https://www.transfermarkt.com.br/luca-meirelles/profil/spieler/1220143
+Facundo Torres,permanent,Austin,MLS,2030-06-30,,,,RW,Ponta Direita,26,UY,,2030,opção do clube 1 ano,10000000,https://www.transfermarkt.com.br/facundo-torres/profil/spieler/465822
+Cuiabano,loan,Vasco,Série A - Brasil,2029-06-30,Nottingham Forest,Premier League,2029-06-30,LB,Lateral Esq.,23,BR,,2026,opção de compra,10000000,https://www.transfermarkt.com.br/cuiabano/profil/spieler/891353
+Pedrinho,permanent,Shakhtar,Premier Liga (UA),2029-06-30,,,,RW,Ponta Direita,28,BR,,2029,,10000000,https://www.transfermarkt.com.br/pedrinho/profil/spieler/515208
+Robert Renan,loan,Vasco,Série A - Brasil,2026-12-31,Zenit,Premier Liga (RU),2028-06-30,CB,Zagueiro,22,BR,,2026,,10000000,https://www.transfermarkt.com.br/robert-renan/profil/spieler/958598
+Emerson,permanent,Olympique de Marselha,Ligue 1,2027-06-30,,,,LB,Lateral Esq.,32,BR,IT,2027,opção do clube 1 ano,9000000,https://www.transfermarkt.com.br/emerson/profil/spieler/181778
+John Kennedy,permanent,Fluminense,Série A - Brasil,2027-12-31,,,,CF,Centroavante,24,BR,,2027,,9000000,https://www.transfermarkt.com.br/john-kennedy/profil/spieler/856085
+Matheuzinho,permanent,Corinthians,Série A - Brasil,2028-12-31,,,,RB,Lateral Dir.,25,BR,,2028,,8000000,https://www.transfermarkt.com.br/matheuzinho/profil/spieler/594226
+Ricardo Mathias,permanent,Al-Ahli,Saudi Pro League,2030-06-30,,,,CF,Centroavante,20,BR,,2030,,7500000,https://www.transfermarkt.com.br/ricardo-mathias/profil/spieler/1044132
+Vini Souza,permanent,VfL Wolfsburg,2. Bundesliga,2030-06-30,,,,DM,Volante,27,BR,,2030,,7000000,https://www.transfermarkt.com.br/vini-souza/profil/spieler/663581
+Matheus Bidu,permanent,Corinthians,Série A - Brasil,2027-12-31,,,,LB,Lateral Esq.,27,BR,,2027,,7000000,https://www.transfermarkt.com.br/matheus-bidu/profil/spieler/670021
+Newerton,permanent,Shakhtar,Premier Liga (UA),2028-06-30,,,,LW,Ponta Esquerda,21,BR,,2028,,7000000,https://www.transfermarkt.com.br/newerton/profil/spieler/1082823
+Gabriel Silva,permanent,Braga,Liga Portugal,2031-06-30,,,,LW,Meia Esquerda,24,BR,,2031,,7000000,https://www.transfermarkt.com.br/gabriel-silva/profil/spieler/627224
+Everton,permanent,Flamengo,Série A - Brasil,2026-12-31,,,,LW,Ponta Esquerda,30,BR,,2026,,7000000,https://www.transfermarkt.com.br/everton/profil/spieler/321239
+Carlos Miguel,permanent,Palmeiras,Série A - Brasil,2030-07-31,,,,GK,Goleiro,27,BR,,2030,,7000000,https://www.transfermarkt.com.br/carlos-miguel/profil/spieler/641458
+Helinho,permanent,Toluca,Liga MX,2028-06-30,,,,RW,Ponta Direita,26,BR,,2028,,6500000,https://www.transfermarkt.com.br/helinho/profil/spieler/412365
+Rodriguinho,permanent,Bragantino,Série A - Brasil,2030-12-31,,,,AM,Meia Ofensivo,22,BR,,2030,,6000000,https://www.transfermarkt.com.br/rodriguinho/profil/spieler/743593
+Khellven,permanent,Palmeiras,Série A - Brasil,2030-06-30,,,,RB,Lateral Dir.,25,BR,,2030,,6000000,https://www.transfermarkt.com.br/khellven/profil/spieler/653348
+Matheus Alves,permanent,CSKA Moscou,Premier Liga (RU),2030-06-30,,,,AM,Meia Ofensivo,21,BR,,2030,,6000000,https://www.transfermarkt.com.br/matheus-alves/profil/spieler/1127813
+Alexsander,permanent,Atlético Mineiro,Série A - Brasil,2029-12-31,,,,DM,Volante,22,BR,,2029,,5500000,https://www.transfermarkt.com.br/alexsander/profil/spieler/997714
+Lucas Fasson,permanent,Lokomotiv Moscou,Premier Liga (RU),2030-06-30,,,,CB,Zagueiro,25,BR,IT,2030,,5000000,https://www.transfermarkt.com.br/lucas-fasson/profil/spieler/729266
+Diego Carlos,permanent,Fenerbahce,Süper Lig,2028-06-30,,,,CB,Zagueiro,33,BR,ES,2028,,5000000,https://www.transfermarkt.com.br/diego-carlos/profil/spieler/329145
+John Victor,permanent,Notthigham Forest,Premier League,2028-06-30,,,,GK,Goleiro,30,BR,PT,2028,,5000000,https://www.transfermarkt.com.br/john-victor/profil/spieler/432914
+Gustavo Martins,permanent,Grêmio,Série A - Brasil,2027-12-31,,,,CB,Zagueiro,24,BR,,2027,,4000000,https://www.transfermarkt.com.br/gustavo-martins/profil/spieler/874223
+Thalys,permanent,UD Almeria,LaLiga2,2031-06-30,,,,CF,Centroavante,21,BR,,2031,,4000000,https://www.transfermarkt.com.br/thalys/profil/spieler/1072157
+JP Chermont,permanent,Coritiba,Série A - Brasil,2026-12-31,,,,RB,Lateral Dir.,20,BR,,2026,,4000000,https://www.transfermarkt.com.br/jp-chermont/profil/spieler/1089955
+Luis Benedetti,permanent,Palmeiras,Série A - Brasil,2029-12-31,,,,CB,Zagueiro,20,BR,,2029,,4000000,https://www.transfermarkt.com.br/luis-benedetti/profil/spieler/1253807
+Dell,permanent,Bahia,Série A - Brasil,2028-12-31,,,,CF,Centroavante,18,BR,,2028,,4000000,https://www.transfermarkt.com.br/dell/profil/spieler/1328021
+Vinicius Lira,permanent,Santos FC,Série A - Brasil,2027-03-31,,,,LB,Lateral Esq.,18,BR,,2027,,4000000,https://www.transfermarkt.com.br/vinicius-lira/profil/spieler/1253844
+Brenner,permanent,Vasco,Série A - Brasil,2029-12-31,,,,CF,Centroavante,26,BR,,2029,,4000000,https://www.transfermarkt.com.br/brenner/profil/spieler/412366
+Dieguinho,permanent,Corinthians,Série A - Brasil,2029-12-31,,,,RW,Ponta Direita,18,BR,,2029,,4000000,https://www.transfermarkt.com.br/dieguinho/profil/spieler/1257132
+Henrique Carmo,permanent,CSKA Moscou,Premier Liga (RU),2030-06-30,,,,RW,Ponta Direita,19,BR,,2030,,3500000,https://www.transfermarkt.com.br/henrique-carmo/profil/spieler/1009031
+Deivid Washington,permanent,Chelsea,Premier League,2030-06-30,,,,CF,Centroavante,21,BR,,2030,opção do clube 1 ano,3000000,https://www.transfermarkt.com.br/deivid-washington/profil/spieler/1082850
+Luis Otávio,permanent,Orlando City,MLS,2028-06-30,,,,DM,Volante,19,BR,,2028,opção do clube 1 ano,3000000,https://www.transfermarkt.com.br/luis-otavio/profil/spieler/1253921
+Alerrandro,loan,Internacional,Série A - Brasil,2026-12-31,CSKA Moscou,Premier Liga (RU),2027-12-31,CF,Centroavante,26,BR,,2026,,3000000,https://www.transfermarkt.com.br/alerrandro/profil/spieler/371996
+Igor Gomes (AM),permanent,Atlético Mineiro,Série A - Brasil,2026-12-31,,,,AM,Meia Ofensivo,27,BR,,2026,,2500000,https://www.transfermarkt.com.br/igor-gomes/profil/spieler/553459
+Thiago Maia,permanent,Internacional,Série A - Brasil,2026-12-31,,,,DM,Volante,29,BR,,2026,,2500000,https://www.transfermarkt.com.br/thiago-maia/profil/spieler/294873
+Allan,permanent,Corinthians,Série A - Brasil,2026-12-31,,,,DM,Volante,29,BR,,2026,,2500000,https://www.transfermarkt.com.br/allan/profil/spieler/385271
+Reinier,permanent,Atlético Mineiro,Série A - Brasil,2029-12-31,,,,AM,Meia Ofensivo,24,BR,,2029,,2000000,https://www.transfermarkt.com.br/reinier/profil/spieler/627226
+Lima,loan,América,Liga MX,2026-12-31,Fluminense,Série A - Brasil,2027-12-31,AM,Meia Ofensivo,30,BR,,2026,opção de compra,2000000,https://www.transfermarkt.com.br/lima/profil/spieler/387611
+Gabriel Pirani,permanent,San Diego,MLS,2026-12-31,,,,AM,Meia Ofensivo,24,BR,,2026,,1500000,https://www.transfermarkt.com.br/gabriel-pirani/profil/spieler/813107
+Patrick,permanent,Atlético Mineiro,Série A - Brasil,2028-12-31,,,,DM,Volante,22,BR,,2028,opção do clube 1 ano,1500000,https://www.transfermarkt.com.br/patrick/profil/spieler/1082625
+David Ruíz,permanent,Miami FC,MLS,2028-12-31,,,,DM,Volante,22,HN,US,2028,opção do clube 1 ano,1500000,https://www.transfermarkt.com.br/david-ruiz/profil/spieler/914681
+Igor Gomes (CB),permanent,Shabab Al-Ahli,UAE Pro League,,,,,CB,Zagueiro,25,BR,AE,,,1500000,https://www.transfermarkt.com.br/igor-gomes/profil/spieler/689640
+Kaiky,permanent,Shabab Al-Ahli,UAE Pro League,,,,,CB,Zagueiro,22,BR,,,,1500000,https://www.transfermarkt.com.br/kaiky/profil/spieler/743589
+Gabriel Vareta,permanent,Al-Wasl,UAE Pro League,,,,,CB,Zagueiro,21,BR,,,,1200000,https://www.transfermarkt.com.br/gabriel-vareta/profil/spieler/1115721
+Raul,loan,Cuiabá,Série B - Brasil,2026-12-31,Athletico Paranaense,Série A - Brasil,2027-12-31,DM,Volante,30,BR,,2026,,1000000,https://www.transfermarkt.com.br/raul/profil/spieler/479587
+Derrick Luckassen,permanent,Estrela Vermelha,Super liga Srbije,2029-06-30,,,,CB,Zagueiro,31,NL,,2029,,1000000,https://www.transfermarkt.com.br/derrick-luckassen/profil/spieler/241457
+Neto,free_agent,,,,,,,GK,Goleiro,37,BR,IT,,,900000,https://www.transfermarkt.com.br/neto/profil/spieler/111819
+Sandry,loan,Criciuma,Série B - Brasil,2026-12-31,Santos FC,Série A - Brasil,2026-12-31,DM,Volante,23,BR,,2026,,900000,https://www.transfermarkt.com.br/sandry/profil/spieler/574768
+Rafael Lobato,permanent,Rio Ave,Liga Portugal,2029-06-30,,,,RW,Ponta Direita,20,BR,,2029,,800000,https://www.transfermarkt.com.br/rafael-lobato/profil/spieler/1097263
+Cleiton,permanent,VfL Wolfsburg,2. Bundesliga,2030-06-30,,,,CB,Zagueiro,23,BR,,2030,,800000,https://www.transfermarkt.com.br/cleiton/profil/spieler/943237
+Filipe Bordon,permanent,Lazio,Série A - Italia,2028-06-30,,,,CB,Zagueiro,21,BR,IT,2028,,750000,https://www.transfermarkt.com.br/filipe-bordon/profil/spieler/1110645
+Pedro Cobra,permanent,Atlético Mineiro,Série A - Brasil,2030-12-31,,,,GK,Goleiro,20,BR,,2030,,600000,https://www.transfermarkt.com.br/pedro-cobra/profil/spieler/1193865
+Luisão,loan,Goiás,Série B - Brasil,2026-12-31,Santos FC,Série A - Brasil,2028-12-31,CB,Zagueiro,22,BR,,2026,,500000,https://www.transfermarkt.com.br/luisao/profil/spieler/1093922
+Ian Luccas,permanent,Alverca,Liga Portugal,2030-06-30,,,,DM,Volante,23,BR,,2030,,500000,https://www.transfermarkt.com.br/ian-luccas/profil/spieler/796796
+Léo Mana,permanent,Corinthians,Série A - Brasil,2029-12-31,,,,RB,Lateral Dir.,22,BR,,2029,,500000,https://www.transfermarkt.com.br/leo-mana/profil/spieler/838387
+Lincoln,permanent,Spartak Praga,Prva liga Srbije,2027-12-31,,,,CF,Centroavante,25,BR,,2027,,400000,https://www.transfermarkt.com.br/lincoln/profil/spieler/372046
+Marcelo Pitaluga,permanent,Fluminense,Série A - Brasil,2028-12-31,,,,GK,Goleiro,23,BR,DE,2028,,200000,https://www.transfermarkt.com.br/marcelo-pitaluga/profil/spieler/662334
+David Luiz,permanent,PAFOS,Cyprus League,2027-05-31,,,,CB,Zagueiro,39,BR,,2027,mais um ano,175000,https://www.transfermarkt.com.br/david-luiz/profil/spieler/46741
+Lyncon,permanent,CRB,Série B - Brasil,2026-11-30,,,,CB,Zagueiro,21,BR,,2026,,100000,https://www.transfermarkt.com.br/lyncon/profil/spieler/1083889
+Filipe,permanent,Bragantino,Série A - Brasil,2027-12-31,,,,LW,Ponta Esquerda,20,BR,,2027,,,https://www.transfermarkt.com.br/filipe/profil/spieler/1091994
+David Martins,permanent,Bahia,Série A - Brasil,,,,,AM,Meia Ofensivo,18,BR,,,,,https://www.transfermarkt.com.br/david-martins/profil/spieler/1255012
+João Pedro,permanent,Santos FC,Série A - Brasil,2027-04-30,,,,GK,Goleiro,18,BR,,2027,,,https://www.transfermarkt.com.br/joao-pedro/profil/spieler/1264076
+Kayke Ayrton,permanent,Athletico Paranaense,Série A - Brasil,,,,,RW,Ponta Direita,18,BR,,,,,https://www.transfermarkt.com.br/kayke-ayrton/profil/spieler/1273513
+Luis Eduardo,permanent,Grêmio,Série A - Brasil,2028-05-31,,,,CB,Zagueiro,18,BR,,2028,,,https://www.transfermarkt.com.br/luis-eduardo/profil/spieler/1355268
+Italo,permanent,Athletico Paranaense,Série A - Brasil,,,,,AM,Meia Ofensivo,18,BR,,,,,https://www.transfermarkt.com.br/italo/profil/spieler/1362389
+Nicolas,permanent,São Paulo,Série A - Brasil,2029-12-31,,,,LB,Lateral Esq.,19,BR,CH,2029,,,https://www.transfermarkt.com.br/nicolas/profil/spieler/1387007
+Gustavo Zabarelli,permanent,São Paulo,Série A - Brasil,,,,,SS,Seg. Atacante,17,BR,,,,,https://www.transfermarkt.com.br/gustavo-zabarelli/profil/spieler/1560617

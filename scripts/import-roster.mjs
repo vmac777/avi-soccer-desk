@@ -11,12 +11,13 @@
  * marked `transfermarkt`; anything inferred or absent stays `placeholder`, which
  * means the UI badges it, PDFs omit it, and matching ignores it.
  *
- * The contract column is the reason that matters. Transfermarkt lists a contract
- * *year*, not a date. Storing "30 June 2027" would invent a precision nobody
- * published — and contract expiry is the field that decides when a player may
- * talk to other clubs. So the year is kept in enrichment_notes as sourced fact,
- * the date is stored as a usable approximation, and the date is marked
- * placeholder so it can never be printed or matched on.
+ * Contract dates here came back confirmed by the agency, so they are marked
+ * `verified` rather than placeholder. Anything still blank stays placeholder,
+ * which means the UI badges it, PDFs omit it, and matching ignores it.
+ *
+ * Loans carry two contracts: `contract_end` is the registration holder's, and
+ * `loan_contract_end` is when the player returns. `current_club` is who they
+ * actually play for today; `owner_club` holds the registration.
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -52,10 +53,17 @@ if (!dryRun && (!EMAIL || !PASSWORD)) {
   process.exit(1);
 }
 
-/** Minimal CSV reader: no embedded newlines, quotes respected. */
+/**
+ * Minimal CSV reader: no embedded newlines, quotes respected.
+ *
+ * Header names are trimmed as well as values. A CSV saved by Excel — or by
+ * Python's csv module, which defaults to CRLF — leaves a trailing \r on the
+ * last header, so `row.last_column` silently reads undefined and one whole
+ * column disappears without an error.
+ */
 function parseCsv(text) {
-  const lines = text.trim().split('\n');
-  const header = splitRow(lines[0]);
+  const lines = text.trim().split(/\r?\n/);
+  const header = splitRow(lines[0]).map((h) => h.trim());
   return lines.slice(1).filter((l) => l.trim()).map((line) => {
     const cells = splitRow(line);
     return Object.fromEntries(header.map((h, i) => [h, (cells[i] ?? '').trim()]));
@@ -86,34 +94,42 @@ function toRow(r) {
   };
 
   const name = r.name;
-  const contractYear = r.contract_year ? Number(r.contract_year) : null;
+  const onLoan = r.tenure === 'loan';
 
-  // Only the year is published. The date is an approximation and is marked as
-  // such — see the header note.
-  const contractEnd = contractYear ? `${contractYear}-06-30` : null;
+  // The club the player actually turns out for. On loan that is the loan club;
+  // the registration holder goes in owner_club.
+  const currentClub = (onLoan ? r.loan_club : r.owner_club) || null;
+  const currentLeague = (onLoan ? r.loan_league : r.owner_league) || null;
 
   const notes = [
-    contractYear ? `Transfermarkt lists contract end year ${contractYear}; exact date unconfirmed.` : null,
     r.contract_option ? `Contract option: ${r.contract_option}.` : null,
-    'Club not captured — Transfermarkt list showed crests only. Needs confirming.',
-  ].filter(Boolean).join(' ');
+    onLoan ? `On loan from ${r.owner_club} to ${r.loan_club}.` : null,
+    r.tenure === 'free_agent' ? 'Free agent — no club.' : null,
+  ].filter(Boolean).join(' ') || null;
 
   const row = {
     name,
     slug: slugify(name),
+    tenure: r.tenure || null,
+    current_club: mark('currentClub', currentClub, 'verified'),
+    league: mark('league', currentLeague, 'verified'),
+    owner_club: mark('ownerClub', r.owner_club || null, 'verified'),
+    owner_league: r.owner_league || null,
+    loan_club: mark('loanClub', r.loan_club || null, 'verified'),
+    loan_league: r.loan_league || null,
+    contract_end: mark('contractEndDate', r.contract_end || null, 'verified'),
+    loan_contract_end: mark('loanContractEnd', r.loan_contract_end || null, 'verified'),
     position: mark('position', r.position, 'transfermarkt'),
     age: r.age ? Number(mark('age', r.age, 'transfermarkt')) : null,
     nationality: mark('nationality', r.nationality, 'transfermarkt'),
-    league: mark('league', r.league, 'transfermarkt'),
-    market_value: r.market_value_eur ? Number(mark('marketValue', r.market_value_eur, 'transfermarkt')) : null,
-    contract_end: contractEnd,
+    market_value: r.market_value_eur
+      ? Number(mark('marketValue', r.market_value_eur, 'transfermarkt')) : null,
+    tm_link: mark('tmLink', r.tm_link || null, 'verified'),
     priority_ranking: 'Medium',
     enrichment_notes: notes,
     data_provenance: provenance,
   };
 
-  // Deliberately NOT marked: contract_end (year only, date inferred) and
-  // current_club (not readable from the source list). Both stay placeholder.
   return row;
 }
 
@@ -129,11 +145,11 @@ for (const r of rows) {
 }
 
 console.log(`${rows.length} players parsed from ${csvPath}`);
-const sourced = rows.filter((r) => r.market_value != null).length;
-const noContract = rows.filter((r) => r.contract_end == null).length;
-console.log(`  with a market value: ${sourced}`);
-console.log(`  with no contract year at all: ${noContract}`);
-console.log(`  club known: 0 (crests only in the source)`);
+const counts = (pred) => rows.filter(pred).length;
+console.log(`  club known:            ${counts((r) => r.current_club)}`);
+console.log(`  contract end known:    ${counts((r) => r.contract_end)}`);
+console.log(`  on loan:               ${counts((r) => r.tenure === 'loan')}`);
+console.log(`  with a Transfermarkt link (enrichable): ${counts((r) => r.tm_link)}`);
 if (collisions.length) {
   console.error(`\n!! slug collisions, would overwrite each other: ${collisions.join(', ')}`);
   process.exit(1);
@@ -166,4 +182,4 @@ if (failed.length) {
   failed.forEach((f) => console.error(`  !! ${f.name}: ${f.error}`));
   process.exit(1);
 }
-console.log('Next: confirm each player\'s club, then re-enrich from Transfermarkt to fill DOB, foot, height and photo.');
+console.log('Next: run enrichment from tm_link to fill DOB, foot, height and photo.');
