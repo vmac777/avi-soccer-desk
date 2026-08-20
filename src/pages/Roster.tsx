@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useScoutedTargets, useAddScoutedTarget, useUpdateScoutedTarget, useDeleteScoutedTarget, useAddBuyPitch, type ScoutedTarget } from '@/hooks/useBuyData';
 import { useContacts, useCreateContact } from '@/hooks/useData';
 import { useAuth } from '@/hooks/useAuth';
@@ -283,8 +284,8 @@ function fmtDDMMYYYY(iso: string | null | undefined): string {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 }
 
-function TargetCard({ target, onEdit, onDelete, onCreatePitch, onRetry, isRetrying }: {
-  target: ScoutedTarget; onEdit: () => void; onDelete: () => void; onCreatePitch: () => void;
+function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, isRetrying }: {
+  target: ScoutedTarget; onOpen: () => void; onEdit: () => void; onDelete: () => void; onCreatePitch: () => void;
   onRetry: (sources: ('tm' | 'tr')[]) => void; isRetrying: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -331,7 +332,14 @@ function TargetCard({ target, onEdit, onDelete, onCreatePitch, onRetry, isRetryi
       </div>
       <div className="p-3 space-y-1.5">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-medium text-foreground truncate">{target.name}</span>
+          {/* The card keeps double-click for expand, so the name is the way in
+              to the dossier — a single click here can't be mistaken for one. */}
+          <button
+            onClick={(e) => { e.stopPropagation(); onOpen(); }}
+            className="text-sm font-medium text-foreground truncate text-left hover:text-primary hover:underline"
+          >
+            {target.name}
+          </button>
           {target.position ? (
             <span className={cn('shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border', positionPillColor(group))}>
               {target.position}
@@ -458,6 +466,7 @@ function TargetCard({ target, onEdit, onDelete, onCreatePitch, onRetry, isRetryi
 }
 
 export default function ScoutedTargetsPage() {
+  const navigate = useNavigate();
   const { data: targets = [], isLoading } = useScoutedTargets();
   const { data: contacts = [] } = useContacts();
   const addMutation = useAddScoutedTarget();
@@ -623,7 +632,7 @@ export default function ScoutedTargetsPage() {
             <p className="col-span-full text-center text-muted-foreground font-mono text-sm py-8">No players yet yet</p>
           ) : (
             filtered.map(t => (
-              <TargetCard key={t.id} target={t} onEdit={() => setEditTarget(t)} onDelete={() => handleDelete(t)} onCreatePitch={() => setPitchTarget(t)} onRetry={(sources) => retryEnrichment({ target: t, sources })} isRetrying={isRetrying} />
+              <TargetCard key={t.id} target={t} onOpen={() => navigate(`/roster/${t.id}`)} onEdit={() => setEditTarget(t)} onDelete={() => handleDelete(t)} onCreatePitch={() => setPitchTarget(t)} onRetry={(sources) => retryEnrichment({ target: t, sources })} isRetrying={isRetrying} />
             ))
           )}
         </div>
@@ -656,7 +665,11 @@ export default function ScoutedTargetsPage() {
                   const group = getPositionGroup(t.position);
                   const contract = contractEndDisplay(t.contract_end);
                   return (
-                    <tr key={t.id} className={cn('h-11 border-b border-border/50 hover:bg-accent/50 transition-colors', i % 2 === 0 && 'bg-card/50')}>
+                    <tr
+                      key={t.id}
+                      onClick={() => navigate(`/roster/${t.id}`)}
+                      className={cn('h-11 border-b border-border/50 hover:bg-accent/50 transition-colors cursor-pointer', i % 2 === 0 && 'bg-card/50')}
+                    >
                       <td className="px-3 font-medium text-foreground">
                         <div className="flex items-center gap-2">
                           <Avatar className="h-7 w-7">
@@ -703,9 +716,9 @@ export default function ScoutedTargetsPage() {
                       </td>
                       <td className="px-3 text-center">
                         <div className="flex items-center justify-center gap-1">
-                          <button onClick={() => setPitchTarget(t)} className="p-1 rounded hover:bg-primary/20" title="Create Pitch"><SendHorizonal className="h-3 w-3 text-muted-foreground" /></button>
-                          <button onClick={() => setEditTarget(t)} className="p-1 rounded hover:bg-accent"><Pencil className="h-3 w-3 text-muted-foreground" /></button>
-                          <button onClick={() => handleDelete(t)} className="p-1 rounded hover:bg-destructive/20"><Trash2 className="h-3 w-3 text-muted-foreground" /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setPitchTarget(t); }} className="p-1 rounded hover:bg-primary/20" title="Create Pitch"><SendHorizonal className="h-3 w-3 text-muted-foreground" /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setEditTarget(t); }} className="p-1 rounded hover:bg-accent"><Pencil className="h-3 w-3 text-muted-foreground" /></button>
+                          <button onClick={(e) => { e.stopPropagation(); handleDelete(t); }} className="p-1 rounded hover:bg-destructive/20"><Trash2 className="h-3 w-3 text-muted-foreground" /></button>
                         </div>
                       </td>
                     </tr>

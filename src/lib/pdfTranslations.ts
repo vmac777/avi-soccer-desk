@@ -47,18 +47,19 @@ export const t = {
   recentMinutes: { en: 'Recent Minutes', pt: 'Minutos Recentes' },
 
   contractEnd: { en: 'Contract End', pt: 'Fim de Contrato' },
-  econRights: { en: 'Economic Rights', pt: 'Direitos Econômicos' },
-  otherEconRights: { en: 'Other Econ Rights', pt: 'Outros Direitos Econ.' },
-  releaseIntl: { en: 'Release Clause — International', pt: 'Cláusula — Internacional' },
-  releaseBrazil: { en: 'Release Clause — Brazil', pt: 'Cláusula — Brasil' },
-  transferFee: { en: 'Incoming Transfer Fee', pt: 'Taxa de Transferência' },
-  agentFee: { en: 'Incoming Agent/Luvas Fee', pt: 'Taxa Agente/Luvas' },
-  salary: { en: 'Salary Monthly', pt: 'Salário Mensal' },
-  imageRights: { en: 'Image Rights Monthly', pt: 'Direitos Imagem Mensal' },
-  totalCostMonthly: { en: 'Total Cost Monthly', pt: 'Custo Total Mensal' },
-  totalCostYearly: { en: 'Total Cost Yearly', pt: 'Custo Total Anual' },
   contractRights: { en: 'Contract & Rights', pt: 'Contrato e Direitos' },
-  costs: { en: 'Costs', pt: 'Custos' },
+
+  // A player out on loan has two live deals. The parent contract says when he
+  // can be sold or goes free; the loan end says when he goes back. A club
+  // reading the document needs both, and needs to see which is which.
+  parentClub: { en: 'Parent Club', pt: 'Clube Detentor' },
+  loanClub: { en: 'On Loan At', pt: 'Emprestado a' },
+  loanEnd: { en: 'Loan Ends', pt: 'Fim do Empréstimo' },
+  freeAgent: { en: 'Free Agent', pt: 'Sem Clube' },
+
+  // The club-owner cost block — salary, image rights, release clauses, economic
+  // rights, luvas — is deliberately absent. That is a selling club's internal
+  // position, not an agency's, and this document goes to the buying side.
 
   valuation: { en: 'Valuation', pt: 'Avaliação' },
   availability: { en: 'Availability & Representation', pt: 'Disponibilidade e Representação' },

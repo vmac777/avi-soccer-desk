@@ -57,7 +57,19 @@ export interface RosterPlayer {
   currentClub?: string;
   previousClub?: string;
   league?: string;
+  /** The registration holder's deal — when he can be sold or goes free. */
   contractEndDate?: string;
+
+  // --- Loan ---
+  // A loaned player has two clubs and two live contracts. `currentClub` is
+  // whoever he turns out for; `ownerClub` holds the registration.
+  tenure?: 'permanent' | 'loan' | 'free_agent';
+  ownerClub?: string;
+  ownerLeague?: string;
+  loanClub?: string;
+  loanLeague?: string;
+  /** When the loan ends and he returns — a different question to contractEndDate. */
+  loanContractEnd?: string;
   photoUrl?: string;
   tmLink?: string;
   videoUrl?: string;
@@ -148,15 +160,30 @@ export function hasTrData(player: RosterPlayer): boolean {
   return player.trId != null;
 }
 
-/** Do we hold enough mandate detail to show the commercial block? */
+/**
+ * Do we hold terms of our own on this player?
+ *
+ * Strictly the agency's side of the deal. A contract end is the *club's* term,
+ * held on nearly every player, so counting it here would open an empty "Our
+ * Mandate" block on the whole roster and imply representation we don't have.
+ */
 export function hasMandateData(player: RosterPlayer): boolean {
   return !!(
     player.mandateStart ||
     player.mandateEnd ||
     player.commissionPct ||
     player.sellOnPct ||
-    player.exclusive != null ||
-    player.contractEndDate
+    player.exclusive != null
+  );
+}
+
+/** Is there anything at all to put in the commercial block of a document? */
+export function hasCommercialData(player: RosterPlayer): boolean {
+  return !!(
+    hasMandateData(player) ||
+    player.contractEndDate ||
+    player.loanContractEnd ||
+    player.marketValue
   );
 }
 

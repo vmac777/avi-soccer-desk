@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { RosterPlayer as Player, getAge, getPositionGroup, parsePlayerDob, hasMandateData, hasTrData, getLatestXtvM, getXtvChange6mPct, getXtvChange12mPct, isPrintable } from '@/lib/rosterData';
+import { RosterPlayer as Player, getAge, getPositionGroup, parsePlayerDob, hasCommercialData, hasTrData, getLatestXtvM, getXtvChange6mPct, getXtvChange12mPct, isPrintable } from '@/lib/rosterData';
 import { formatCurrency } from '@/lib/currency';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -278,7 +278,7 @@ export default function ExportPdfDialog({ player, open, onClose }: ExportPdfDial
   // Template data
   const dob = parsePlayerDob(player.dob);
   const age = getAge(player.dob);
-  const hasFin = hasMandateData(player);
+  const hasFin = hasCommercialData(player);
   const hasTr = hasTrData(player);
   const latestXtv = getLatestXtvM(player);
   const change6m = getXtvChange6mPct(player);
@@ -447,11 +447,34 @@ export default function ExportPdfDialog({ player, open, onClose }: ExportPdfDial
             <PdfGrid cols={2}>
               <div>
                 <PdfSubheading>{tr('contractRights', lang)}</PdfSubheading>
-                {isPrintable(player, 'contractEndDate') && (
-                  <PdfField label={tr('contractEnd', lang)} value={formatPdfDate(player.contractEndDate, lang)} />
-                )}
-                {isPrintable(player, 'currentClub') && (
-                  <PdfField label={tr('currentClub', lang)} value={player.currentClub} />
+                {/* On loan, the two dates answer different questions, so they
+                    are never merged into one "contract end" on a club's copy. */}
+                {player.tenure === 'loan' ? (
+                  <>
+                    {isPrintable(player, 'ownerClub') && (
+                      <PdfField label={tr('parentClub', lang)} value={player.ownerClub} />
+                    )}
+                    {isPrintable(player, 'contractEndDate') && (
+                      <PdfField label={tr('contractEnd', lang)} value={formatPdfDate(player.contractEndDate, lang)} />
+                    )}
+                    {isPrintable(player, 'loanClub') && (
+                      <PdfField label={tr('loanClub', lang)} value={player.loanClub} />
+                    )}
+                    {isPrintable(player, 'loanContractEnd') && (
+                      <PdfField label={tr('loanEnd', lang)} value={formatPdfDate(player.loanContractEnd, lang)} />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {isPrintable(player, 'contractEndDate') && (
+                      <PdfField label={tr('contractEnd', lang)} value={formatPdfDate(player.contractEndDate, lang)} />
+                    )}
+                    {player.tenure === 'free_agent' ? (
+                      <PdfField label={tr('currentClub', lang)} value={tr('freeAgent', lang)} />
+                    ) : isPrintable(player, 'currentClub') ? (
+                      <PdfField label={tr('currentClub', lang)} value={player.currentClub} />
+                    ) : null}
+                  </>
                 )}
                 {isPrintable(player, 'marketValue') && (
                   <PdfField label={tr('marketValue', lang)} value={formatCurrency(player.marketValue)} />

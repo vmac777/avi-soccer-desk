@@ -11,6 +11,7 @@ import Dashboard from "@/pages/Dashboard";
 import ContactsPage from "@/pages/Contacts";
 import PendingActionsPage from "@/pages/PendingActions";
 import RosterPage from "@/pages/Roster";
+import RosterPlayerPage from "@/pages/RosterPlayerPage";
 import PitchesPage from "@/pages/BuyPitches";
 import LoginPage from "@/pages/Login";
 import NotFound from "@/pages/NotFound";
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/contacts" element={adminRoute(<ContactsPage />)} />
             <Route path="/pending-actions" element={adminRoute(<PendingActionsPage />)} />
             <Route path="/roster" element={adminRoute(<RosterPage />)} />
+            <Route path="/roster/:id" element={adminRoute(<RosterPlayerPage />)} />
             <Route path="/pitches" element={adminRoute(<PitchesPage />)} />
 
             <Route path="/admin/audit" element={superAdminRoute(<Audit />)} />
