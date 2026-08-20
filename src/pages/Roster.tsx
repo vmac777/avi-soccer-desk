@@ -63,6 +63,15 @@ function contractEndDisplay(dateStr?: string | null) {
   return { text, className: '' };
 }
 
+const tenureBadge = (tenure: string | null) => {
+  switch (tenure) {
+    case 'loan':       return { label: 'LOAN',      className: 'bg-amber-500/15 text-amber-300 border-amber-500/30' };
+    case 'free_agent': return { label: 'FREE',      className: 'bg-rose-500/15 text-rose-300 border-rose-500/30' };
+    case 'permanent':  return { label: 'PERMANENT', className: 'bg-muted text-muted-foreground border-border' };
+    default:           return { label: '—',         className: 'bg-muted text-muted-foreground border-border' };
+  }
+};
+
 const priorityColor = (p: string) => {
   switch (p) {
     case 'High': return 'bg-red-500/15 text-red-400 border-red-500/25';
@@ -461,7 +470,7 @@ export default function ScoutedTargetsPage() {
 
   const [search, setSearch] = useState('');
   const [posFilter, setPosFilter] = useState<string>('All');
-  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
+  const [viewMode, setViewMode] = useState<'card' | 'table'>('table');
   const [showCreate, setShowCreate] = useState(false);
   const [editTarget, setEditTarget] = useState<ScoutedTarget | null>(null);
   const [pitchTarget, setPitchTarget] = useState<ScoutedTarget | null>(null);
@@ -578,7 +587,7 @@ export default function ScoutedTargetsPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-[11px] tracking-[0.15em] font-bold text-primary uppercase">SCOUTED TARGETS</h1>
+        <h1 className="text-[11px] tracking-[0.15em] font-bold text-primary uppercase">ROSTER</h1>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-0.5 bg-card border border-border rounded-md p-0.5">
             <button onClick={() => setViewMode('card')} className={cn('p-1.5 rounded transition-colors', viewMode === 'card' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground')}>
@@ -589,7 +598,7 @@ export default function ScoutedTargetsPage() {
             </button>
           </div>
           <Button onClick={() => setShowCreate(true)} className="h-8 text-xs bg-primary text-primary-foreground">
-            <Plus className="h-3.5 w-3.5 mr-1" /> Add Target
+            <Plus className="h-3.5 w-3.5 mr-1" /> Add Player
           </Button>
         </div>
       </div>
@@ -604,14 +613,14 @@ export default function ScoutedTargetsPage() {
         </div>
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-          <Input placeholder="Search targets..." value={search} onChange={e => setSearch(e.target.value)} className="w-48 h-8 text-xs bg-card border-border pl-7" />
+          <Input placeholder="Search roster..." value={search} onChange={e => setSearch(e.target.value)} className="w-48 h-8 text-xs bg-card border-border pl-7" />
         </div>
       </div>
 
       {viewMode === 'card' && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
           {filtered.length === 0 ? (
-            <p className="col-span-full text-center text-muted-foreground font-mono text-sm py-8">No scouted targets yet</p>
+            <p className="col-span-full text-center text-muted-foreground font-mono text-sm py-8">No players yet yet</p>
           ) : (
             filtered.map(t => (
               <TargetCard key={t.id} target={t} onEdit={() => setEditTarget(t)} onDelete={() => handleDelete(t)} onCreatePitch={() => setPitchTarget(t)} onRetry={(sources) => retryEnrichment({ target: t, sources })} isRetrying={isRetrying} />
@@ -632,7 +641,7 @@ export default function ScoutedTargetsPage() {
                 <th className="px-3 py-2 text-left font-medium">Nationality</th>
                 <th className="px-3 py-2 text-left font-medium">Contract</th>
                 <th className="px-3 py-2 text-right font-medium">Value</th>
-                <th className="px-3 py-2 text-left font-medium">Priority</th>
+                <th className="px-3 py-2 text-left font-medium">Status</th>
                 <th className="px-3 py-2 text-left font-medium">Agent</th>
                 <th className="px-3 py-2 text-center font-medium">TM</th>
                 <th className="px-3 py-2 text-center font-medium">Val.</th>
@@ -641,7 +650,7 @@ export default function ScoutedTargetsPage() {
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={12} className="px-3 py-8 text-center text-muted-foreground font-mono">No scouted targets</td></tr>
+                <tr><td colSpan={12} className="px-3 py-8 text-center text-muted-foreground font-mono">No players yet</td></tr>
               ) : (
                 filtered.map((t, i) => {
                   const group = getPositionGroup(t.position);
@@ -659,11 +668,28 @@ export default function ScoutedTargetsPage() {
                       </td>
                       <td className="px-3"><span className={cn('inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border', positionPillColor(group))}>{t.position || '—'}</span></td>
                       <td className="px-3 text-muted-foreground">{t.league || '—'}</td>
-                      <td className="px-3 text-muted-foreground">{t.current_club || '—'}</td>
+                      <td className="px-3 text-muted-foreground">
+                        <div>{t.current_club || '—'}</div>
+                        {t.tenure === 'loan' && t.owner_club && (
+                          <div className="text-[10px] text-muted-foreground/70 italic">from {t.owner_club}</div>
+                        )}
+                      </td>
                       <td className="px-3 text-muted-foreground">{t.nationality || '—'}</td>
-                      <td className={cn('px-3', contract.className)}>{contract.text}</td>
+                      <td className={cn('px-3', contract.className)}>
+                        <div>{contract.text}</div>
+                        {t.tenure === 'loan' && t.loan_contract_end && (
+                          <div className="text-[10px] text-muted-foreground/70">
+                            loan ends {contractEndDisplay(t.loan_contract_end).text}
+                          </div>
+                        )}
+                      </td>
                       <td className="px-3 text-right text-foreground">{t.market_value ? `€${(t.market_value / 1000000).toFixed(1)}M` : '—'}</td>
-                      <td className="px-3"><span className={cn('inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium border', priorityColor(t.priority_ranking))}>{t.priority_ranking}</span></td>
+                      <td className="px-3">
+                        {(() => {
+                          const b = tenureBadge(t.tenure);
+                          return <span className={cn('inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium border', b.className)}>{b.label}</span>;
+                        })()}
+                      </td>
                       <td className="px-3 text-muted-foreground">{t.agent_name || '—'}</td>
                       <td className="px-3 text-center">
                         {t.tm_link ? (
@@ -688,7 +714,7 @@ export default function ScoutedTargetsPage() {
               )}
             </tbody>
           </table>
-          <div className="px-3 py-2 border-t border-border text-[10px] text-muted-foreground font-mono">{filtered.length} targets</div>
+          <div className="px-3 py-2 border-t border-border text-[10px] text-muted-foreground font-mono">{filtered.length} players</div>
         </div>
       )}
 

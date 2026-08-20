@@ -41,6 +41,18 @@ export interface ScoutedTarget {
   tm_status?: 'pending' | 'ok' | 'failed' | null;
   tr_status?: 'pending' | 'ok' | 'failed' | null;
   enrichment_notes?: string | null;
+
+  // Roster tenure. A player out on loan has two clubs and two live contracts:
+  // `contract_end` is the registration holder's deal — when he can be sold or
+  // goes free — and `loan_contract_end` is when he returns. `current_club` is
+  // whoever he actually plays for now.
+  tenure?: 'permanent' | 'loan' | 'free_agent' | null;
+  owner_club?: string | null;
+  owner_league?: string | null;
+  loan_club?: string | null;
+  loan_league?: string | null;
+  loan_contract_end?: string | null;
+  data_provenance?: Record<string, 'verified' | 'transfermarkt' | 'placeholder'> | null;
 }
 
 export type BallInCourt = 'us' | 'them';
