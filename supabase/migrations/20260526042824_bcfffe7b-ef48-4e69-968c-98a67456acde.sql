@@ -1,0 +1,1 @@
+ALTER TABLE public.market_briefs ADD COLUMN IF NOT EXISTS hidden_at TIMESTAMPTZ;

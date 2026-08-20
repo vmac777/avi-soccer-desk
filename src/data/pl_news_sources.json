@@ -1,0 +1,122 @@
+{
+  "clubs": {
+    "AFC Bournemouth": {
+      "skySports": "https://www.skysports.com/bournemouth",
+      "bbc": "https://www.bbc.com/sport/football/teams/afc-bournemouth",
+      "espn": "https://www.espn.com/soccer/club/_/id/349/afc-bournemouth"
+    },
+    "Arsenal": {
+      "skySports": "https://www.skysports.com/arsenal",
+      "bbc": "https://www.bbc.com/sport/football/teams/arsenal",
+      "espn": "https://www.espn.com/soccer/club/_/id/359/arsenal"
+    },
+    "Aston Villa": {
+      "skySports": "https://www.skysports.com/aston-villa",
+      "bbc": "https://www.bbc.com/sport/football/teams/aston-villa",
+      "espn": "https://www.espn.com/soccer/club/_/id/362/aston-villa"
+    },
+    "Brentford": {
+      "skySports": "https://www.skysports.com/brentford",
+      "bbc": "https://www.bbc.com/sport/football/teams/brentford",
+      "espn": "https://www.espn.com/soccer/club/_/id/337/brentford"
+    },
+    "Brighton & Hove": {
+      "skySports": "https://www.skysports.com/brighton-and-hove-albion",
+      "bbc": "https://www.bbc.com/sport/football/teams/brighton-and-hove-albion",
+      "espn": "https://www.espn.com/soccer/club/_/id/331/brighton-hove-albion"
+    },
+    "Burnley": {
+      "skySports": "https://www.skysports.com/burnley",
+      "bbc": "https://www.bbc.com/sport/football/teams/burnley",
+      "espn": "https://www.espn.com/soccer/club/_/id/379/burnley"
+    },
+    "Chelsea": {
+      "skySports": "https://www.skysports.com/chelsea",
+      "bbc": "https://www.bbc.com/sport/football/teams/chelsea",
+      "espn": "https://www.espn.com/soccer/club/_/id/363/chelsea"
+    },
+    "Crystal Palace": {
+      "skySports": "https://www.skysports.com/crystal-palace",
+      "bbc": "https://www.bbc.com/sport/football/teams/crystal-palace",
+      "espn": "https://www.espn.com/soccer/club/_/id/384/crystal-palace"
+    },
+    "Everton": {
+      "skySports": "https://www.skysports.com/everton",
+      "bbc": "https://www.bbc.com/sport/football/teams/everton",
+      "espn": "https://www.espn.com/soccer/club/_/id/368/everton"
+    },
+    "Fulham": {
+      "skySports": "https://www.skysports.com/fulham",
+      "bbc": "https://www.bbc.com/sport/football/teams/fulham",
+      "espn": "https://www.espn.com/soccer/club/_/id/370/fulham"
+    },
+    "Leeds United": {
+      "skySports": "https://www.skysports.com/leeds-united",
+      "bbc": "https://www.bbc.com/sport/football/teams/leeds-united",
+      "espn": "https://www.espn.com/soccer/club/_/id/357/leeds-united"
+    },
+    "Liverpool": {
+      "skySports": "https://www.skysports.com/liverpool",
+      "bbc": "https://www.bbc.com/sport/football/teams/liverpool",
+      "espn": "https://www.espn.com/soccer/club/_/id/364/liverpool"
+    },
+    "Manchester City": {
+      "skySports": "https://www.skysports.com/manchester-city",
+      "bbc": "https://www.bbc.com/sport/football/teams/manchester-city",
+      "espn": "https://www.espn.com/soccer/club/_/id/382/manchester-city"
+    },
+    "Manchester United": {
+      "skySports": "https://www.skysports.com/manchester-united",
+      "bbc": "https://www.bbc.com/sport/football/teams/manchester-united",
+      "espn": "https://www.espn.com/soccer/club/_/id/360/manchester-united"
+    },
+    "Newcastle United": {
+      "skySports": "https://www.skysports.com/newcastle-united",
+      "bbc": "https://www.bbc.com/sport/football/teams/newcastle-united",
+      "espn": "https://www.espn.com/soccer/club/_/id/361/newcastle-united"
+    },
+    "Nottingham Forest": {
+      "skySports": "https://www.skysports.com/nottingham-forest",
+      "bbc": "https://www.bbc.com/sport/football/teams/nottingham-forest",
+      "espn": "https://www.espn.com/soccer/club/_/id/393/nottingham-forest"
+    },
+    "Sunderland": {
+      "skySports": "https://www.skysports.com/sunderland",
+      "bbc": "https://www.bbc.com/sport/football/teams/sunderland",
+      "espn": "https://www.espn.com/soccer/club/_/id/366/sunderland"
+    },
+    "Tottenham Hotspur": {
+      "skySports": "https://www.skysports.com/tottenham-hotspur",
+      "bbc": "https://www.bbc.com/sport/football/teams/tottenham-hotspur",
+      "espn": "https://www.espn.com/soccer/club/_/id/367/tottenham-hotspur"
+    },
+    "West Ham United": {
+      "skySports": "https://www.skysports.com/west-ham-united",
+      "bbc": "https://www.bbc.com/sport/football/teams/west-ham-united",
+      "espn": "https://www.espn.com/soccer/club/_/id/371/west-ham-united"
+    },
+    "Wolverhampton": {
+      "skySports": "https://www.skysports.com/wolverhampton-wanderers",
+      "bbc": "https://www.bbc.com/sport/football/teams/wolverhampton-wanderers",
+      "espn": "https://www.espn.com/soccer/club/_/id/380/wolverhampton-wanderers"
+    }
+  },
+  "aliases": {
+    "Bournemouth": "AFC Bournemouth",
+    "Brighton": "Brighton & Hove",
+    "Brighton Hove Albion": "Brighton & Hove",
+    "Brighton & Hove Albion": "Brighton & Hove",
+    "Leeds": "Leeds United",
+    "Man City": "Manchester City",
+    "Man United": "Manchester United",
+    "Man Utd": "Manchester United",
+    "Newcastle": "Newcastle United",
+    "Nott'm Forest": "Nottingham Forest",
+    "Notts Forest": "Nottingham Forest",
+    "Spurs": "Tottenham Hotspur",
+    "Tottenham": "Tottenham Hotspur",
+    "West Ham": "West Ham United",
+    "Wolves": "Wolverhampton",
+    "Wolverhampton Wanderers": "Wolverhampton"
+  }
+}

@@ -1,0 +1,16 @@
+import { ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuthContext } from '@/contexts/AuthContext';
+
+const Spinner = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center">
+    <span className="text-muted-foreground font-mono text-sm">Loading...</span>
+  </div>
+);
+
+export default function RequireAuth({ children }: { children: ReactNode }) {
+  const { session, loading } = useAuthContext();
+  if (loading) return <Spinner />;
+  if (!session) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}

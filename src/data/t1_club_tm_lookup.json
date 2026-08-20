@@ -1,0 +1,2018 @@
+{
+  "clubs": {
+    "Athletico PR": {
+      "tm": "https://www.transfermarkt.com/club-athletico-paranaense/startseite/verein/679",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-athletico-paranaense/transferrekorde/verein/679"
+    },
+    "Atlético-MG": {
+      "tm": "https://www.transfermarkt.com/clube-atletico-mineiro/startseite/verein/330",
+      "tmTopTransfers": "https://www.transfermarkt.com/clube-atletico-mineiro/transferrekorde/verein/330"
+    },
+    "Bahia": {
+      "tm": "https://www.transfermarkt.com/esporte-clube-bahia/startseite/verein/10010",
+      "tmTopTransfers": "https://www.transfermarkt.com/esporte-clube-bahia/transferrekorde/verein/10010"
+    },
+    "Chapecoense": {
+      "tm": "https://www.transfermarkt.com/chapecoense/startseite/verein/17776",
+      "tmTopTransfers": "https://www.transfermarkt.com/chapecoense/transferrekorde/verein/17776"
+    },
+    "Corinthians": {
+      "tm": "https://www.transfermarkt.com/corinthians-sao-paulo/startseite/verein/199",
+      "tmTopTransfers": "https://www.transfermarkt.com/corinthians-sao-paulo/transferrekorde/verein/199"
+    },
+    "Coritiba": {
+      "tm": "https://www.transfermarkt.com/coritiba-fc/startseite/verein/776",
+      "tmTopTransfers": "https://www.transfermarkt.com/coritiba-fc/transferrekorde/verein/776"
+    },
+    "Cruzeiro": {
+      "tm": "https://www.transfermarkt.com/ec-cruzeiro-belo-horizonte/startseite/verein/609",
+      "tmTopTransfers": "https://www.transfermarkt.com/ec-cruzeiro-belo-horizonte/transferrekorde/verein/609"
+    },
+    "Flamengo": {
+      "tm": "https://www.transfermarkt.com/flamengo-rio-de-janeiro/startseite/verein/614",
+      "tmTopTransfers": "https://www.transfermarkt.com/flamengo-rio-de-janeiro/transferrekorde/verein/614"
+    },
+    "Fluminense": {
+      "tm": "https://www.transfermarkt.com/fluminense-rio-de-janeiro/startseite/verein/2462",
+      "tmTopTransfers": "https://www.transfermarkt.com/fluminense-rio-de-janeiro/transferrekorde/verein/2462"
+    },
+    "Grêmio": {
+      "tm": "https://www.transfermarkt.com/gremio-porto-alegre/startseite/verein/210",
+      "tmTopTransfers": "https://www.transfermarkt.com/gremio-porto-alegre/transferrekorde/verein/210"
+    },
+    "Internacional": {
+      "tm": "https://www.transfermarkt.com/sc-internacional-porto-alegre/startseite/verein/6600",
+      "tmTopTransfers": "https://www.transfermarkt.com/sc-internacional-porto-alegre/transferrekorde/verein/6600"
+    },
+    "Mirassol": {
+      "tm": "https://www.transfermarkt.com/mirassol-futebol-clube-sp-/startseite/verein/3876",
+      "tmTopTransfers": "https://www.transfermarkt.com/mirassol-futebol-clube-sp-/transferrekorde/verein/3876"
+    },
+    "Palmeiras": {
+      "tm": "https://www.transfermarkt.com/se-palmeiras-sao-paulo/startseite/verein/1023",
+      "tmTopTransfers": "https://www.transfermarkt.com/se-palmeiras-sao-paulo/transferrekorde/verein/1023"
+    },
+    "Red Bull Bragantino": {
+      "tm": "https://www.transfermarkt.com/red-bull-bragantino/startseite/verein/8793",
+      "tmTopTransfers": "https://www.transfermarkt.com/red-bull-bragantino/transferrekorde/verein/8793"
+    },
+    "Remo": {
+      "tm": "https://www.transfermarkt.com/clube-do-remo-pa-/startseite/verein/10997",
+      "tmTopTransfers": "https://www.transfermarkt.com/clube-do-remo-pa-/transferrekorde/verein/10997"
+    },
+    "Santos": {
+      "tm": "https://www.transfermarkt.com/fc-santos/startseite/verein/221",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-santos/transferrekorde/verein/221"
+    },
+    "São Paulo": {
+      "tm": "https://www.transfermarkt.com/fc-sao-paulo/startseite/verein/585",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-sao-paulo/transferrekorde/verein/585"
+    },
+    "Vasco da Gama": {
+      "tm": "https://www.transfermarkt.com/vasco-da-gama-rio-de-janeiro/startseite/verein/978",
+      "tmTopTransfers": "https://www.transfermarkt.com/vasco-da-gama-rio-de-janeiro/transferrekorde/verein/978"
+    },
+    "Vitória": {
+      "tm": "https://www.transfermarkt.com/esporte-clube-vitoria/startseite/verein/2125",
+      "tmTopTransfers": "https://www.transfermarkt.com/esporte-clube-vitoria/transferrekorde/verein/2125"
+    },
+    "Arsenal": {
+      "tm": "https://www.transfermarkt.com/fc-arsenal/startseite/verein/11",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-arsenal/transferrekorde/verein/11"
+    },
+    "Aston Villa": {
+      "tm": "https://www.transfermarkt.com/aston-villa/startseite/verein/405",
+      "tmTopTransfers": "https://www.transfermarkt.com/aston-villa/transferrekorde/verein/405"
+    },
+    "Bournemouth": {
+      "tm": "https://www.transfermarkt.com/afc-bournemouth/startseite/verein/989",
+      "tmTopTransfers": "https://www.transfermarkt.com/afc-bournemouth/transferrekorde/verein/989"
+    },
+    "Brentford": {
+      "tm": "https://www.transfermarkt.com/fc-brentford/startseite/verein/1148",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-brentford/transferrekorde/verein/1148"
+    },
+    "Brighton": {
+      "tm": "https://www.transfermarkt.com/brighton-amp-hove-albion/startseite/verein/1237",
+      "tmTopTransfers": "https://www.transfermarkt.com/brighton-amp-hove-albion/transferrekorde/verein/1237"
+    },
+    "Burnley": {
+      "tm": "https://www.transfermarkt.com/fc-burnley/startseite/verein/1132",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-burnley/transferrekorde/verein/1132"
+    },
+    "Chelsea": {
+      "tm": "https://www.transfermarkt.com/fc-chelsea/startseite/verein/631",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-chelsea/transferrekorde/verein/631"
+    },
+    "Crystal Palace": {
+      "tm": "https://www.transfermarkt.com/crystal-palace/startseite/verein/873",
+      "tmTopTransfers": "https://www.transfermarkt.com/crystal-palace/transferrekorde/verein/873"
+    },
+    "Everton": {
+      "tm": "https://www.transfermarkt.com/fc-everton/startseite/verein/29",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-everton/transferrekorde/verein/29"
+    },
+    "Fulham": {
+      "tm": "https://www.transfermarkt.com/fc-fulham/startseite/verein/931",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-fulham/transferrekorde/verein/931"
+    },
+    "Leeds United": {
+      "tm": "https://www.transfermarkt.com/leeds-united/startseite/verein/399",
+      "tmTopTransfers": "https://www.transfermarkt.com/leeds-united/transferrekorde/verein/399"
+    },
+    "Liverpool": {
+      "tm": "https://www.transfermarkt.com/fc-liverpool/startseite/verein/31",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-liverpool/transferrekorde/verein/31"
+    },
+    "Manchester City": {
+      "tm": "https://www.transfermarkt.com/manchester-city/startseite/verein/281",
+      "tmTopTransfers": "https://www.transfermarkt.com/manchester-city/transferrekorde/verein/281"
+    },
+    "Manchester United": {
+      "tm": "https://www.transfermarkt.com/manchester-united/startseite/verein/985",
+      "tmTopTransfers": "https://www.transfermarkt.com/manchester-united/transferrekorde/verein/985"
+    },
+    "Newcastle United": {
+      "tm": "https://www.transfermarkt.com/newcastle-united/startseite/verein/762",
+      "tmTopTransfers": "https://www.transfermarkt.com/newcastle-united/transferrekorde/verein/762"
+    },
+    "Nottingham Forest": {
+      "tm": "https://www.transfermarkt.com/nottingham-forest/startseite/verein/703",
+      "tmTopTransfers": "https://www.transfermarkt.com/nottingham-forest/transferrekorde/verein/703"
+    },
+    "Sunderland": {
+      "tm": "https://www.transfermarkt.com/afc-sunderland/startseite/verein/289",
+      "tmTopTransfers": "https://www.transfermarkt.com/afc-sunderland/transferrekorde/verein/289"
+    },
+    "Tottenham Hotspur": {
+      "tm": "https://www.transfermarkt.com/tottenham-hotspur/startseite/verein/148",
+      "tmTopTransfers": "https://www.transfermarkt.com/tottenham-hotspur/transferrekorde/verein/148"
+    },
+    "West Ham United": {
+      "tm": "https://www.transfermarkt.com/west-ham-united/startseite/verein/379",
+      "tmTopTransfers": "https://www.transfermarkt.com/west-ham-united/transferrekorde/verein/379"
+    },
+    "Wolverhampton Wanderers": {
+      "tm": "https://www.transfermarkt.com/wolverhampton-wanderers/startseite/verein/543",
+      "tmTopTransfers": "https://www.transfermarkt.com/wolverhampton-wanderers/transferrekorde/verein/543"
+    },
+    "Angers": {
+      "tm": "https://www.transfermarkt.com/sco-angers/startseite/verein/1420",
+      "tmTopTransfers": "https://www.transfermarkt.com/sco-angers/transferrekorde/verein/1420"
+    },
+    "Auxerre": {
+      "tm": "https://www.transfermarkt.com/aj-auxerre/startseite/verein/290",
+      "tmTopTransfers": "https://www.transfermarkt.com/aj-auxerre/transferrekorde/verein/290"
+    },
+    "Brestois": {
+      "tm": "https://www.transfermarkt.com/stade-brestois-29/startseite/verein/3911",
+      "tmTopTransfers": "https://www.transfermarkt.com/stade-brestois-29/transferrekorde/verein/3911"
+    },
+    "Le Havre": {
+      "tm": "https://www.transfermarkt.com/ac-le-havre/startseite/verein/738",
+      "tmTopTransfers": "https://www.transfermarkt.com/ac-le-havre/transferrekorde/verein/738"
+    },
+    "Lens": {
+      "tm": "https://www.transfermarkt.com/rc-lens/startseite/verein/826",
+      "tmTopTransfers": "https://www.transfermarkt.com/rc-lens/transferrekorde/verein/826"
+    },
+    "Lille": {
+      "tm": "https://www.transfermarkt.com/losc-lille/startseite/verein/1082",
+      "tmTopTransfers": "https://www.transfermarkt.com/losc-lille/transferrekorde/verein/1082"
+    },
+    "Lorient": {
+      "tm": "https://www.transfermarkt.com/fc-lorient/startseite/verein/1158",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-lorient/transferrekorde/verein/1158"
+    },
+    "Metz": {
+      "tm": "https://www.transfermarkt.com/fc-metz/startseite/verein/347",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-metz/transferrekorde/verein/347"
+    },
+    "Monaco": {
+      "tm": "https://www.transfermarkt.com/as-monaco/startseite/verein/162",
+      "tmTopTransfers": "https://www.transfermarkt.com/as-monaco/transferrekorde/verein/162"
+    },
+    "Nantes": {
+      "tm": "https://www.transfermarkt.com/fc-nantes/startseite/verein/995",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-nantes/transferrekorde/verein/995"
+    },
+    "Nice": {
+      "tm": "https://www.transfermarkt.com/ogc-nizza/startseite/verein/417",
+      "tmTopTransfers": "https://www.transfermarkt.com/ogc-nizza/transferrekorde/verein/417"
+    },
+    "Olympique Lyonnais": {
+      "tm": "https://www.transfermarkt.com/olympique-lyon/startseite/verein/1041",
+      "tmTopTransfers": "https://www.transfermarkt.com/olympique-lyon/transferrekorde/verein/1041"
+    },
+    "Olympique Marseille": {
+      "tm": "https://www.transfermarkt.com/olympique-marseille/startseite/verein/244",
+      "tmTopTransfers": "https://www.transfermarkt.com/olympique-marseille/transferrekorde/verein/244"
+    },
+    "Paris FC": {
+      "tm": "https://www.transfermarkt.com/paris-fc/startseite/verein/10004",
+      "tmTopTransfers": "https://www.transfermarkt.com/paris-fc/transferrekorde/verein/10004"
+    },
+    "Paris Saint Germain": {
+      "tm": "https://www.transfermarkt.com/fc-paris-saint-germain/startseite/verein/583",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-paris-saint-germain/transferrekorde/verein/583"
+    },
+    "Rennes": {
+      "tm": "https://www.transfermarkt.com/fc-stade-rennes/startseite/verein/273",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-stade-rennes/transferrekorde/verein/273"
+    },
+    "Strasbourg": {
+      "tm": "https://www.transfermarkt.com/rc-strassburg-alsace/startseite/verein/667",
+      "tmTopTransfers": "https://www.transfermarkt.com/rc-strassburg-alsace/transferrekorde/verein/667"
+    },
+    "Toulouse": {
+      "tm": "https://www.transfermarkt.com/fc-toulouse/startseite/verein/415",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-toulouse/transferrekorde/verein/415"
+    },
+    "Augsburg": {
+      "tm": "https://www.transfermarkt.com/fc-augsburg/startseite/verein/167",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-augsburg/transferrekorde/verein/167"
+    },
+    "Bayer Leverkusen": {
+      "tm": "https://www.transfermarkt.com/bayer-04-leverkusen/startseite/verein/15",
+      "tmTopTransfers": "https://www.transfermarkt.com/bayer-04-leverkusen/transferrekorde/verein/15"
+    },
+    "Bayern Munique": {
+      "tm": "https://www.transfermarkt.com/fc-bayern-munchen/startseite/verein/27",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-bayern-munchen/transferrekorde/verein/27"
+    },
+    "Borussia Dortmund": {
+      "tm": "https://www.transfermarkt.com/borussia-dortmund/startseite/verein/16",
+      "tmTopTransfers": "https://www.transfermarkt.com/borussia-dortmund/transferrekorde/verein/16"
+    },
+    "Borussia Mönch...": {
+      "tm": "https://www.transfermarkt.com/borussia-monchengladbach/startseite/verein/18",
+      "tmTopTransfers": "https://www.transfermarkt.com/borussia-monchengladbach/transferrekorde/verein/18"
+    },
+    "Eintracht Frankfurt": {
+      "tm": "https://www.transfermarkt.com/eintracht-frankfurt/startseite/verein/24",
+      "tmTopTransfers": "https://www.transfermarkt.com/eintracht-frankfurt/transferrekorde/verein/24"
+    },
+    "Freiburg": {
+      "tm": "https://www.transfermarkt.com/sc-freiburg/startseite/verein/60",
+      "tmTopTransfers": "https://www.transfermarkt.com/sc-freiburg/transferrekorde/verein/60"
+    },
+    "Hamburger SV": {
+      "tm": "https://www.transfermarkt.com/hamburgo-sv/startseite/verein/41",
+      "tmTopTransfers": "https://www.transfermarkt.com/hamburgo-sv/transferrekorde/verein/41"
+    },
+    "Heidenheim": {
+      "tm": "https://www.transfermarkt.com/1-fc-heidenheim-1846/startseite/verein/2036",
+      "tmTopTransfers": "https://www.transfermarkt.com/1-fc-heidenheim-1846/transferrekorde/verein/2036"
+    },
+    "Hoffenheim": {
+      "tm": "https://www.transfermarkt.com/tsg-1899-hoffenheim/startseite/verein/533",
+      "tmTopTransfers": "https://www.transfermarkt.com/tsg-1899-hoffenheim/transferrekorde/verein/533"
+    },
+    "Koln": {
+      "tm": "https://www.transfermarkt.com/1-fc-koln/startseite/verein/3",
+      "tmTopTransfers": "https://www.transfermarkt.com/1-fc-koln/transferrekorde/verein/3"
+    },
+    "Mainz": {
+      "tm": "https://www.transfermarkt.com/1-fsv-mainz-05/startseite/verein/39",
+      "tmTopTransfers": "https://www.transfermarkt.com/1-fsv-mainz-05/transferrekorde/verein/39"
+    },
+    "RB Leipzig": {
+      "tm": "https://www.transfermarkt.com/rasenballsport-leipzig/startseite/verein/23826",
+      "tmTopTransfers": "https://www.transfermarkt.com/rasenballsport-leipzig/transferrekorde/verein/23826"
+    },
+    "St Pauli": {
+      "tm": "https://www.transfermarkt.com/fc-st-pauli/startseite/verein/35",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-st-pauli/transferrekorde/verein/35"
+    },
+    "Stuttgart": {
+      "tm": "https://www.transfermarkt.com/vfb-stuttgart/startseite/verein/79",
+      "tmTopTransfers": "https://www.transfermarkt.com/vfb-stuttgart/transferrekorde/verein/79"
+    },
+    "Union Berlin": {
+      "tm": "https://www.transfermarkt.com/1-fc-union-berlin/startseite/verein/89",
+      "tmTopTransfers": "https://www.transfermarkt.com/1-fc-union-berlin/transferrekorde/verein/89"
+    },
+    "Werder Bremen": {
+      "tm": "https://www.transfermarkt.com/sv-werder-bremen/startseite/verein/86",
+      "tmTopTransfers": "https://www.transfermarkt.com/sv-werder-bremen/transferrekorde/verein/86"
+    },
+    "Wolfsburg": {
+      "tm": "https://www.transfermarkt.com/vfl-wolfsburg/startseite/verein/82",
+      "tmTopTransfers": "https://www.transfermarkt.com/vfl-wolfsburg/transferrekorde/verein/82"
+    },
+    "Atalanta": {
+      "tm": "https://www.transfermarkt.com/atalanta-bergamo/startseite/verein/800",
+      "tmTopTransfers": "https://www.transfermarkt.com/atalanta-bergamo/transferrekorde/verein/800"
+    },
+    "Bologna": {
+      "tm": "https://www.transfermarkt.com/fc-bologna/startseite/verein/1025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-bologna/transferrekorde/verein/1025"
+    },
+    "Cagliari": {
+      "tm": "https://www.transfermarkt.com/cagliari-calcio/startseite/verein/1390",
+      "tmTopTransfers": "https://www.transfermarkt.com/cagliari-calcio/transferrekorde/verein/1390"
+    },
+    "Como": {
+      "tm": "https://www.transfermarkt.com/como-1907/startseite/verein/1047",
+      "tmTopTransfers": "https://www.transfermarkt.com/como-1907/transferrekorde/verein/1047"
+    },
+    "Cremonese": {
+      "tm": "https://www.transfermarkt.com/us-cremonese/startseite/verein/2239",
+      "tmTopTransfers": "https://www.transfermarkt.com/us-cremonese/transferrekorde/verein/2239"
+    },
+    "Fiorentina": {
+      "tm": "https://www.transfermarkt.com/ac-florenz/startseite/verein/430",
+      "tmTopTransfers": "https://www.transfermarkt.com/ac-florenz/transferrekorde/verein/430"
+    },
+    "Genoa": {
+      "tm": "https://www.transfermarkt.com/cfc-genua/startseite/verein/252",
+      "tmTopTransfers": "https://www.transfermarkt.com/cfc-genua/transferrekorde/verein/252"
+    },
+    "Hellas Verona": {
+      "tm": "https://www.transfermarkt.com/hellas-verona/startseite/verein/276",
+      "tmTopTransfers": "https://www.transfermarkt.com/hellas-verona/transferrekorde/verein/276"
+    },
+    "Inter de Milao": {
+      "tm": "https://www.transfermarkt.com/inter-mailand/startseite/verein/46",
+      "tmTopTransfers": "https://www.transfermarkt.com/inter-mailand/transferrekorde/verein/46"
+    },
+    "Juventus": {
+      "tm": "https://www.transfermarkt.com/juventus-turin/startseite/verein/506",
+      "tmTopTransfers": "https://www.transfermarkt.com/juventus-turin/transferrekorde/verein/506"
+    },
+    "Lazio": {
+      "tm": "https://www.transfermarkt.com/lazio-rom/startseite/verein/398",
+      "tmTopTransfers": "https://www.transfermarkt.com/lazio-rom/transferrekorde/verein/398"
+    },
+    "Lecce": {
+      "tm": "https://www.transfermarkt.com/us-lecce/startseite/verein/1005",
+      "tmTopTransfers": "https://www.transfermarkt.com/us-lecce/transferrekorde/verein/1005"
+    },
+    "Milan": {
+      "tm": "https://www.transfermarkt.com/ac-mailand/startseite/verein/5",
+      "tmTopTransfers": "https://www.transfermarkt.com/ac-mailand/transferrekorde/verein/5"
+    },
+    "Napoli": {
+      "tm": "https://www.transfermarkt.com/ssc-neapel/startseite/verein/6195",
+      "tmTopTransfers": "https://www.transfermarkt.com/ssc-neapel/transferrekorde/verein/6195"
+    },
+    "Parma": {
+      "tm": "https://www.transfermarkt.com/parma-calcio-1913/startseite/verein/130",
+      "tmTopTransfers": "https://www.transfermarkt.com/parma-calcio-1913/transferrekorde/verein/130"
+    },
+    "Pisa": {
+      "tm": "https://www.transfermarkt.com/ac-pisa-1909/startseite/verein/4172",
+      "tmTopTransfers": "https://www.transfermarkt.com/ac-pisa-1909/transferrekorde/verein/4172"
+    },
+    "Roma": {
+      "tm": "https://www.transfermarkt.com/as-rom/startseite/verein/12",
+      "tmTopTransfers": "https://www.transfermarkt.com/as-rom/transferrekorde/verein/12"
+    },
+    "Sassuolo": {
+      "tm": "https://www.transfermarkt.com/us-sassuolo/startseite/verein/6574",
+      "tmTopTransfers": "https://www.transfermarkt.com/us-sassuolo/transferrekorde/verein/6574"
+    },
+    "Torino": {
+      "tm": "https://www.transfermarkt.com/fc-turin/startseite/verein/416",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-turin/transferrekorde/verein/416"
+    },
+    "Udinese": {
+      "tm": "https://www.transfermarkt.com/udinese-calcio/startseite/verein/410",
+      "tmTopTransfers": "https://www.transfermarkt.com/udinese-calcio/transferrekorde/verein/410"
+    },
+    "América": {
+      "tm": "https://www.transfermarkt.com/cf-america/startseite/verein/3631",
+      "tmTopTransfers": "https://www.transfermarkt.com/cf-america/transferrekorde/verein/3631"
+    },
+    "Atlas": {
+      "tm": "https://www.transfermarkt.com/atlas-guadalajara/startseite/verein/8590",
+      "tmTopTransfers": "https://www.transfermarkt.com/atlas-guadalajara/transferrekorde/verein/8590"
+    },
+    "Atlético San Luis": {
+      "tm": "https://www.transfermarkt.com/atletico-de-san-luis/startseite/verein/40188",
+      "tmTopTransfers": "https://www.transfermarkt.com/atletico-de-san-luis/transferrekorde/verein/40188"
+    },
+    "Cruz Azul": {
+      "tm": "https://www.transfermarkt.com/cd-cruz-azul/startseite/verein/3711",
+      "tmTopTransfers": "https://www.transfermarkt.com/cd-cruz-azul/transferrekorde/verein/3711"
+    },
+    "Guadalajara": {
+      "tm": "https://www.transfermarkt.com/deportivo-guadalajara/startseite/verein/6711",
+      "tmTopTransfers": "https://www.transfermarkt.com/deportivo-guadalajara/transferrekorde/verein/6711"
+    },
+    "Juárez": {
+      "tm": "https://www.transfermarkt.com/fc-juarez/startseite/verein/49283",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-juarez/transferrekorde/verein/49283"
+    },
+    "León": {
+      "tm": "https://www.transfermarkt.com/club-leon-fc/startseite/verein/4941",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-leon-fc/transferrekorde/verein/4941"
+    },
+    "Mazatlán": {
+      "tm": "https://www.transfermarkt.com/mazatlan-fc/startseite/verein/82696",
+      "tmTopTransfers": "https://www.transfermarkt.com/mazatlan-fc/transferrekorde/verein/82696"
+    },
+    "Monterrey": {
+      "tm": "https://www.transfermarkt.com/cf-monterrey/startseite/verein/2407",
+      "tmTopTransfers": "https://www.transfermarkt.com/cf-monterrey/transferrekorde/verein/2407"
+    },
+    "Necaxa": {
+      "tm": "https://www.transfermarkt.com/club-necaxa/startseite/verein/1146",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-necaxa/transferrekorde/verein/1146"
+    },
+    "Pachuca": {
+      "tm": "https://www.transfermarkt.com/cf-pachuca/startseite/verein/4035",
+      "tmTopTransfers": "https://www.transfermarkt.com/cf-pachuca/transferrekorde/verein/4035"
+    },
+    "Puebla": {
+      "tm": "https://www.transfermarkt.com/puebla-fc/startseite/verein/5662",
+      "tmTopTransfers": "https://www.transfermarkt.com/puebla-fc/transferrekorde/verein/5662"
+    },
+    "Pumas UNAM": {
+      "tm": "https://www.transfermarkt.com/unam-pumas/startseite/verein/7633",
+      "tmTopTransfers": "https://www.transfermarkt.com/unam-pumas/transferrekorde/verein/7633"
+    },
+    "Querétaro": {
+      "tm": "https://www.transfermarkt.com/queretaro-fc/startseite/verein/4961",
+      "tmTopTransfers": "https://www.transfermarkt.com/queretaro-fc/transferrekorde/verein/4961"
+    },
+    "Santos Laguna": {
+      "tm": "https://www.transfermarkt.com/santos-laguna/startseite/verein/1403",
+      "tmTopTransfers": "https://www.transfermarkt.com/santos-laguna/transferrekorde/verein/1403"
+    },
+    "Tigres UANL": {
+      "tm": "https://www.transfermarkt.com/tigres-uanl/startseite/verein/7055",
+      "tmTopTransfers": "https://www.transfermarkt.com/tigres-uanl/transferrekorde/verein/7055"
+    },
+    "Tijuana": {
+      "tm": "https://www.transfermarkt.com/club-tijuana/startseite/verein/13353",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-tijuana/transferrekorde/verein/13353"
+    },
+    "Toluca": {
+      "tm": "https://www.transfermarkt.com/deportivo-toluca/startseite/verein/1804",
+      "tmTopTransfers": "https://www.transfermarkt.com/deportivo-toluca/transferrekorde/verein/1804"
+    },
+    "AVS": {
+      "tm": "https://www.transfermarkt.com/avs-futebol/startseite/verein/110302",
+      "tmTopTransfers": "https://www.transfermarkt.com/avs-futebol-sad/transferrekorde/verein/110302"
+    },
+    "Arouca": {
+      "tm": "https://www.transfermarkt.com/fc-arouca/startseite/verein/8024",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-arouca/transferrekorde/verein/8024"
+    },
+    "Benfica": {
+      "tm": "https://www.transfermarkt.com/benfica-lissabon/startseite/verein/294",
+      "tmTopTransfers": "https://www.transfermarkt.com/benfica-lissabon/transferrekorde/verein/294"
+    },
+    "Braga": {
+      "tm": "https://www.transfermarkt.com/sc-braga/startseite/verein/1075",
+      "tmTopTransfers": "https://www.transfermarkt.com/sc-braga/transferrekorde/verein/1075"
+    },
+    "Casa Pia": {
+      "tm": "https://www.transfermarkt.com/casa-pia-ac/startseite/verein/3268",
+      "tmTopTransfers": "https://www.transfermarkt.com/casa-pia-ac/transferrekorde/verein/3268"
+    },
+    "Estoril": {
+      "tm": "https://www.transfermarkt.com/gd-estoril-praia/startseite/verein/1465",
+      "tmTopTransfers": "https://www.transfermarkt.com/gd-estoril-praia/transferrekorde/verein/1465"
+    },
+    "Estrela Amadora": {
+      "tm": "https://www.transfermarkt.com/cf-estrela-amadora-sad/startseite/verein/2431",
+      "tmTopTransfers": "https://www.transfermarkt.com/cf-estrela-amadora-sad/transferrekorde/verein/2431"
+    },
+    "FC Alverca": {
+      "tm": "https://www.transfermarkt.com/fc-alverca/startseite/verein/2521",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-alverca/transferrekorde/verein/2521"
+    },
+    "Famalicão": {
+      "tm": "https://www.transfermarkt.com/fc-famalicao/startseite/verein/3329",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-famalicao/transferrekorde/verein/3329"
+    },
+    "Gil Vicente": {
+      "tm": "https://www.transfermarkt.com/gil-vicente-fc/startseite/verein/2424",
+      "tmTopTransfers": "https://www.transfermarkt.com/gil-vicente-fc/transferrekorde/verein/2424"
+    },
+    "Moreirense": {
+      "tm": "https://www.transfermarkt.com/moreirense-fc/startseite/verein/979",
+      "tmTopTransfers": "https://www.transfermarkt.com/moreirense-fc/transferrekorde/verein/979"
+    },
+    "Nacional": {
+      "tm": "https://www.transfermarkt.com/cd-nacional/startseite/verein/982",
+      "tmTopTransfers": "https://www.transfermarkt.com/cd-nacional/transferrekorde/verein/982"
+    },
+    "Porto": {
+      "tm": "https://www.transfermarkt.com/fc-porto/startseite/verein/720",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-porto/transferrekorde/verein/720"
+    },
+    "Rio Ave": {
+      "tm": "https://www.transfermarkt.com/rio-ave-fc/startseite/verein/2425",
+      "tmTopTransfers": "https://www.transfermarkt.com/rio-ave-fc/transferrekorde/verein/2425"
+    },
+    "Santa Clara": {
+      "tm": "https://www.transfermarkt.com/cd-santa-clara/startseite/verein/2423",
+      "tmTopTransfers": "https://www.transfermarkt.com/cd-santa-clara/transferrekorde/verein/2423"
+    },
+    "Sporting": {
+      "tm": "https://www.transfermarkt.com/sporting-lissabon/startseite/verein/336",
+      "tmTopTransfers": "https://www.transfermarkt.com/sporting-lissabon/transferrekorde/verein/336"
+    },
+    "Tondela": {
+      "tm": "https://www.transfermarkt.com/cd-tondela/startseite/verein/7179",
+      "tmTopTransfers": "https://www.transfermarkt.com/cd-tondela/transferrekorde/verein/7179"
+    },
+    "Vitoria de Guimarães": {
+      "tm": "https://www.transfermarkt.com/vitoria-guimaraes-sc/startseite/verein/2420",
+      "tmTopTransfers": "https://www.transfermarkt.com/vitoria-guimaraes-sc/transferrekorde/verein/2420"
+    },
+    "Al Ahli": {
+      "tm": "https://www.transfermarkt.com/al-ahli-sc/startseite/verein/3612",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-ahli-sc/transferrekorde/verein/3612"
+    },
+    "Al-Arabi": {
+      "tm": "https://www.transfermarkt.com/al-arabi-sc/startseite/verein/1230",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-arabi-sc/transferrekorde/verein/1230"
+    },
+    "Al-Duhail": {
+      "tm": "https://www.transfermarkt.com/al-duhail-sc/startseite/verein/26091",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-duhail-sc/transferrekorde/verein/26091"
+    },
+    "Al-Gharafa": {
+      "tm": "https://www.transfermarkt.com/al-gharafa-sc/startseite/verein/6297",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-gharafa-sc/transferrekorde/verein/6297"
+    },
+    "Al-Rayyan": {
+      "tm": "https://www.transfermarkt.com/al-rayyan-sc/startseite/verein/3229",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-rayyan-sc/transferrekorde/verein/3229"
+    },
+    "Al-Sadd": {
+      "tm": "https://www.transfermarkt.com/al-sadd-sc/startseite/verein/656",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-sadd-sc/transferrekorde/verein/656"
+    },
+    "Al-Sailiya": {
+      "tm": "https://www.transfermarkt.com/al-sailiya-sc/startseite/verein/4630/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-sailiya-sc/transferrekorde/verein/4630"
+    },
+    "Al-Shahaniya": {
+      "tm": "https://www.transfermarkt.com/al-shahania-sc/startseite/verein/34694/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-shahania-sc/transferrekorde/verein/34694"
+    },
+    "Al-Shamal": {
+      "tm": "https://www.transfermarkt.com/al-shamal/startseite/verein/10775",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-shamal/transferrekorde/verein/10775"
+    },
+    "Al-Wakrah": {
+      "tm": "https://www.transfermarkt.com/al-wakrah-sc/startseite/verein/13509",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-wakrah-sc/transferrekorde/verein/13509"
+    },
+    "Qatar SC": {
+      "tm": "https://www.transfermarkt.com/qatar-sc/startseite/verein/965",
+      "tmTopTransfers": "https://www.transfermarkt.com/qatar-sc/transferrekorde/verein/965"
+    },
+    "Umm-Salal": {
+      "tm": "https://www.transfermarkt.com/umm-salal-sc/startseite/verein/10920",
+      "tmTopTransfers": "https://www.transfermarkt.com/umm-salal-sc/transferrekorde/verein/10920"
+    },
+    "Akhmat Groznyi": {
+      "tm": "https://www.transfermarkt.com/akhmat-grozny/startseite/verein/3725/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/akhmat-grozny/transferrekorde/verein/3725"
+    },
+    "Akron": {
+      "tm": "https://www.transfermarkt.com/akron-togliatti/startseite/verein/71985/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/akron-togliatti/transferrekorde/verein/71985"
+    },
+    "Baltika": {
+      "tm": "https://www.transfermarkt.com/baltika-kaliningrad/startseite/verein/2741",
+      "tmTopTransfers": "https://www.transfermarkt.com/baltika-kaliningrad/transferrekorde/verein/2741"
+    },
+    "CSKA Moscou": {
+      "tm": "https://www.transfermarkt.com/zska-moskau/startseite/verein/2410",
+      "tmTopTransfers": "https://www.transfermarkt.com/zska-moskau/transferrekorde/verein/2410"
+    },
+    "Dinamo Moscou": {
+      "tm": "https://www.transfermarkt.com/dinamo-moskau/startseite/verein/121",
+      "tmTopTransfers": "https://www.transfermarkt.com/dinamo-moskau/transferrekorde/verein/121"
+    },
+    "Dinamo-Dagestan": {
+      "tm": "https://www.transfermarkt.com/dinamo-makhachkala/startseite/verein/75231",
+      "tmTopTransfers": "https://www.transfermarkt.com/dinamo-makhachkala/startseite/verein/75231"
+    },
+    "Krasnodar": {
+      "tm": "https://www.transfermarkt.com/fk-krasnodar/startseite/verein/16704",
+      "tmTopTransfers": "https://www.transfermarkt.com/fk-krasnodar/transferrekorde/verein/16704"
+    },
+    "Krylya Sovetov": {
+      "tm": "https://www.transfermarkt.com/krylya-sovetov-samara/startseite/verein/2696",
+      "tmTopTransfers": "https://www.transfermarkt.com/krylya-sovetov-samara/transferrekorde/verein/2696"
+    },
+    "Lokomotiv Moscou": {
+      "tm": "https://www.transfermarkt.com/lokomotiv-moskau/startseite/verein/932",
+      "tmTopTransfers": "https://www.transfermarkt.com/lokomotiv-moskau/transferrekorde/verein/932"
+    },
+    "Nizhny Novgorod": {
+      "tm": "https://www.transfermarkt.com/fk-nizhny-novgorod/startseite/verein/49702/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fk-nizhny-novgorod/transferrekorde/verein/49702"
+    },
+    "Orenburg": {
+      "tm": "https://www.transfermarkt.com/fk-orenburg/startseite/verein/14589/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fk-orenburg/transferrekorde/verein/14589"
+    },
+    "Rostov": {
+      "tm": "https://www.transfermarkt.com/fk-rostov/startseite/verein/1083",
+      "tmTopTransfers": "https://www.transfermarkt.com/fk-rostov/transferrekorde/verein/1083"
+    },
+    "Rubin Kazan": {
+      "tm": "https://www.transfermarkt.com/rubin-kazan/startseite/verein/2698",
+      "tmTopTransfers": "https://www.transfermarkt.com/rubin-kazan/transferrekorde/verein/2698"
+    },
+    "Sochi": {
+      "tm": "https://www.transfermarkt.com/fk-sochi/startseite/verein/41231/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fk-sochi/transferrekorde/verein/41231"
+    },
+    "Spartak Moscou": {
+      "tm": "https://www.transfermarkt.com/spartak-moskau/startseite/verein/232",
+      "tmTopTransfers": "https://www.transfermarkt.com/spartak-moskau/transferrekorde/verein/232"
+    },
+    "Zenit St Petersburg": {
+      "tm": "https://www.transfermarkt.com/zenit-st-petersburg/startseite/verein/964",
+      "tmTopTransfers": "https://www.transfermarkt.com/zenit-st-petersburg/transferrekorde/verein/964"
+    },
+    "Al Ahli Saudi": {
+      "tm": "https://www.transfermarkt.com/al-ahli-dschidda/startseite/verein/18487",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-ahli-dschidda/transferrekorde/verein/18487"
+    },
+    "Al Fateh": {
+      "tm": "https://www.transfermarkt.com/al-fateh/startseite/verein/27221",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-fateh/transferrekorde/verein/27221"
+    },
+    "Al Feiha": {
+      "tm": "https://www.transfermarkt.com/al-fayha-fc/startseite/verein/50531",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-fayha-fc/transferrekorde/verein/50531"
+    },
+    "Al Hazm": {
+      "tm": "https://www.transfermarkt.com/al-hazm/startseite/verein/9131/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-hazm/startseite/verein/9131/saison_id/2025"
+    },
+    "Al Hilal": {
+      "tm": "https://www.transfermarkt.com/al-hilal-riad/startseite/verein/1114",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-hilal-riad/transferrekorde/verein/1114"
+    },
+    "Al Ittihad": {
+      "tm": "https://www.transfermarkt.com/al-ittihad-dschidda/startseite/verein/8023",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-ittihad-dschidda/transferrekorde/verein/8023"
+    },
+    "Al Khaleej": {
+      "tm": "https://www.transfermarkt.com/al-khaleej/startseite/verein/6070/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-khaleej/transferrekorde/verein/6070"
+    },
+    "Al Kholood": {
+      "tm": "https://www.transfermarkt.com/al-kholood/startseite/verein/91427",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-kholood/transferrekorde/verein/91427"
+    },
+    "Al Nassr": {
+      "tm": "https://www.transfermarkt.com/al-nasr-riad/startseite/verein/18544",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-nasr-riad/transferrekorde/verein/18544"
+    },
+    "Al Qadsiah FC": {
+      "tm": "https://www.transfermarkt.com/al-qadisiyah-fc/startseite/verein/26069",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-qadisiyah-fc/transferrekorde/verein/26069"
+    },
+    "Al Shabah Saudi": {
+      "tm": "https://www.transfermarkt.com/al-shabab-riad/startseite/verein/9840",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-shabab-riad/transferrekorde/verein/9840"
+    },
+    "Al-Ettifaq": {
+      "tm": "https://www.transfermarkt.com/al-ettifaq/startseite/verein/7732",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-ettifaq/transferrekorde/verein/7732"
+    },
+    "Al-Najma": {
+      "tm": "https://www.transfermarkt.com/al-najma/startseite/verein/32328/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-najma/transferrekorde/verein/32328"
+    },
+    "Al-Okhdood": {
+      "tm": "https://www.transfermarkt.com/al-akhdoud-club/startseite/verein/71665/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-akhdoud-club/transferrekorde/verein/71665"
+    },
+    "Al-Riyadh": {
+      "tm": "https://www.transfermarkt.com/al-riad/startseite/verein/31008/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-riad/transferrekorde/verein/31008"
+    },
+    "Al-Tawoon": {
+      "tm": "https://www.transfermarkt.com/al-taawoun-fc/startseite/verein/28844",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-taawoun-fc/transferrekorde/verein/28844"
+    },
+    "Dhamk": {
+      "tm": "https://www.transfermarkt.com/damac-fc/startseite/verein/50532/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/damac-fc/transferrekorde/verein/50532"
+    },
+    "NEOM": {
+      "tm": "https://www.transfermarkt.com/al-suqoor/startseite/verein/34911",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-suqoor/transferrekorde/verein/34911"
+    },
+    "Alavés": {
+      "tm": "https://www.transfermarkt.com/deportivo-alaves/startseite/verein/1108",
+      "tmTopTransfers": "https://www.transfermarkt.com/deportivo-alaves/transferrekorde/verein/1108"
+    },
+    "Athletic Bilbao": {
+      "tm": "https://www.transfermarkt.com/athletic-bilbao/startseite/verein/621",
+      "tmTopTransfers": "https://www.transfermarkt.com/athletic-bilbao/transferrekorde/verein/621"
+    },
+    "Atlético de Madrid": {
+      "tm": "https://www.transfermarkt.com/atletico-madrid/startseite/verein/13",
+      "tmTopTransfers": "https://www.transfermarkt.com/atletico-madrid/transferrekorde/verein/13"
+    },
+    "Barcelona": {
+      "tm": "https://www.transfermarkt.com/fc-barcelona/startseite/verein/131",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-barcelona/transferrekorde/verein/131"
+    },
+    "Betis": {
+      "tm": "https://www.transfermarkt.com/real-betis-sevilla/startseite/verein/150",
+      "tmTopTransfers": "https://www.transfermarkt.com/real-betis-sevilla/transferrekorde/verein/150"
+    },
+    "Celta de Vigo": {
+      "tm": "https://www.transfermarkt.com/celta-vigo/startseite/verein/940",
+      "tmTopTransfers": "https://www.transfermarkt.com/celta-vigo/transferrekorde/verein/940"
+    },
+    "Elche": {
+      "tm": "https://www.transfermarkt.com/fc-elche/startseite/verein/1531",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-elche/transferrekorde/verein/1531"
+    },
+    "Espanyol": {
+      "tm": "https://www.transfermarkt.com/rcd-espanyol-barcelona/startseite/verein/714",
+      "tmTopTransfers": "https://www.transfermarkt.com/rcd-espanyol-barcelona/transferrekorde/verein/714"
+    },
+    "Getafe": {
+      "tm": "https://www.transfermarkt.com/fc-getafe/startseite/verein/3709",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-getafe/transferrekorde/verein/3709"
+    },
+    "Girona": {
+      "tm": "https://www.transfermarkt.com/fc-girona/startseite/verein/12321",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-girona/transferrekorde/verein/12321"
+    },
+    "Levante": {
+      "tm": "https://www.transfermarkt.com/ud-levante/startseite/verein/3368",
+      "tmTopTransfers": "https://www.transfermarkt.com/ud-levante/transferrekorde/verein/3368"
+    },
+    "Mallorca": {
+      "tm": "https://www.transfermarkt.com/rcd-mallorca/startseite/verein/237",
+      "tmTopTransfers": "https://www.transfermarkt.com/rcd-mallorca/transferrekorde/verein/237"
+    },
+    "Osasuna": {
+      "tm": "https://www.transfermarkt.com/ca-osasuna/startseite/verein/331",
+      "tmTopTransfers": "https://www.transfermarkt.com/ca-osasuna/transferrekorde/verein/331"
+    },
+    "Rayo Vallecano": {
+      "tm": "https://www.transfermarkt.com/rayo-vallecano/startseite/verein/367",
+      "tmTopTransfers": "https://www.transfermarkt.com/rayo-vallecano/transferrekorde/verein/367"
+    },
+    "Real Madrid": {
+      "tm": "https://www.transfermarkt.com/real-madrid/startseite/verein/418",
+      "tmTopTransfers": "https://www.transfermarkt.com/real-madrid/transferrekorde/verein/418"
+    },
+    "Real Oviedo": {
+      "tm": "https://www.transfermarkt.com/real-oviedo/startseite/verein/2497",
+      "tmTopTransfers": "https://www.transfermarkt.com/real-oviedo/transferrekorde/verein/2497"
+    },
+    "Real Sociedad": {
+      "tm": "https://www.transfermarkt.com/real-sociedad-san-sebastian/startseite/verein/681",
+      "tmTopTransfers": "https://www.transfermarkt.com/real-sociedad-san-sebastian/transferrekorde/verein/681"
+    },
+    "Sevilla": {
+      "tm": "https://www.transfermarkt.com/fc-sevilla/startseite/verein/368",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-sevilla/transferrekorde/verein/368"
+    },
+    "Valencia": {
+      "tm": "https://www.transfermarkt.com/fc-valencia/startseite/verein/1049",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-valencia/transferrekorde/verein/1049"
+    },
+    "Villarreal": {
+      "tm": "https://www.transfermarkt.com/fc-villarreal/startseite/verein/1050",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-villarreal/transferrekorde/verein/1050"
+    },
+    "Alanyaspor": {
+      "tm": "https://www.transfermarkt.com/alanyaspor/startseite/verein/11282",
+      "tmTopTransfers": "https://www.transfermarkt.com/alanyaspor/transferrekorde/verein/11282"
+    },
+    "Antalyaspor": {
+      "tm": "https://www.transfermarkt.com/antalyaspor/startseite/verein/589",
+      "tmTopTransfers": "https://www.transfermarkt.com/antalyaspor/transferrekorde/verein/589"
+    },
+    "Besiktas": {
+      "tm": "https://www.transfermarkt.com/besiktas-istanbul/startseite/verein/114",
+      "tmTopTransfers": "https://www.transfermarkt.com/besiktas-istanbul/transferrekorde/verein/114"
+    },
+    "Eyupspor": {
+      "tm": "https://www.transfermarkt.com/eyupspor/startseite/verein/7160",
+      "tmTopTransfers": "https://www.transfermarkt.com/eyupspor/transferrekorde/verein/7160"
+    },
+    "Fenerbahce": {
+      "tm": "https://www.transfermarkt.com/fenerbahce-istanbul/startseite/verein/36",
+      "tmTopTransfers": "https://www.transfermarkt.com/fenerbahce-istanbul/transferrekorde/verein/36"
+    },
+    "Galatasaray": {
+      "tm": "https://www.transfermarkt.com/galatasaray-istanbul/startseite/verein/141",
+      "tmTopTransfers": "https://www.transfermarkt.com/galatasaray-istanbul/transferrekorde/verein/141"
+    },
+    "Gaziantep FK": {
+      "tm": "https://www.transfermarkt.com/gaziantep-fk/startseite/verein/2832",
+      "tmTopTransfers": "https://www.transfermarkt.com/gaziantep-fk/transferrekorde/verein/2832"
+    },
+    "Gençlerbirliği": {
+      "tm": "https://www.transfermarkt.com/genclerbirligi-ankara/startseite/verein/820",
+      "tmTopTransfers": "https://www.transfermarkt.com/genclerbirligi-ankara/transferrekorde/verein/820"
+    },
+    "Goztepe": {
+      "tm": "https://www.transfermarkt.com/goztepe/startseite/verein/1467",
+      "tmTopTransfers": "https://www.transfermarkt.com/goztepe/transferrekorde/verein/1467"
+    },
+    "Istambul Baseksir": {
+      "tm": "https://www.transfermarkt.com/istanbul-basaksehir-fk/startseite/verein/6890",
+      "tmTopTransfers": "https://www.transfermarkt.com/istanbul-basaksehir-fk/transferrekorde/verein/6890"
+    },
+    "Karagumruk": {
+      "tm": "https://www.transfermarkt.com/karagumruk/startseite/verein/6646",
+      "tmTopTransfers": "https://www.transfermarkt.com/karagumruk/transferrekorde/verein/6646"
+    },
+    "Kasimpasa": {
+      "tm": "https://www.transfermarkt.com/kasimpasa/startseite/verein/10484",
+      "tmTopTransfers": "https://www.transfermarkt.com/kasimpasa/transferrekorde/verein/10484"
+    },
+    "Kayserispor": {
+      "tm": "https://www.transfermarkt.com/kayserispor/startseite/verein/3205",
+      "tmTopTransfers": "https://www.transfermarkt.com/kayserispor/transferrekorde/verein/3205"
+    },
+    "Kocaelispor": {
+      "tm": "https://www.transfermarkt.com/kocaelispor/startseite/verein/120",
+      "tmTopTransfers": "https://www.transfermarkt.com/kocaelispor/transferrekorde/verein/120"
+    },
+    "Konyaspor": {
+      "tm": "https://www.transfermarkt.com/konyaspor/startseite/verein/2293",
+      "tmTopTransfers": "https://www.transfermarkt.com/konyaspor/transferrekorde/verein/2293"
+    },
+    "Rizespor": {
+      "tm": "https://www.transfermarkt.com/caykur-rizespor/startseite/verein/126",
+      "tmTopTransfers": "https://www.transfermarkt.com/caykur-rizespor/transferrekorde/verein/126"
+    },
+    "Samsunspor": {
+      "tm": "https://www.transfermarkt.com/samsunspor/startseite/verein/152",
+      "tmTopTransfers": "https://www.transfermarkt.com/samsunspor/transferrekorde/verein/152"
+    },
+    "Trabzonspor": {
+      "tm": "https://www.transfermarkt.com/trabzonspor/startseite/verein/449",
+      "tmTopTransfers": "https://www.transfermarkt.com/trabzonspor/transferrekorde/verein/449"
+    },
+    "Ajman": {
+      "tm": "https://www.transfermarkt.com/ajman-club/startseite/verein/24724/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/ajman-club/transferrekorde/verein/24724"
+    },
+    "Al Ain": {
+      "tm": "https://www.transfermarkt.com/al-ain-fc/startseite/verein/2150",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-ain-fc/transferrekorde/verein/2150"
+    },
+    "Al Battaeh": {
+      "tm": "https://www.transfermarkt.com/al-bataeh-club/startseite/verein/78312/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-bataeh-club/transferrekorde/verein/78312"
+    },
+    "Al Dhafra": {
+      "tm": "https://www.transfermarkt.com/al-dhafra-scc/startseite/verein/14456/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-dhafra-scc/transferrekorde/verein/14456"
+    },
+    "Al Ittihad Kalba": {
+      "tm": "https://www.transfermarkt.com/al-ittihad-kalba-sports-club/startseite/verein/38040",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-ittihad-kalba-sports-club/transferrekorde/verein/38040"
+    },
+    "Al JAzira": {
+      "tm": "https://www.transfermarkt.com/al-jazira-abu-dhabi-/startseite/verein/2524",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-jazira-abu-dhabi-/transferrekorde/verein/2524"
+    },
+    "Al Shabab Dubai": {
+      "tm": "https://www.transfermarkt.com/fc-shabab-al-ahli-dubai/startseite/verein/60529",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-shabab-al-ahli-dubai/transferrekorde/verein/60529"
+    },
+    "Al Wahda Football Club": {
+      "tm": "https://www.transfermarkt.com/al-wahda-fc-abu-dhabi/startseite/verein/161",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-wahda-fc-abu-dhabi/transferrekorde/verein/161"
+    },
+    "Al Wasl": {
+      "tm": "https://www.transfermarkt.com/al-wasl-sports-club/startseite/verein/16214",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-wasl-sports-club/transferrekorde/verein/16214"
+    },
+    "Al-Nasr": {
+      "tm": "https://www.transfermarkt.com/al-nasr-dubai-/startseite/verein/5432",
+      "tmTopTransfers": "https://www.transfermarkt.com/al-nasr-dubai-/transferrekorde/verein/5432"
+    },
+    "Baniyas": {
+      "tm": "https://www.transfermarkt.com/fc-baniyas/startseite/verein/4785",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-baniyas/transferrekorde/verein/4785"
+    },
+    "Dibba Al Fujairah": {
+      "tm": "https://www.transfermarkt.com/dibba-al-fujairah/startseite/verein/44289/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/dibba-al-fujairah/transferrekorde/verein/44289"
+    },
+    "Khor Fakkan": {
+      "tm": "https://www.transfermarkt.com/khor-fakkan/startseite/verein/26351/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/khor-fakkan/transferrekorde/verein/26351"
+    },
+    "Sharjah": {
+      "tm": "https://www.transfermarkt.com/sharjah-cultural-sports-club/startseite/verein/13613",
+      "tmTopTransfers": "https://www.transfermarkt.com/sharjah-cultural-sports-club/transferrekorde/verein/13613"
+    },
+    "Atlanta United": {
+      "tm": "https://www.transfermarkt.com/atlanta-united-fc/startseite/verein/51663",
+      "tmTopTransfers": "https://www.transfermarkt.com/atlanta-united-fc/transferrekorde/verein/51663"
+    },
+    "Austin": {
+      "tm": "https://www.transfermarkt.com/austin-fc/startseite/verein/72309",
+      "tmTopTransfers": "https://www.transfermarkt.com/austin-fc/transferrekorde/verein/72309"
+    },
+    "CF Montreal": {
+      "tm": "https://www.transfermarkt.com/club-de-foot-montreal/startseite/verein/4078",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-de-foot-montreal/transferrekorde/verein/4078"
+    },
+    "Charlotte": {
+      "tm": "https://www.transfermarkt.com/charlotte-fc/startseite/verein/78435",
+      "tmTopTransfers": "https://www.transfermarkt.com/charlotte-fc/transferrekorde/verein/78435"
+    },
+    "Chicago Fire": {
+      "tm": "https://www.transfermarkt.com/chicago-fire-fc/startseite/verein/432",
+      "tmTopTransfers": "https://www.transfermarkt.com/chicago-fire-fc/transferrekorde/verein/432"
+    },
+    "Cincinnati": {
+      "tm": "https://www.transfermarkt.com/fc-cincinnati/startseite/verein/51772",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-cincinnati/transferrekorde/verein/51772"
+    },
+    "Colorado Rapids": {
+      "tm": "https://www.transfermarkt.com/colorado-rapids/startseite/verein/1247",
+      "tmTopTransfers": "https://www.transfermarkt.com/colorado-rapids/transferrekorde/verein/1247"
+    },
+    "Columbus Crew": {
+      "tm": "https://www.transfermarkt.com/columbus-crew-sc/startseite/verein/813",
+      "tmTopTransfers": "https://www.transfermarkt.com/columbus-crew-sc/transferrekorde/verein/813"
+    },
+    "D.C. United": {
+      "tm": "https://www.transfermarkt.com/d-c-united/startseite/verein/2440",
+      "tmTopTransfers": "https://www.transfermarkt.com/d-c-united/transferrekorde/verein/2440"
+    },
+    "Dallas": {
+      "tm": "https://www.transfermarkt.com/fc-dallas/startseite/verein/8816",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-dallas/transferrekorde/verein/8816"
+    },
+    "Houston Dynamo": {
+      "tm": "https://www.transfermarkt.com/houston-dynamo-fc/startseite/verein/9168",
+      "tmTopTransfers": "https://www.transfermarkt.com/houston-dynamo-fc/transferrekorde/verein/9168"
+    },
+    "Inter Miami": {
+      "tm": "https://www.transfermarkt.com/inter-miami-cf/startseite/verein/69261",
+      "tmTopTransfers": "https://www.transfermarkt.com/inter-miami-cf/transferrekorde/verein/69261"
+    },
+    "LA Galaxy": {
+      "tm": "https://www.transfermarkt.com/los-angeles-galaxy/startseite/verein/1061",
+      "tmTopTransfers": "https://www.transfermarkt.com/los-angeles-galaxy/transferrekorde/verein/1061"
+    },
+    "Los Angeles FC": {
+      "tm": "https://www.transfermarkt.com/los-angeles-fc/startseite/verein/51828",
+      "tmTopTransfers": "https://www.transfermarkt.com/los-angeles-fc/transferrekorde/verein/51828"
+    },
+    "Minnesota United": {
+      "tm": "https://www.transfermarkt.com/minnesota-united-fc/startseite/verein/56089",
+      "tmTopTransfers": "https://www.transfermarkt.com/minnesota-united-fc/transferrekorde/verein/56089"
+    },
+    "Nashville SC": {
+      "tm": "https://www.transfermarkt.com/nashville-sc/startseite/verein/63966",
+      "tmTopTransfers": "https://www.transfermarkt.com/nashville-sc/transferrekorde/verein/63966"
+    },
+    "New England": {
+      "tm": "https://www.transfermarkt.com/new-england-revolution/startseite/verein/626",
+      "tmTopTransfers": "https://www.transfermarkt.com/new-england-revolution/transferrekorde/verein/626"
+    },
+    "New York City": {
+      "tm": "https://www.transfermarkt.com/new-york-city-fc/startseite/verein/40058",
+      "tmTopTransfers": "https://www.transfermarkt.com/new-york-city-fc/transferrekorde/verein/40058"
+    },
+    "New York RB": {
+      "tm": "https://www.transfermarkt.com/new-york-red-bulls/startseite/verein/623",
+      "tmTopTransfers": "https://www.transfermarkt.com/new-york-red-bulls/transferrekorde/verein/623"
+    },
+    "Orlando City": {
+      "tm": "https://www.transfermarkt.com/orlando-city-sc/startseite/verein/45604",
+      "tmTopTransfers": "https://www.transfermarkt.com/orlando-city-sc/transferrekorde/verein/45604"
+    },
+    "Philadelphia Union": {
+      "tm": "https://www.transfermarkt.com/philadelphia-union/startseite/verein/25467",
+      "tmTopTransfers": "https://www.transfermarkt.com/philadelphia-union/transferrekorde/verein/25467"
+    },
+    "Portland Timbers": {
+      "tm": "https://www.transfermarkt.com/portland-timbers/startseite/verein/4291",
+      "tmTopTransfers": "https://www.transfermarkt.com/portland-timbers/transferrekorde/verein/4291"
+    },
+    "Real Salt Lake": {
+      "tm": "https://www.transfermarkt.com/real-salt-lake-city/startseite/verein/6643",
+      "tmTopTransfers": "https://www.transfermarkt.com/real-salt-lake-city/transferrekorde/verein/6643"
+    },
+    "SJ Earthquakes": {
+      "tm": "https://www.transfermarkt.com/san-jose-earthquakes/startseite/verein/218",
+      "tmTopTransfers": "https://www.transfermarkt.com/san-jose-earthquakes/transferrekorde/verein/218"
+    },
+    "San Diego": {
+      "tm": "https://www.transfermarkt.com/san-diego-fc/startseite/verein/114977",
+      "tmTopTransfers": "https://www.transfermarkt.com/san-diego-fc/transferrekorde/verein/114977"
+    },
+    "Seattle Sounders": {
+      "tm": "https://www.transfermarkt.com/seattle-sounders-fc/startseite/verein/9636",
+      "tmTopTransfers": "https://www.transfermarkt.com/seattle-sounders-fc/transferrekorde/verein/9636"
+    },
+    "Sporting KC": {
+      "tm": "https://www.transfermarkt.com/sporting-kansas-city/startseite/verein/4284",
+      "tmTopTransfers": "https://www.transfermarkt.com/sporting-kansas-city/transferrekorde/verein/4284"
+    },
+    "St. Louis City": {
+      "tm": "https://www.transfermarkt.com/st-louis-city-sc/startseite/verein/82686",
+      "tmTopTransfers": "https://www.transfermarkt.com/st-louis-city-sc/transferrekorde/verein/82686"
+    },
+    "Toronto": {
+      "tm": "https://www.transfermarkt.com/toronto-fc/startseite/verein/11141",
+      "tmTopTransfers": "https://www.transfermarkt.com/toronto-fc/transferrekorde/verein/11141"
+    },
+    "Vancouver Whitecaps": {
+      "tm": "https://www.transfermarkt.com/vancouver-whitecaps-fc/startseite/verein/6321",
+      "tmTopTransfers": "https://www.transfermarkt.com/vancouver-whitecaps-fc/transferrekorde/verein/6321"
+    },
+    "Aldosivi": {
+      "tm": "https://www.transfermarkt.com/club-atletico-aldosivi/startseite/verein/12301",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-aldosivi/transferrekorde/verein/12301"
+    },
+    "Argentinos Juniors": {
+      "tm": "https://www.transfermarkt.com/argentinos-juniors/startseite/verein/1030",
+      "tmTopTransfers": "https://www.transfermarkt.com/argentinos-juniors/transferrekorde/verein/1030"
+    },
+    "Banfield": {
+      "tm": "https://www.transfermarkt.com/club-atletico-banfield/startseite/verein/830/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-banfield/transferrekorde/verein/830"
+    },
+    "Barracas Central": {
+      "tm": "https://www.transfermarkt.com/club-atletico-barracas-central/startseite/verein/25184/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-barracas-central/startseite/verein/25184/saison_id/2025"
+    },
+    "Belgrano": {
+      "tm": "https://www.transfermarkt.com/ca-belgrano/startseite/verein/2417/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/ca-belgrano/transferrekorde/verein/2417"
+    },
+    "Boca Juniors": {
+      "tm": "https://www.transfermarkt.com/club-atletico-boca-juniors/startseite/verein/189",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-boca-juniors/transferrekorde/verein/189"
+    },
+    "Central Córdoba": {
+      "tm": "https://www.transfermarkt.com/club-atletico-central-cordoba-sde-/startseite/verein/31284/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-central-cordoba-sde-/transferrekorde/verein/31284"
+    },
+    "Club Gimnasia y Esgrima de Mendoza": {
+      "tm": "https://www.transfermarkt.com/gimnasia-y-esgrima-de-mendoza/startseite/verein/14687/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/gimnasia-y-esgrima-de-mendoza/transferrekorde/verein/14687"
+    },
+    "Club de Gimnasia y Esgrima La Plata": {
+      "tm": "https://www.transfermarkt.com/club-de-gimnasia-y-esgrima-la-plata/startseite/verein/1106/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-de-gimnasia-y-esgrima-la-plata/transferrekorde/verein/1106"
+    },
+    "Defensa Y Justicia": {
+      "tm": "https://www.transfermarkt.com/defensa-y-justicia/startseite/verein/2402",
+      "tmTopTransfers": "https://www.transfermarkt.com/defensa-y-justicia/transferrekorde/verein/2402"
+    },
+    "Deportivo Riestra": {
+      "tm": "https://www.transfermarkt.com/cd-riestra/startseite/verein/19775/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/cd-riestra/transferrekorde/verein/19775"
+    },
+    "Estudiantes de La Plata": {
+      "tm": "https://www.transfermarkt.com/club-estudiantes-de-la-plata/startseite/verein/288",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-estudiantes-de-la-plata/transferrekorde/verein/288"
+    },
+    "Estudiantes de Río Cuarto": {
+      "tm": "https://www.transfermarkt.com/aa-estudiantes-de-rio-cuarto/startseite/verein/14602/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/aa-estudiantes-de-rio-cuarto/transferrekorde/verein/14602"
+    },
+    "Huracan": {
+      "tm": "https://www.transfermarkt.com/club-atletico-huracan/startseite/verein/2063/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-huracan/transferrekorde/verein/2063"
+    },
+    "Independiente": {
+      "tm": "https://www.transfermarkt.com/club-atletico-independiente/startseite/verein/1234",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-independiente/transferrekorde/verein/1234"
+    },
+    "Independiente Rivadavia": {
+      "tm": "https://www.transfermarkt.com/independiente-rivadavia/startseite/verein/12179/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/independiente-rivadavia/transferrekorde/verein/12179"
+    },
+    "Instituto": {
+      "tm": "https://www.transfermarkt.com/instituto-acc/startseite/verein/1829",
+      "tmTopTransfers": "https://www.transfermarkt.com/instituto-ac-cordoba/transferrekorde/verein/1829"
+    },
+    "Lanús": {
+      "tm": "https://www.transfermarkt.com/club-atletico-lanus/startseite/verein/333",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-lanus/transferrekorde/verein/333"
+    },
+    "Newell's Old Boys": {
+      "tm": "https://www.transfermarkt.com/newells-old-boys/startseite/verein/1286",
+      "tmTopTransfers": "https://www.transfermarkt.com/newells-old-boys/transferrekorde/verein/1286"
+    },
+    "Platense": {
+      "tm": "https://www.transfermarkt.com/club-atletico-platense/startseite/verein/928/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-platense/transferrekorde/verein/928"
+    },
+    "Racing": {
+      "tm": "https://www.transfermarkt.com/racing-club/startseite/verein/1444",
+      "tmTopTransfers": "https://www.transfermarkt.com/racing-club/transferrekorde/verein/1444"
+    },
+    "River Plate": {
+      "tm": "https://www.transfermarkt.com/club-atletico-river-plate/startseite/verein/209",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-river-plate/transferrekorde/verein/209"
+    },
+    "Rosario Central": {
+      "tm": "https://www.transfermarkt.com/club-atletico-rosario-central/startseite/verein/1418",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-rosario-central/transferrekorde/verein/1418"
+    },
+    "San Lorenzo": {
+      "tm": "https://www.transfermarkt.com/club-atletico-san-lorenzo-de-almagro/startseite/verein/1775",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-san-lorenzo-de-almagro/transferrekorde/verein/1775"
+    },
+    "Sarmiento": {
+      "tm": "https://www.transfermarkt.com/club-atletico-sarmiento-junin-/startseite/verein/12454",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-sarmiento-junin-/transferrekorde/verein/12454"
+    },
+    "Talleres": {
+      "tm": "https://www.transfermarkt.com/club-atletico-talleres/startseite/verein/3938",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-talleres/transferrekorde/verein/3938"
+    },
+    "Tigre": {
+      "tm": "https://www.transfermarkt.com/club-atletico-tigre/startseite/verein/11831",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-tigre/transferrekorde/verein/11831"
+    },
+    "Tucumán": {
+      "tm": "https://www.transfermarkt.com/club-atletico-tucuman/startseite/verein/14554/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-tucuman/transferrekorde/verein/14554"
+    },
+    "Unión de Santa Fé": {
+      "tm": "https://www.transfermarkt.com/club-atletico-union/startseite/verein/7097/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-union/transferrekorde/verein/7097"
+    },
+    "Vélez Sarsfield": {
+      "tm": "https://www.transfermarkt.com/club-atletico-velez-sarsfield/startseite/verein/1029",
+      "tmTopTransfers": "https://www.transfermarkt.com/club-atletico-velez-sarsfield/transferrekorde/verein/1029"
+    },
+    "Altach": {
+      "tm": "https://www.transfermarkt.com/scr-altach/startseite/verein/3551/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/scr-altach/transferrekorde/verein/3551"
+    },
+    "Austria Vienna": {
+      "tm": "https://www.transfermarkt.com/fk-austria-wien/startseite/verein/14",
+      "tmTopTransfers": "https://www.transfermarkt.com/fk-austria-wien/transferrekorde/verein/14"
+    },
+    "Blau Weib Linz": {
+      "tm": "https://www.transfermarkt.com/fc-blau-weiss-linz/startseite/verein/2157/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-blau-weiss-linz/transferrekorde/verein/2157"
+    },
+    "Grazer AK": {
+      "tm": "https://www.transfermarkt.com/grazer-ak-1902/startseite/verein/316/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/grazer-ak-1902/transferrekorde/verein/316"
+    },
+    "Hartberg": {
+      "tm": "https://www.transfermarkt.com/tsv-hartberg/startseite/verein/4467/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/tsv-hartberg/transferrekorde/verein/4467"
+    },
+    "Lask": {
+      "tm": "https://www.transfermarkt.com/lask/startseite/verein/413",
+      "tmTopTransfers": "https://www.transfermarkt.com/lask/transferrekorde/verein/413"
+    },
+    "Rapid Vienna": {
+      "tm": "https://www.transfermarkt.com/sk-rapid-wien/startseite/verein/170",
+      "tmTopTransfers": "https://www.transfermarkt.com/sk-rapid-wien/transferrekorde/verein/170"
+    },
+    "Red Bull Salzburg": {
+      "tm": "https://www.transfermarkt.com/red-bull-salzburg/startseite/verein/409",
+      "tmTopTransfers": "https://www.transfermarkt.com/red-bull-salzburg/transferrekorde/verein/409"
+    },
+    "Ried": {
+      "tm": "https://www.transfermarkt.com/sv-ried/startseite/verein/266/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sv-ried/transferrekorde/verein/266"
+    },
+    "Sturm Graz": {
+      "tm": "https://www.transfermarkt.com/sk-sturm-graz/startseite/verein/122",
+      "tmTopTransfers": "https://www.transfermarkt.com/sk-sturm-graz/transferrekorde/verein/122"
+    },
+    "WSG Tirol": {
+      "tm": "https://www.transfermarkt.com/wsg-tirol/startseite/verein/2446/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/wsg-tirol/transferrekorde/verein/2446"
+    },
+    "Wolfsberg": {
+      "tm": "https://www.transfermarkt.com/wolfsberger-ac/startseite/verein/4441",
+      "tmTopTransfers": "https://www.transfermarkt.com/wolfsberger-ac/transferrekorde/verein/4441"
+    },
+    "Anderlecht": {
+      "tm": "https://www.transfermarkt.com/rsc-anderlecht/startseite/verein/58",
+      "tmTopTransfers": "https://www.transfermarkt.com/rsc-anderlecht/transferrekorde/verein/58"
+    },
+    "Antwerp": {
+      "tm": "https://www.transfermarkt.com/royal-antwerpen-fc/startseite/verein/1096",
+      "tmTopTransfers": "https://www.transfermarkt.com/royal-antwerpen-fc/transferrekorde/verein/1096"
+    },
+    "Cercle Brugge": {
+      "tm": "https://www.transfermarkt.com/cercle-brugge/startseite/verein/520/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/cercle-brugge/startseite/verein/520/saison_id/2025"
+    },
+    "Charleroi": {
+      "tm": "https://www.transfermarkt.com/rsc-charleroi/startseite/verein/172/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/rsc-charleroi/transferrekorde/verein/172"
+    },
+    "Club Brugge": {
+      "tm": "https://www.transfermarkt.com/fc-brugge/startseite/verein/2282",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-brugge/transferrekorde/verein/2282"
+    },
+    "Dender Eendracht": {
+      "tm": "https://www.transfermarkt.pt/fcv-dender-eh/startseite/verein/9010",
+      "tmTopTransfers": "https://www.transfermarkt.pt/fcv-dender-eh/transferrekorde/verein/9010"
+    },
+    "Genk": {
+      "tm": "https://www.transfermarkt.com/krc-genk/startseite/verein/1184",
+      "tmTopTransfers": "https://www.transfermarkt.com/krc-genk/transferrekorde/verein/1184"
+    },
+    "Gent": {
+      "tm": "https://www.transfermarkt.com/kaa-gent/startseite/verein/157",
+      "tmTopTransfers": "https://www.transfermarkt.com/kaa-gent/transferrekorde/verein/157"
+    },
+    "Louviere": {
+      "tm": "https://www.transfermarkt.com/raal-la-louviere/startseite/verein/3901/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/raal-la-louviere/transferrekorde/verein/3901"
+    },
+    "Mechelen": {
+      "tm": "https://www.transfermarkt.com/kv-mechelen/startseite/verein/354/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/kv-mechelen/transferrekorde/verein/354"
+    },
+    "OH Leuven": {
+      "tm": "https://www.transfermarkt.com/oud-heverlee-leuven/startseite/verein/2727/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/oud-heverlee-leuven/transferrekorde/verein/2727"
+    },
+    "Sint Truidense": {
+      "tm": "https://www.transfermarkt.com/vv-st-truiden/transferrekorde/verein/475",
+      "tmTopTransfers": "https://www.transfermarkt.com/vv-st-truiden/transferrekorde/verein/475"
+    },
+    "Standard de Liège": {
+      "tm": "https://www.transfermarkt.com/standard-luttich/startseite/verein/3057",
+      "tmTopTransfers": "https://www.transfermarkt.com/standard-luttich/transferrekorde/verein/3057"
+    },
+    "Union Saint Gilloise": {
+      "tm": "https://www.transfermarkt.com/royale-union-saint-gilloise/startseite/verein/3948",
+      "tmTopTransfers": "https://www.transfermarkt.com/royale-union-saint-gilloise/transferrekorde/verein/3948"
+    },
+    "Westerlo": {
+      "tm": "https://www.transfermarkt.com/kvc-westerlo/startseite/verein/968",
+      "tmTopTransfers": "https://www.transfermarkt.com/kvc-westerlo/transferrekorde/verein/968"
+    },
+    "Zulte-Waregem": {
+      "tm": "https://www.transfermarkt.com/sv-zulte-waregem/startseite/verein/3508/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sv-zulte-waregem/transferrekorde/verein/3508"
+    },
+    "América-MG": {
+      "tm": "https://www.transfermarkt.com/america-futebol-clube-mg-/startseite/verein/2863",
+      "tmTopTransfers": "https://www.transfermarkt.com/america-futebol-clube-mg-/transferrekorde/verein/2863"
+    },
+    "Athletic MG": {
+      "tm": "https://www.transfermarkt.com/athletic-club-mg-/startseite/verein/64918",
+      "tmTopTransfers": "https://www.transfermarkt.com/athletic-club-mg-/transferrekorde/verein/64918"
+    },
+    "Atlético-GO": {
+      "tm": "https://www.transfermarkt.com/atletico-clube-goianiense/startseite/verein/15172",
+      "tmTopTransfers": "https://www.transfermarkt.com/atletico-clube-goianiense/transferrekorde/verein/15172"
+    },
+    "Avaí": {
+      "tm": "https://www.transfermarkt.com/avai-fc-sc-/startseite/verein/2035/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/avai-fc-sc-/transferrekorde/verein/2035"
+    },
+    "Botafogo-SP": {
+      "tm": "https://www.transfermarkt.com/botafogo-futebol-clube-sp-/startseite/verein/9030/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/botafogo-futebol-clube-sp-/transferrekorde/verein/9030"
+    },
+    "CRB-AL": {
+      "tm": "https://www.transfermarkt.com/clube-de-regatas-brasil-al-/startseite/verein/11449/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/clube-de-regatas-brasil-al-/transferrekorde/verein/11449"
+    },
+    "Ceará": {
+      "tm": "https://www.transfermarkt.com/ceara-sporting-club/startseite/verein/2029/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/ceara-sporting-club/transferrekorde/verein/2029"
+    },
+    "Criciúma": {
+      "tm": "https://www.transfermarkt.com/criciuma-esporte-clube/startseite/verein/7178/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/criciuma-esporte-clube/transferrekorde/verein/7178"
+    },
+    "Cuiabá-MT": {
+      "tm": "https://www.transfermarkt.com/cuiaba-ec-mt-/startseite/verein/28022",
+      "tmTopTransfers": "https://www.transfermarkt.com/cuiaba-ec-mt-/transferrekorde/verein/28022"
+    },
+    "Fortaleza": {
+      "tm": "https://www.transfermarkt.com/fortaleza-esporte-clube/startseite/verein/10870",
+      "tmTopTransfers": "https://www.transfermarkt.com/fortaleza-esporte-clube/transferrekorde/verein/10870"
+    },
+    "Goiás": {
+      "tm": "https://www.transfermarkt.com/goias-ec/startseite/verein/3197",
+      "tmTopTransfers": "https://www.transfermarkt.com/goias-ec/transferrekorde/verein/3197"
+    },
+    "Juventude": {
+      "tm": "https://www.transfermarkt.com/esporte-clube-juventude/startseite/verein/10492",
+      "tmTopTransfers": "https://www.transfermarkt.com/esporte-clube-juventude/transferrekorde/verein/10492"
+    },
+    "Londrina": {
+      "tm": "https://www.transfermarkt.com/londrina-esporte-clube-pr-/startseite/verein/1693/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/londrina-esporte-clube-pr-/transferrekorde/verein/1693"
+    },
+    "Novorizontino": {
+      "tm": "https://www.transfermarkt.com/gremio-novorizontino-sp-/startseite/verein/37474",
+      "tmTopTransfers": "https://www.transfermarkt.com/gremio-novorizontino-sp-/transferrekorde/verein/37474"
+    },
+    "Náutico": {
+      "tm": "https://www.transfermarkt.com/clube-nautico-capibaribe/startseite/verein/2646/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/clube-nautico-capibaribe/transferrekorde/verein/2646"
+    },
+    "Operário-PR": {
+      "tm": "https://www.transfermarkt.com/operario-ferroviario-ec-pr-/startseite/verein/27214/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/operario-ferroviario-ec-pr-/transferrekorde/verein/27214"
+    },
+    "Ponte Preta": {
+      "tm": "https://www.transfermarkt.com/aa-ponte-preta/startseite/verein/1134/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/aa-ponte-preta/transferrekorde/verein/1134"
+    },
+    "Sport": {
+      "tm": "https://www.transfermarkt.com/sport-club-do-recife/startseite/verein/8718/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sport-club-do-recife/transferrekorde/verein/8718"
+    },
+    "São Bernardo": {
+      "tm": "https://www.transfermarkt.com/sao-bernardo-futebol-clube-sp-/startseite/verein/16439/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sao-bernardo-futebol-clube-sp-/transferrekorde/verein/16439"
+    },
+    "Vila Nova-GO": {
+      "tm": "https://www.transfermarkt.com/vila-nova-futebol-clube-go-/startseite/verein/5677/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/vila-nova-futebol-clube-go-/transferrekorde/verein/5677"
+    },
+    "Arda (Kardzhali)": {
+      "tm": "https://www.transfermarkt.com/pfc-arda-kardzhali/startseite/verein/40604/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/pfc-arda-kardzhali/transferrekorde/verein/40604"
+    },
+    "Beroe": {
+      "tm": "https://www.transfermarkt.com/pfc-beroe-stara-zagora/startseite/verein/6764/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/pfc-beroe-stara-zagora/transferrekorde/verein/6764"
+    },
+    "Botev Plovdiv": {
+      "tm": "https://www.transfermarkt.com/botev-plovdiv/startseite/verein/2531/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/botev-plovdiv/transferrekorde/verein/2531"
+    },
+    "Botev Vratsa": {
+      "tm": "https://www.transfermarkt.com/pofk-botev-vratsa/startseite/verein/26462/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/pofk-botev-vratsa/transferrekorde/verein/26462"
+    },
+    "CSKA 1948": {
+      "tm": "https://www.transfermarkt.com/cska-1948/startseite/verein/61955/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/cska-1948/transferrekorde/verein/61955"
+    },
+    "CSKA Sofia": {
+      "tm": "https://www.transfermarkt.com/zska-sofia/startseite/verein/208/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/zska-sofia/transferrekorde/verein/208"
+    },
+    "Cherno More": {
+      "tm": "https://www.transfermarkt.com/cherno-more-varna/startseite/verein/967/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/cherno-more-varna/transferrekorde/verein/967"
+    },
+    "Dobrudzha Dobrich": {
+      "tm": "https://www.transfermarkt.com/pfk-dobrudzha-dobrich/startseite/verein/4362/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/pfk-dobrudzha-dobrich/transferrekorde/verein/4362"
+    },
+    "Levski Sofia": {
+      "tm": "https://www.transfermarkt.com/levski-sofia/startseite/verein/156/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/levski-sofia/transferrekorde/verein/156"
+    },
+    "Lokomotiv Plovdiv": {
+      "tm": "https://www.transfermarkt.com/lokomotive-plovdiv/startseite/verein/2259/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/lokomotive-plovdiv/transferrekorde/verein/2259"
+    },
+    "Ludogorets": {
+      "tm": "https://www.transfermarkt.com/pfk-ludogorets-razgrad/startseite/verein/31614/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/pfk-ludogorets-razgrad/transferrekorde/verein/31614"
+    },
+    "Montana": {
+      "tm": "https://www.transfermarkt.com/pfc-montana/startseite/verein/24078/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/pfc-montana/startseite/verein/24078/saison_id/2025"
+    },
+    "PFC Lokomotiv Sofia": {
+      "tm": "https://www.transfermarkt.com/lokomotiv-sofia/startseite/verein/730/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/lokomotiv-sofia/transferrekorde/verein/730"
+    },
+    "Septemvri": {
+      "tm": "https://www.transfermarkt.com/septemvri-sofia/startseite/verein/40416/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/septemvri-sofia/transferrekorde/verein/40416"
+    },
+    "Slavia Sofia": {
+      "tm": "https://www.transfermarkt.com/slavia-sofia/startseite/verein/675/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/slavia-sofia/transferrekorde/verein/675"
+    },
+    "Spartak Varna": {
+      "tm": "https://www.transfermarkt.com/spartak-varna/startseite/verein/9599/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/spartak-varna/transferrekorde/verein/9599"
+    },
+    "Dinamo Zagreb": {
+      "tm": "https://www.transfermarkt.com/gnk-dinamo-zagreb/startseite/verein/419",
+      "tmTopTransfers": "https://www.transfermarkt.com/gnk-dinamo-zagreb/transferrekorde/verein/419"
+    },
+    "HNK Gorica": {
+      "tm": "https://www.transfermarkt.com/hnk-gorica/startseite/verein/24575/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/hnk-gorica/transferrekorde/verein/24575"
+    },
+    "HNK Hajduk Split": {
+      "tm": "https://www.transfermarkt.com/hnk-hajduk-split/startseite/verein/447",
+      "tmTopTransfers": "https://www.transfermarkt.com/hnk-hajduk-split/transferrekorde/verein/447"
+    },
+    "NK Istra": {
+      "tm": "https://www.transfermarkt.com/nk-istra-1961/startseite/verein/999",
+      "tmTopTransfers": "https://www.transfermarkt.com/nk-istra-1961/transferrekorde/verein/999"
+    },
+    "NK Lokomotiva": {
+      "tm": "https://www.transfermarkt.com/nk-lokomotiva-zagreb/startseite/verein/11194/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/nk-lokomotiva-zagreb/transferrekorde/verein/11194"
+    },
+    "NK Varaždin": {
+      "tm": "https://www.transfermarkt.com/nk-varazdin/startseite/verein/599/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/nk-varazdin/transferrekorde/verein/599"
+    },
+    "Osijek": {
+      "tm": "https://www.transfermarkt.com/nk-osijek/startseite/verein/327",
+      "tmTopTransfers": "https://www.transfermarkt.com/nk-osijek/transferrekorde/verein/327"
+    },
+    "Rijeka": {
+      "tm": "https://www.transfermarkt.com/hnk-rijeka/startseite/verein/144",
+      "tmTopTransfers": "https://www.transfermarkt.com/hnk-rijeka/transferrekorde/verein/144"
+    },
+    "Slaven Belupo Koprivnica": {
+      "tm": "https://www.transfermarkt.com/slaven-belupo-koprivnica/startseite/verein/2362/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/slaven-belupo-koprivnica/transferrekorde/verein/2362"
+    },
+    "Vukovar 1991": {
+      "tm": "https://www.transfermarkt.com/hnk-vukovar-1991/startseite/verein/456/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/hnk-vukovar-1991/transferrekorde/verein/456"
+    },
+    "AGF Foldbold": {
+      "tm": "https://www.transfermarkt.com/aarhus-gf/startseite/verein/678",
+      "tmTopTransfers": "https://www.transfermarkt.com/aarhus-gf/transferrekorde/verein/678"
+    },
+    "Brondby IF": {
+      "tm": "https://www.transfermarkt.com/brondby-if/startseite/verein/206",
+      "tmTopTransfers": "https://www.transfermarkt.com/brondby-if/transferrekorde/verein/206"
+    },
+    "Copenhagen": {
+      "tm": "https://www.transfermarkt.com/fc-kopenhagen/startseite/verein/190",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-kopenhagen/transferrekorde/verein/190"
+    },
+    "FC Fredericia": {
+      "tm": "https://www.transfermarkt.com/fc-fredericia/startseite/verein/5776/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-fredericia/transferrekorde/verein/5776"
+    },
+    "FC Midtjylland": {
+      "tm": "https://www.transfermarkt.com/fc-midtjylland/startseite/verein/865",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-midtjylland/transferrekorde/verein/865"
+    },
+    "Nordjslandt": {
+      "tm": "https://www.transfermarkt.com/fc-nordsjaelland/startseite/verein/2778",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-nordsjaelland/transferrekorde/verein/2778"
+    },
+    "Odense BK": {
+      "tm": "https://www.transfermarkt.com/odense-boldklub/startseite/verein/173",
+      "tmTopTransfers": "https://www.transfermarkt.com/odense-boldklub/transferrekorde/verein/173"
+    },
+    "Randers FC": {
+      "tm": "https://www.transfermarkt.com/randers-fc/startseite/verein/5724",
+      "tmTopTransfers": "https://www.transfermarkt.com/randers-fc/transferrekorde/verein/5724"
+    },
+    "Silkeborg": {
+      "tm": "https://www.transfermarkt.com/silkeborg-if/startseite/verein/1177",
+      "tmTopTransfers": "https://www.transfermarkt.com/silkeborg-if/transferrekorde/verein/1177"
+    },
+    "Sønderjyske": {
+      "tm": "https://www.transfermarkt.com/sonderjyske/startseite/verein/5817/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sonderjyske/transferrekorde/verein/5817"
+    },
+    "Vejle Boldklub": {
+      "tm": "https://www.transfermarkt.com/vejle-boldklub/startseite/verein/443",
+      "tmTopTransfers": "https://www.transfermarkt.com/vejle-boldklub/transferrekorde/verein/443"
+    },
+    "Viborg": {
+      "tm": "https://www.transfermarkt.com/viborg-ff/startseite/verein/1063",
+      "tmTopTransfers": "https://www.transfermarkt.com/viborg-ff/transferrekorde/verein/1063"
+    },
+    "Birmingham City": {
+      "tm": "https://www.transfermarkt.com/birmingham-city/startseite/verein/337",
+      "tmTopTransfers": "https://www.transfermarkt.com/birmingham-city/transferrekorde/verein/337"
+    },
+    "Blackburn Rovers": {
+      "tm": "https://www.transfermarkt.com/blackburn-rovers/startseite/verein/164",
+      "tmTopTransfers": "https://www.transfermarkt.com/blackburn-rovers/transferrekorde/verein/164"
+    },
+    "Bristol City": {
+      "tm": "https://www.transfermarkt.com/bristol-city/startseite/verein/698/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/bristol-city/transferrekorde/verein/698"
+    },
+    "Charlton": {
+      "tm": "https://www.transfermarkt.com/charlton-athletic/startseite/verein/358/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/charlton-athletic/transferrekorde/verein/358"
+    },
+    "Coventry City": {
+      "tm": "https://www.transfermarkt.com/coventry-city/startseite/verein/990",
+      "tmTopTransfers": "https://www.transfermarkt.com/coventry-city/transferrekorde/verein/990"
+    },
+    "Derby County": {
+      "tm": "https://www.transfermarkt.com/derby-county/startseite/verein/22",
+      "tmTopTransfers": "https://www.transfermarkt.com/derby-county/transferrekorde/verein/22"
+    },
+    "Hull City": {
+      "tm": "https://www.transfermarkt.com/hull-city/startseite/verein/3008/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/hull-city/transferrekorde/verein/3008"
+    },
+    "Ipswich Town": {
+      "tm": "https://www.transfermarkt.com/ipswich-town/startseite/verein/677",
+      "tmTopTransfers": "https://www.transfermarkt.com/ipswich-town/transferrekorde/verein/677"
+    },
+    "Leicester City": {
+      "tm": "https://www.transfermarkt.com/leicester-city/startseite/verein/1003",
+      "tmTopTransfers": "https://www.transfermarkt.com/leicester-city/transferrekorde/verein/1003"
+    },
+    "Middlesbrough": {
+      "tm": "https://www.transfermarkt.com/fc-middlesbrough/startseite/verein/641",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-middlesbrough/transferrekorde/verein/641"
+    },
+    "Millwall": {
+      "tm": "https://www.transfermarkt.com/fc-millwall/startseite/verein/1028/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-millwall/transferrekorde/verein/1028"
+    },
+    "Norwich City": {
+      "tm": "https://www.transfermarkt.com/norwich-city/startseite/verein/1123",
+      "tmTopTransfers": "https://www.transfermarkt.com/norwich-city/transferrekorde/verein/1123"
+    },
+    "Oxford United": {
+      "tm": "https://www.transfermarkt.com/oxford-united/startseite/verein/988/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/oxford-united/transferrekorde/verein/988"
+    },
+    "Portsmouth": {
+      "tm": "https://www.transfermarkt.com/fc-portsmouth/startseite/verein/1020/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-portsmouth/transferrekorde/verein/1020"
+    },
+    "Preston North End": {
+      "tm": "https://www.transfermarkt.com/preston-north-end/startseite/verein/466/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/preston-north-end/transferrekorde/verein/466"
+    },
+    "Queens Park Rangers": {
+      "tm": "https://www.transfermarkt.com/queens-park-rangers/startseite/verein/1039",
+      "tmTopTransfers": "https://www.transfermarkt.com/queens-park-rangers/transferrekorde/verein/1039"
+    },
+    "Sheffield United": {
+      "tm": "https://www.transfermarkt.com/sheffield-united/startseite/verein/350",
+      "tmTopTransfers": "https://www.transfermarkt.com/sheffield-united/transferrekorde/verein/350"
+    },
+    "Sheffield Wednesday": {
+      "tm": "https://www.transfermarkt.com/sheffield-wednesday/startseite/verein/1035/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sheffield-wednesday/transferrekorde/verein/1035"
+    },
+    "Southampton": {
+      "tm": "https://www.transfermarkt.com/fc-southampton/startseite/verein/180",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-southampton/transferrekorde/verein/180"
+    },
+    "Stoke": {
+      "tm": "https://www.transfermarkt.com/stoke-city/startseite/verein/512",
+      "tmTopTransfers": "https://www.transfermarkt.com/stoke-city/transferrekorde/verein/512"
+    },
+    "Swansea City": {
+      "tm": "https://www.transfermarkt.com/swansea-city/startseite/verein/2288",
+      "tmTopTransfers": "https://www.transfermarkt.com/swansea-city/transferrekorde/verein/2288"
+    },
+    "Watford": {
+      "tm": "https://www.transfermarkt.com/fc-watford/startseite/verein/1010",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-watford/transferrekorde/verein/1010"
+    },
+    "West Bromwich": {
+      "tm": "https://www.transfermarkt.com/west-bromwich-albion/startseite/verein/984",
+      "tmTopTransfers": "https://www.transfermarkt.com/west-bromwich-albion/transferrekorde/verein/984"
+    },
+    "Wrexham FC": {
+      "tm": "https://www.transfermarkt.com/afc-wrexham/startseite/verein/1112/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/afc-wrexham/transferrekorde/verein/1112"
+    },
+    "AEK": {
+      "tm": "https://www.transfermarkt.com/aek-athen/startseite/verein/2441",
+      "tmTopTransfers": "https://www.transfermarkt.com/aek-athen/transferrekorde/verein/2441"
+    },
+    "Aris": {
+      "tm": "https://www.transfermarkt.com/aris-thessaloniki/startseite/verein/605",
+      "tmTopTransfers": "https://www.transfermarkt.com/aris-thessaloniki/transferrekorde/verein/605"
+    },
+    "Asteras Tripoli": {
+      "tm": "https://www.transfermarkt.com/asteras-tripolis/startseite/verein/6676/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/asteras-tripolis/transferrekorde/verein/6676"
+    },
+    "Atromitos": {
+      "tm": "https://www.transfermarkt.com/atromitos-athen/startseite/verein/3060/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/atromitos-athen/transferrekorde/verein/3060"
+    },
+    "Kifisia": {
+      "tm": "https://www.transfermarkt.com/ae-kifisias/startseite/verein/30120/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/ae-kifisias/transferrekorde/verein/30120"
+    },
+    "Larissa FC / AEL": {
+      "tm": "https://www.transfermarkt.com/ae-larisa/startseite/verein/4603/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/ae-larisa/transferrekorde/verein/4603"
+    },
+    "Levadiakos": {
+      "tm": "https://www.transfermarkt.com/apo-levadiakos/startseite/verein/2672/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/apo-levadiakos/transferrekorde/verein/2672"
+    },
+    "OFI Crete": {
+      "tm": "https://www.transfermarkt.com/ofi-kreta/startseite/verein/653/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/ofi-kreta/transferrekorde/verein/653"
+    },
+    "Olympiacos": {
+      "tm": "https://www.transfermarkt.com/olympiakos-piraus/startseite/verein/683",
+      "tmTopTransfers": "https://www.transfermarkt.com/olympiakos-piraus/transferrekorde/verein/683"
+    },
+    "PAOK": {
+      "tm": "https://www.transfermarkt.com/paok-thessaloniki/startseite/verein/1091",
+      "tmTopTransfers": "https://www.transfermarkt.com/paok-thessaloniki/transferrekorde/verein/1091"
+    },
+    "Panathinaikos": {
+      "tm": "https://www.transfermarkt.com/panathinaikos-athen/startseite/verein/265",
+      "tmTopTransfers": "https://www.transfermarkt.com/panathinaikos-athen/transferrekorde/verein/265"
+    },
+    "Panetolikos": {
+      "tm": "https://www.transfermarkt.com/panetolikos-gfs/startseite/verein/6418/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/panetolikos-gfs/transferrekorde/verein/6418"
+    },
+    "Panserraikos FC": {
+      "tm": "https://www.transfermarkt.com/panserraikos/startseite/verein/3385/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/panserraikos-fc/transferrekorde/verein/15036"
+    },
+    "Volos NFC": {
+      "tm": "https://www.transfermarkt.com/volos-nps/startseite/verein/60949/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/volos-nps/transferrekorde/verein/60949"
+    },
+    "Avispa Fukuoka": {
+      "tm": "https://www.transfermarkt.com/avispa-fukuoka/startseite/verein/9597",
+      "tmTopTransfers": "https://www.transfermarkt.com/avispa-fukuoka/transferrekorde/verein/9597"
+    },
+    "Cerezo Osaka": {
+      "tm": "https://www.transfermarkt.com/cerezo-osaka/startseite/verein/1022",
+      "tmTopTransfers": "https://www.transfermarkt.com/cerezo-osaka/transferrekorde/verein/1022"
+    },
+    "Fagiano Okayama": {
+      "tm": "https://www.transfermarkt.com/fagiano-okayama/startseite/verein/22171",
+      "tmTopTransfers": "https://www.transfermarkt.com/fagiano-okayama/transferrekorde/verein/22171"
+    },
+    "Fc Tokyo": {
+      "tm": "https://www.transfermarkt.com/fc-tokyo/startseite/verein/6631",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-tokyo/transferrekorde/verein/6631"
+    },
+    "Gamba Osaka": {
+      "tm": "https://www.transfermarkt.com/gamba-osaka/startseite/verein/596",
+      "tmTopTransfers": "https://www.transfermarkt.com/gamba-osaka/transferrekorde/verein/596"
+    },
+    "JEF United Ichihara-Chiba": {
+      "tm": "https://www.transfermarkt.com/jef-united-chiba/startseite/verein/672/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/jef-united-chiba/transferrekorde/verein/672"
+    },
+    "Kashima Antlers": {
+      "tm": "https://www.transfermarkt.com/kashima-antlers/startseite/verein/2241/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/kashima-antlers/transferrekorde/verein/2241"
+    },
+    "Kashiwa Reysol": {
+      "tm": "https://www.transfermarkt.com/kashiwa-reysol/startseite/verein/6632",
+      "tmTopTransfers": "https://www.transfermarkt.com/kashiwa-reysol/transferrekorde/verein/6632"
+    },
+    "Kawasaki Frontale": {
+      "tm": "https://www.transfermarkt.com/kawasaki-frontale/startseite/verein/9598",
+      "tmTopTransfers": "https://www.transfermarkt.com/kawasaki-frontale/transferrekorde/verein/9598"
+    },
+    "Kyoto Sanga": {
+      "tm": "https://www.transfermarkt.com/kyoto-sanga/startseite/verein/593",
+      "tmTopTransfers": "https://www.transfermarkt.com/kyoto-sanga/transferrekorde/verein/593"
+    },
+    "Machida": {
+      "tm": "https://www.transfermarkt.com/machida-zelvia/startseite/verein/23568",
+      "tmTopTransfers": "https://www.transfermarkt.com/machida-zelvia/transferrekorde/verein/23568"
+    },
+    "Mito Hollyhock": {
+      "tm": "https://www.transfermarkt.com/mito-hollyhock/startseite/verein/21975/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/mito-hollyhock/transferrekorde/verein/21975"
+    },
+    "Nagoya Grampus": {
+      "tm": "https://www.transfermarkt.com/nagoya-grampus/startseite/verein/1066",
+      "tmTopTransfers": "https://www.transfermarkt.com/nagoya-grampus/transferrekorde/verein/1066"
+    },
+    "Sanfrecce Hiroshima": {
+      "tm": "https://www.transfermarkt.com/sanfrecce-hiroshima/startseite/verein/2697",
+      "tmTopTransfers": "https://www.transfermarkt.com/sanfrecce-hiroshima/transferrekorde/verein/2697"
+    },
+    "Shimizu S- Pulse": {
+      "tm": "https://www.transfermarkt.com/shimizu-s-pulse/startseite/verein/1062",
+      "tmTopTransfers": "https://www.transfermarkt.com/shimizu-s-pulse/transferrekorde/verein/1062"
+    },
+    "Tokyo Verdy 1969": {
+      "tm": "https://www.transfermarkt.com/tokyo-verdy/startseite/verein/3734",
+      "tmTopTransfers": "https://www.transfermarkt.com/tokyo-verdy/transferrekorde/verein/3734"
+    },
+    "Urawa Red Diamonds": {
+      "tm": "https://www.transfermarkt.com/urawa-red-diamonds/startseite/verein/828/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/urawa-red-diamonds/transferrekorde/verein/828"
+    },
+    "V-Varen Nagasaki": {
+      "tm": "https://www.transfermarkt.com/v-varen-nagasaki/startseite/verein/23581/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/v-varen-nagasaki/transferrekorde/verein/23581"
+    },
+    "Vissel Kobe": {
+      "tm": "https://www.transfermarkt.com/vissel-kobe/startseite/verein/3958",
+      "tmTopTransfers": "https://www.transfermarkt.com/vissel-kobe/transferrekorde/verein/3958"
+    },
+    "Yokohama F. Marinos": {
+      "tm": "https://www.transfermarkt.com/yokohama-f-marinos/startseite/verein/3828",
+      "tmTopTransfers": "https://www.transfermarkt.com/yokohama-f-marinos/transferrekorde/verein/3828"
+    },
+    "AZ Alkmaar": {
+      "tm": "https://www.transfermarkt.com/az-alkmaar/startseite/verein/1090",
+      "tmTopTransfers": "https://www.transfermarkt.com/az-alkmaar/transferrekorde/verein/1090"
+    },
+    "Ajax": {
+      "tm": "https://www.transfermarkt.com/ajax-amsterdam/startseite/verein/610",
+      "tmTopTransfers": "https://www.transfermarkt.com/ajax-amsterdam/transferrekorde/verein/610"
+    },
+    "Excelsior": {
+      "tm": "https://www.transfermarkt.com/sbv-excelsior-rotterdam/startseite/verein/798/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sbv-excelsior-rotterdam/transferrekorde/verein/798"
+    },
+    "FC Groningen": {
+      "tm": "https://www.transfermarkt.com/fc-groningen/startseite/verein/202",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-groningen/transferrekorde/verein/202"
+    },
+    "FC Utrecht": {
+      "tm": "https://www.transfermarkt.com/fc-utrecht/startseite/verein/200",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-utrecht/transferrekorde/verein/200"
+    },
+    "FC Volendam": {
+      "tm": "http://transfermarkt.com/fc-volendam/startseite/verein/724/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-volendam/startseite/verein/724/saison_id/2025"
+    },
+    "Feyenoord": {
+      "tm": "https://www.transfermarkt.com/feyenoord-rotterdam/startseite/verein/234",
+      "tmTopTransfers": "https://www.transfermarkt.com/feyenoord-rotterdam/transferrekorde/verein/234"
+    },
+    "Fortuna Sittard": {
+      "tm": "https://www.transfermarkt.com/fortuna-sittard/startseite/verein/385/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fortuna-sittard/transferrekorde/verein/385"
+    },
+    "Go Ahead Eagles": {
+      "tm": "https://www.transfermarkt.com/go-ahead-eagles-deventer/startseite/verein/1435/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/go-ahead-eagles-deventer/transferrekorde/verein/1435"
+    },
+    "Heracles Almelo": {
+      "tm": "https://www.transfermarkt.com/heracles-almelo/startseite/verein/1304",
+      "tmTopTransfers": "https://www.transfermarkt.com/heracles-almelo/transferrekorde/verein/1304"
+    },
+    "NAC Breda": {
+      "tm": "https://www.transfermarkt.com/nac-breda/startseite/verein/132/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/nac-breda/transferrekorde/verein/132"
+    },
+    "NEC Nijmegen": {
+      "tm": "https://www.transfermarkt.com/nec-nijmegen/startseite/verein/467",
+      "tmTopTransfers": "https://www.transfermarkt.com/nec-nijmegen/transferrekorde/verein/467"
+    },
+    "PEC Zwolle": {
+      "tm": "https://www.transfermarkt.com/pec-zwolle/startseite/verein/1269",
+      "tmTopTransfers": "https://www.transfermarkt.com/pec-zwolle/transferrekorde/verein/1269"
+    },
+    "PSV Eindhoven": {
+      "tm": "https://www.transfermarkt.com/psv-eindhoven/startseite/verein/383",
+      "tmTopTransfers": "https://www.transfermarkt.com/psv-eindhoven/transferrekorde/verein/383"
+    },
+    "SC Heereveen": {
+      "tm": "https://www.transfermarkt.com/sc-heerenveen/startseite/verein/306",
+      "tmTopTransfers": "https://www.transfermarkt.com/sc-heerenveen/transferrekorde/verein/306"
+    },
+    "Sparta Rotterdam": {
+      "tm": "https://www.transfermarkt.com/sparta-rotterdam/startseite/verein/468/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sparta-rotterdam/transferrekorde/verein/468"
+    },
+    "Telstar": {
+      "tm": "https://www.transfermarkt.com/sc-telstar/startseite/verein/1434/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sc-telstar/transferrekorde/verein/1434"
+    },
+    "Twente": {
+      "tm": "https://www.transfermarkt.com/fc-twente-enschede/startseite/verein/317",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-twente-enschede/transferrekorde/verein/317"
+    },
+    "Académico Viseu": {
+      "tm": "https://www.transfermarkt.com/academico-viseu-fc/startseite/verein/7788/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/academico-viseu-fc/transferrekorde/verein/7788"
+    },
+    "Benfica B": {
+      "tm": "https://www.transfermarkt.com/benfica-lissabon-b/startseite/verein/10330/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/benfica-lissabon-b/transferrekorde/verein/10330"
+    },
+    "CS Maritimo": {
+      "tm": "https://www.transfermarkt.com/cs-maritimo/startseite/verein/1301/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/cs-maritimo/transferrekorde/verein/1301"
+    },
+    "Chaves": {
+      "tm": "https://www.transfermarkt.com/gd-chaves/startseite/verein/3325/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/gd-chaves/transferrekorde/verein/3325"
+    },
+    "Farense": {
+      "tm": "https://www.transfermarkt.com/sc-farense/startseite/verein/4294/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sc-farense/transferrekorde/verein/4294"
+    },
+    "Feirense": {
+      "tm": "https://www.transfermarkt.com/cd-feirense/startseite/verein/3349/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/cd-feirense/transferrekorde/verein/3349"
+    },
+    "Felgueiras": {
+      "tm": "https://www.transfermarkt.com/fc-felgueiras-1932/startseite/verein/1701/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-felgueiras-1932/transferrekorde/verein/1701"
+    },
+    "Leiria": {
+      "tm": "https://www.transfermarkt.com/uniao-leiria/startseite/verein/2639/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/uniao-leiria/transferrekorde/verein/2639"
+    },
+    "Leixões": {
+      "tm": "https://www.transfermarkt.com/leixoes-sc/startseite/verein/3345/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/leixoes-sc/transferrekorde/verein/3345"
+    },
+    "Lusitânia FC": {
+      "tm": "https://www.transfermarkt.com/lusitania-fc-lourosa/startseite/verein/8189/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/lusitania-fc-lourosa/transferrekorde/verein/8189"
+    },
+    "Oliveirense": {
+      "tm": "https://www.transfermarkt.com/ud-oliveirense/startseite/verein/8827/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/ud-oliveirense/transferrekorde/verein/8827"
+    },
+    "Paços de Ferreira": {
+      "tm": "https://www.transfermarkt.com/fc-pacos-de-ferreira/startseite/verein/2995/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-pacos-de-ferreira/transferrekorde/verein/2995"
+    },
+    "Penafiel": {
+      "tm": "https://www.transfermarkt.com/fc-penafiel/startseite/verein/3327/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-penafiel/transferrekorde/verein/3327"
+    },
+    "Portimonense": {
+      "tm": "https://www.transfermarkt.com/portimonense-sc/startseite/verein/7378/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/portimonense-sc/transferrekorde/verein/7378"
+    },
+    "Porto B": {
+      "tm": "https://www.transfermarkt.com/fc-porto-b/startseite/verein/10331/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-porto-b/transferrekorde/verein/10331"
+    },
+    "Sporting CP B": {
+      "tm": "https://www.transfermarkt.com/sporting-lissabon-b/startseite/verein/10949/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sporting-lissabon-b/transferrekorde/verein/10949"
+    },
+    "Torreense": {
+      "tm": "https://www.transfermarkt.com/sc-uniao-torreense/startseite/verein/2432/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/sc-uniao-torreense/transferrekorde/verein/2432"
+    },
+    "Vizela": {
+      "tm": "https://www.transfermarkt.com/fc-vizela/startseite/verein/6912/saison_id/2025",
+      "tmTopTransfers": "https://www.transfermarkt.com/fc-vizela/transferrekorde/verein/6912"
+    },
+    "Aberdeen": {
+      "tm": "https://www.transfermarkt.com/aberdeen-fc/startseite/verein/370",
+      "tmTopTransfers": "https://www.transfermarkt.com/aberdeen-fc/transferrekorde/verein/370"
+    },
+    "Celtic": {
+      "tm": "https://www.transfermarkt.com/celtic-glasgow/startseite/verein/371",
+      "tmTopTransfers": "https://www.transfermarkt.com/celtic-glasgow/transferrekorde/verein/371"
+    },
+    "Dundee": {
+      "tm": "https://www.transfermarkt.com/dundee-fc/startseite/verein/511",
+      "tmTopTransfers": "https://www.transfermarkt.com/dundee-fc/transferrekorde/verein/511"
+    },
+    "Dundee United": {
+      "tm": "https://www.transfermarkt.com/dundee-united-fc/startseite/verein/1519",
+      "tmTopTransfers": "https://www.transfermarkt.com/dundee-united-fc/transferrekorde/verein/1519"
+    },
+    "Falkirk": {
+      "tm": "https://www.transfermarkt.com/falkirk-fc/startseite/verein/1191",
+      "tmTopTransfers": "https://www.transfermarkt.com/falkirk-fc/transferrekorde/verein/1191"
+    },
+    "Heart of Midlothian": {
+      "tm": "https://www.transfermarkt.com/heart-of-midlothian-fc/startseite/verein/43",
+      "tmTopTransfers": "https://www.transfermarkt.com/heart-of-midlothian-fc/transferrekorde/verein/43"
+    },
+    "Hibernian": {
+      "tm": "https://www.transfermarkt.com/hibernian-fc/startseite/verein/903",
+      "tmTopTransfers": "https://www.transfermarkt.com/hibernian-fc/transferrekorde/verein/903"
+    },
+    "Kilmarnock": {
+      "tm": "https://www.transfermarkt.com/kilmarnock-fc/startseite/verein/2553",
+      "tmTopTransfers": "https://www.transfermarkt.com/kilmarnock-fc/transferrekorde/verein/2553"
+    },
+    "Livingston": {
+      "tm": "https://www.transfermarkt.com/livingston-fc/startseite/verein/1241",
+      "tmTopTransfers": "https://www.transfermarkt.com/livingston-fc/transferrekorde/verein/1241"
+    },
+    "Motherwell": {
+      "tm": "https://www.transfermarkt.com/motherwell-fc/startseite/verein/987",
+      "tmTopTransfers": "https://www.transfermarkt.com/motherwell-fc/transferrekorde/verein/987"
+    },
+    "Rangers": {
+      "tm": "https://www.transfermarkt.com/glasgow-rangers/startseite/verein/124",
+      "tmTopTransfers": "https://www.transfermarkt.com/glasgow-rangers/transferrekorde/verein/124"
+    },
+    "St Mirren": {
+      "tm": "https://www.transfermarkt.com/st-mirren-fc/startseite/verein/465",
+      "tmTopTransfers": "https://www.transfermarkt.com/st-mirren-fc/transferrekorde/verein/465"
+    }
+  },
+  "aliases": {
+    "AFC Bournemouth": "Bournemouth",
+    "Brighton & Hove": "Brighton",
+    "Brighton & Hove Albion": "Brighton",
+    "Wolverhampton": "Wolverhampton Wanderers",
+    "Querétaro FC": "Querétaro",
+    "Queretáro FC": "Querétaro",
+    "Queretaro FC": "Querétaro",
+    "Göztepe": "Goztepe",
+    "Karagümrük": "Karagumruk",
+    "Kasımpaşa": "Kasimpasa",
+    "Istanbul Başakşehir": "Istambul Baseksir",
+    "Man City": "Manchester City",
+    "Man Utd": "Manchester United",
+    "Wolves": "Wolverhampton Wanderers",
+    "Spurs": "Tottenham Hotspur",
+    "Forest": "Nottingham Forest",
+    "Villa": "Aston Villa",
+    "Palace": "Crystal Palace",
+    "West Ham": "West Ham United",
+    "Newcastle": "Newcastle United",
+    "Bayern": "Bayern Munique",
+    "Bayern Munich": "Bayern Munique",
+    "Dortmund": "Borussia Dortmund",
+    "Leverkusen": "Bayer Leverkusen",
+    "Frankfurt": "Eintracht Frankfurt",
+    "Gladbach": "Borussia Mönch...",
+    "Mönchengladbach": "Borussia Mönch...",
+    "Borussia Mönchengladbach": "Borussia Mönch...",
+    "Borussia Monchengladbach": "Borussia Mönch...",
+    "Leipzig": "RB Leipzig",
+    "Werder": "Werder Bremen",
+    "Köln": "Koln",
+    "Hamburg": "Hamburger SV",
+    "PSG": "Paris Saint Germain",
+    "Lyon": "Olympique Lyonnais",
+    "Marseille": "Olympique Marseille",
+    "OL": "Olympique Lyonnais",
+    "OM": "Olympique Marseille",
+    "Real": "Real Madrid",
+    "Barça": "Barcelona",
+    "Barca": "Barcelona",
+    "Atlético": "Atlético de Madrid",
+    "Atletico Madrid": "Atlético de Madrid",
+    "Atletico": "Atlético de Madrid",
+    "Celta": "Celta de Vigo",
+    "Sociedad": "Real Sociedad",
+    "Bilbao": "Athletic Bilbao",
+    "Inter": "Inter de Milao",
+    "Inter Milan": "Inter de Milao",
+    "Juve": "Juventus",
+    "Fiorentina": "Fiorentina",
+    "Porto": "Porto",
+    "Sporting": "Sporting",
+    "Benfica": "Benfica",
+    "Guimarães": "Vitoria de Guimarães",
+    "Flamengo": "Flamengo",
+    "Palmeiras": "Palmeiras",
+    "Botafogo": "Botafogo",
+    "Vasco": "Vasco da Gama",
+    "Athletico": "Athletico PR",
+    "Atlético Mineiro": "Atlético-MG",
+    "Bragantino": "Red Bull Bragantino",
+    "RB Bragantino": "Red Bull Bragantino",
+    "Gala": "Galatasaray",
+    "Fener": "Fenerbahce",
+    "BJK": "Besiktas",
+    "Başakşehir": "Istambul Baseksir",
+    "Basaksehir": "Istambul Baseksir",
+    "Al-Hilal": "Al Hilal",
+    "Al-Nassr": "Al Nassr",
+    "Al-Ittihad": "Al Ittihad",
+    "Al-Ahli": "Al Ahli Saudi",
+    "Miami": "Inter Miami",
+    "LAFC": "Los Angeles FC",
+    "Galaxy": "LA Galaxy",
+    "Sounders": "Seattle Sounders",
+    "Timbers": "Portland Timbers",
+    "NYCFC": "New York City",
+    "Red Bulls": "New York RB",
+    "Whitecaps": "Vancouver Whitecaps",
+    "TFC": "Toronto",
+    "Chivas": "Guadalajara",
+    "América": "América",
+    "Pumas": "Pumas UNAM",
+    "Al Sadd": "Al-Sadd",
+    "Al Duhail": "Al-Duhail",
+    "Al Jazira": "Al JAzira",
+    "Shabab Al Ahli": "Al Shabab Dubai"
+  }
+}

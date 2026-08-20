@@ -1,0 +1,7 @@
+project_id = "avi-soccer-desk"
+
+[functions.tr-proxy]
+verify_jwt = false
+
+[functions.serve-shared-brief]
+verify_jwt = false

@@ -1,0 +1,1 @@
+DELETE FROM contacts WHERE club = 'Sharjah FC' AND market = 'UAE - Pro League';

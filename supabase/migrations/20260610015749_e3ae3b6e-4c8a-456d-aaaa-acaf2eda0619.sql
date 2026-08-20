@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS restrict_club_sources_select_admin ON public.club_sources;

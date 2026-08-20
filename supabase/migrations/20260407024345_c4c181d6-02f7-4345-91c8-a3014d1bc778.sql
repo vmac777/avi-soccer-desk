@@ -1,0 +1,1 @@
+ALTER VIEW public.contacts_enriched SET (security_invoker = on);
