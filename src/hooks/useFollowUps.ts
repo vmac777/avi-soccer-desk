@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { todayKey } from '@/lib/dateKeys';
 
 export type FollowUpTargetType =
   | 'contact'
@@ -227,8 +229,9 @@ export function useCompleteFollowUp() {
       );
       return { prev };
     },
-    onError: (_err, _id, ctx) => {
+    onError: (err: any, _id, ctx) => {
       if (ctx?.prev) qc.setQueryData(['follow_ups'], ctx.prev);
+      toast.error(err?.message ?? "Couldn't complete that reminder");
     },
     onSettled: () => qc.invalidateQueries({ queryKey: ['follow_ups'] }),
   });
@@ -250,8 +253,42 @@ export function useDeleteFollowUp() {
       qc.setQueryData<FollowUp[]>(['follow_ups'], (old) => old?.filter(f => f.id !== id));
       return { prev };
     },
-    onError: (_err, _id, ctx) => {
+    onError: (err: any, _id, ctx) => {
       if (ctx?.prev) qc.setQueryData(['follow_ups'], ctx.prev);
+      toast.error(err?.message ?? "Couldn't delete that reminder");
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['follow_ups'] }),
+  });
+}
+
+/**
+ * Move a reminder to a different day.
+ *
+ * This is what a calendar is for. Dragging a chip from Thursday to Monday is
+ * one gesture; doing the same in the list means opening the reminder and
+ * retyping a date, which is why nobody ever re-dates anything.
+ */
+export function useRescheduleFollowUp() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, dueDate }: { id: string; dueDate: string }) => {
+      const { error } = await supabase
+        .from('follow_ups' as any)
+        .update({ due_date: dueDate })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onMutate: async ({ id, dueDate }) => {
+      await qc.cancelQueries({ queryKey: ['follow_ups'] });
+      const prev = qc.getQueryData<FollowUp[]>(['follow_ups']);
+      qc.setQueryData<FollowUp[]>(['follow_ups'], (old) =>
+        old?.map(f => f.id === id ? { ...f, due_date: dueDate } : f)
+      );
+      return { prev };
+    },
+    onError: (err: any, _vars, ctx) => {
+      if (ctx?.prev) qc.setQueryData(['follow_ups'], ctx.prev);
+      toast.error(err?.message ?? "Couldn't move that reminder");
     },
     onSettled: () => qc.invalidateQueries({ queryKey: ['follow_ups'] }),
   });
@@ -259,13 +296,13 @@ export function useDeleteFollowUp() {
 
 export function useFollowUpBadgeCount() {
   const { data: followUps = [] } = useFollowUps();
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayKey();
   return followUps.filter(f => !f.completed && f.target_type !== 'buy_pitch' && f.due_date <= today).length;
 }
 
 /** Badge count for buy-side pitch reminders only (used on the Buy Pipeline page). */
 export function useBuyPitchFollowUpBadgeCount() {
   const { data: followUps = [] } = useFollowUps();
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayKey();
   return followUps.filter(f => !f.completed && f.target_type === 'buy_pitch' && f.due_date <= today).length;
 }

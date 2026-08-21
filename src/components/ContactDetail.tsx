@@ -5,6 +5,7 @@ import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useAuth } from '@/hooks/useAuth';
 import { useBuyPitches, useScoutedTargets } from '@/hooks/useBuyData';
 import { cn } from '@/lib/utils';
+import { DETAIL_PANEL_WIDTH } from '@/lib/panelWidth';
 import { healthColor, healthBg, stagePill, formatDaysAgo, UNCONTACTED_LABEL } from '@/lib/contactUtils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import FollowUpBanner from '@/components/FollowUpBanner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { todayKey } from '@/lib/dateKeys';
 
 const STAGES = ['', 'Contacted - No Answer', 'Contacted', 'Offered', 'Negotiating', 'Closed Won', 'Closed Lost', 'Dormant'];
 
@@ -85,7 +87,7 @@ const ContactDetail = ({ contactId, onClose }: ContactDetailProps) => {
             initial="hidden"
             animate="visible"
             exit="hidden"
-            className="relative w-[500px] h-full bg-card border-l border-border p-6 flex items-center justify-center"
+            className={cn(DETAIL_PANEL_WIDTH, 'relative h-full bg-card border-l border-border p-6 flex items-center justify-center')}
             onClick={(e) => e.stopPropagation()}
           >
             <span className="text-muted-foreground font-mono text-sm">Loading...</span>
@@ -125,7 +127,7 @@ const ContactDetail = ({ contactId, onClose }: ContactDetailProps) => {
   };
 
   const handleLogInteraction = async (type: string) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = todayKey();
     await updateContact.mutateAsync({ id: contactId, last_contact: today });
     await createInteraction.mutateAsync({
       contact_id: contactId,
@@ -163,7 +165,7 @@ const ContactDetail = ({ contactId, onClose }: ContactDetailProps) => {
           initial="hidden"
           animate="visible"
           exit="hidden"
-          className="relative w-[500px] h-full bg-card border-l border-border overflow-y-auto"
+          className={cn(DETAIL_PANEL_WIDTH, 'relative h-full bg-card border-l border-border overflow-y-auto')}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}

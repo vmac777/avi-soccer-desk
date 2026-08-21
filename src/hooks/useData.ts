@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { ContactEnriched, Interaction, Player, PlayerClubLink } from '@/lib/supabase';
 import type { TablesInsert } from '@/integrations/supabase/types';
+import { todayKey } from '@/lib/dateKeys';
 
 // Contacts
 export function useContacts() {
@@ -110,7 +111,7 @@ export function useLogTouch() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ contactId, loggedBy, club }: { contactId: string; loggedBy: string; club: string }) => {
-      const today = new Date().toISOString().split('T')[0];
+      const today = todayKey();
       // Update last_contact
       await supabase.from('contacts').update({ last_contact: today }).eq('id', contactId);
       // Create interaction

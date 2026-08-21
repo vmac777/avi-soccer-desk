@@ -2,6 +2,7 @@ import { useContactFollowUps, useDeleteFollowUp, type FollowUp } from '@/hooks/u
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { todayKey } from '@/lib/dateKeys';
 
 interface FollowUpBannerProps {
   contactId: string;
@@ -13,7 +14,7 @@ const FollowUpBanner = ({ contactId }: FollowUpBannerProps) => {
 
   if (followUps.length === 0) return null;
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayKey();
 
   const handleDelete = (id: string) => {
     if (window.confirm('Delete this reminder?')) {

@@ -2,12 +2,18 @@ import { useState, useMemo } from 'react';
 import { useFollowUps, useCompleteFollowUp, useDeleteFollowUp, type FollowUp, type FollowUpTargetType } from '@/hooks/useFollowUps';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { Trash2, CheckSquare, Square } from 'lucide-react';
+import { Trash2, CheckSquare, Square, List, CalendarDays } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import ContactDetail from '@/components/ContactDetail';
 import FollowUpDetailPanel from '@/components/FollowUpDetailPanel';
+import FollowUpCalendar from '@/components/FollowUpCalendar';
+import { TYPE_BADGE } from '@/lib/followUpDisplay';
+import { parseDateKey, todayKey } from '@/lib/dateKeys';
 
 type TabKey = 'all' | 'contact' | 'player' | 'pitch';
+
+/** Reminder cards, as many abreast as the screen has room for. */
+const REMINDER_GRID = 'grid gap-2 sm:grid-cols-2 2xl:grid-cols-3';
 
 const TAB_DEFS: { key: TabKey; label: string; types: FollowUpTargetType[] }[] = [
   { key: 'all', label: 'All', types: ['contact', 'scouted_target', 'buy_pitch'] },
@@ -15,12 +21,6 @@ const TAB_DEFS: { key: TabKey; label: string; types: FollowUpTargetType[] }[] = 
   { key: 'player', label: 'Players', types: ['scouted_target'] },
   { key: 'pitch', label: 'Pitches', types: ['buy_pitch'] },
 ];
-
-const TYPE_BADGE: Record<FollowUpTargetType, { label: string; className: string }> = {
-  contact: { label: 'Contact', className: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/25' },
-  scouted_target: { label: 'Target', className: 'bg-violet-500/15 text-violet-300 border-violet-500/25' },
-  buy_pitch: { label: 'Pitch', className: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/25' },
-};
 
 interface ReminderCardProps {
   item: FollowUp;
@@ -77,7 +77,7 @@ const ReminderCard = ({ item, isCompleted = false, today, onSelect, onComplete, 
             {item.action_text}
           </p>
           <p className={cn('text-[10px] font-mono mt-0.5', dateColor)}>
-            Due: {format(new Date(item.due_date + 'T00:00:00'), 'MMM d, yyyy')}
+            Due: {format(parseDateKey(item.due_date), 'MMM d, yyyy')}
           </p>
         </div>
         <button
@@ -97,10 +97,15 @@ const PendingActionsPage = () => {
   const deleteFollowUp = useDeleteFollowUp();
   const [showCompleted, setShowCompleted] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>('all');
+  /**
+   * The list answers "what is late"; the calendar answers "what does my week
+   * look like". Both are worth having, so neither replaces the other.
+   */
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [selectedFollowUp, setSelectedFollowUp] = useState<FollowUp | null>(null);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayKey();
 
   // Filter by tab first
   const tabTypes = TAB_DEFS.find(t => t.key === activeTab)!.types;
@@ -114,6 +119,16 @@ const PendingActionsPage = () => {
   const upcoming = visible.filter(f => !f.completed && f.due_date > today);
   const completed = visible.filter(f => f.completed).sort((a, b) =>
     (b.completed_at || '').localeCompare(a.completed_at || '')
+  );
+
+  /**
+   * What the calendar plots. Same tab filter and same show-completed switch as
+   * the list, so flipping views never changes which reminders exist — only how
+   * they are arranged.
+   */
+  const calendarItems = useMemo(
+    () => (showCompleted ? visible : visible.filter(f => !f.completed)),
+    [visible, showCompleted],
   );
 
   // Group upcoming by date
@@ -148,13 +163,6 @@ const PendingActionsPage = () => {
     }
   };
 
-  const getDateColor = (dueDate: string) => {
-    if (dueDate < today) return 'text-destructive';
-    if (dueDate === today) return 'text-[#c8952a]';
-    return 'text-muted-foreground';
-  };
-
-
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-64"><span className="text-muted-foreground font-mono text-sm">Loading...</span></div>;
@@ -164,15 +172,33 @@ const PendingActionsPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-lg font-bold text-foreground">Pending Actions</h1>
           <p className="text-xs text-muted-foreground">Follow-up reminders for contacts, players, and pitches</p>
         </div>
-        <label className="flex items-center gap-2 text-xs text-muted-foreground">
-          Show completed
-          <Switch checked={showCompleted} onCheckedChange={setShowCompleted} />
-        </label>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-0.5 rounded-md border border-border bg-card p-0.5">
+            {([['list', List], ['calendar', CalendarDays]] as const).map(([mode, Icon]) => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                title={mode === 'list' ? 'List view' : 'Calendar view'}
+                aria-label={mode === 'list' ? 'List view' : 'Calendar view'}
+                className={cn(
+                  'p-1.5 rounded transition-colors',
+                  viewMode === mode ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                <Icon className="h-3.5 w-3.5" />
+              </button>
+            ))}
+          </div>
+          <label className="flex items-center gap-2 text-xs text-muted-foreground">
+            Show completed
+            <Switch checked={showCompleted} onCheckedChange={setShowCompleted} />
+          </label>
+        </div>
       </div>
 
       {/* Filter tabs */}
@@ -205,7 +231,17 @@ const PendingActionsPage = () => {
         })}
       </div>
 
-      {!hasActiveItems && !showCompleted && (
+      {viewMode === 'calendar' && (
+        <FollowUpCalendar
+          items={calendarItems}
+          today={today}
+          onSelect={setSelectedFollowUp}
+          onComplete={handleComplete}
+          onDelete={handleDelete}
+        />
+      )}
+
+      {viewMode === 'list' && !hasActiveItems && !showCompleted && (
         <div className="text-center py-16">
           <p className="text-sm text-muted-foreground">No pending follow-ups</p>
           <p className="text-xs text-muted-foreground mt-1">Set one from any contact, player, or pitch.</p>
@@ -213,31 +249,31 @@ const PendingActionsPage = () => {
       )}
 
       {/* Overdue */}
-      {overdue.length > 0 && (
+      {viewMode === 'list' && overdue.length > 0 && (
         <div>
           <h2 className="text-xs font-bold uppercase tracking-wider text-destructive mb-2">
             Overdue ({overdue.length})
           </h2>
-          <div className="space-y-2">
+          <div className={REMINDER_GRID}>
             {overdue.map(item => <ReminderCard key={item.id} item={item} today={today} onSelect={setSelectedFollowUp} onComplete={handleComplete} onDelete={handleDelete} />)}
           </div>
         </div>
       )}
 
       {/* Today */}
-      {todayItems.length > 0 && (
+      {viewMode === 'list' && todayItems.length > 0 && (
         <div>
           <h2 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#c8952a' }}>
             Today ({todayItems.length})
           </h2>
-          <div className="space-y-2">
+          <div className={REMINDER_GRID}>
             {todayItems.map(item => <ReminderCard key={item.id} item={item} today={today} onSelect={setSelectedFollowUp} onComplete={handleComplete} onDelete={handleDelete} />)}
           </div>
         </div>
       )}
 
       {/* Upcoming */}
-      {upcoming.length > 0 && (
+      {viewMode === 'list' && upcoming.length > 0 && (
         <div>
           <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
             Upcoming ({upcoming.length})
@@ -245,9 +281,9 @@ const PendingActionsPage = () => {
           {Object.entries(upcomingByDate).map(([dateStr, items]) => (
             <div key={dateStr} className="mb-3">
               <p className="text-[10px] font-mono text-muted-foreground mb-1.5 px-1">
-                {format(new Date(dateStr + 'T00:00:00'), 'EEE, MMM d')}
+                {format(parseDateKey(dateStr), 'EEE, MMM d')}
               </p>
-              <div className="space-y-2">
+              <div className={REMINDER_GRID}>
                 {items.map(item => <ReminderCard key={item.id} item={item} today={today} onSelect={setSelectedFollowUp} onComplete={handleComplete} onDelete={handleDelete} />)}
               </div>
             </div>
@@ -256,12 +292,12 @@ const PendingActionsPage = () => {
       )}
 
       {/* Completed */}
-      {showCompleted && completed.length > 0 && (
+      {viewMode === 'list' && showCompleted && completed.length > 0 && (
         <div>
           <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
             Completed ({completed.length})
           </h2>
-          <div className="space-y-2">
+          <div className={REMINDER_GRID}>
             {completed.map(item => <ReminderCard key={item.id} item={item} isCompleted today={today} onSelect={setSelectedFollowUp} onComplete={handleComplete} onDelete={handleDelete} />)}
           </div>
         </div>

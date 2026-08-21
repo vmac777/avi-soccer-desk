@@ -26,6 +26,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatCompactEur } from '@/lib/currency';
 import { cn } from '@/lib/utils';
+import { DETAIL_PANEL_WIDTH } from '@/lib/panelWidth';
 import { toast } from 'sonner';
 import { Trash2, Paperclip, X, Download } from 'lucide-react';
 import SetReminderButton from '@/components/SetReminderButton';
@@ -278,7 +279,7 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
   return (
     <>
       <Sheet open onOpenChange={v => { if (!v) onClose(); }}>
-        <SheetContent side="right" className="w-full sm:max-w-[500px] overflow-y-auto">
+        <SheetContent side="right" className={cn(DETAIL_PANEL_WIDTH, 'overflow-y-auto')}>
           <SheetHeader>
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
@@ -482,7 +483,7 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
           </div>
 
           {/* MWP / Ask / Offer / Final */}
-          <div className="mt-4 grid grid-cols-4 gap-2">
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
             {([
               // Same columns, read from the agency's seat: the ask belongs to
               // the selling club, the offer to the buying club, and MWP — a

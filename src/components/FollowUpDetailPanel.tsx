@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { X, Trash2, ExternalLink, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { DETAIL_PANEL_WIDTH } from '@/lib/panelWidth';
 import {
   useFollowUpLinks,
   useDeleteFollowUp,
@@ -90,7 +91,8 @@ const FollowUpDetailPanel = ({ followUp, onClose, onOpenContact }: FollowUpDetai
       />
       <div
         className={cn(
-          'fixed top-0 right-0 z-[71] h-full w-full max-w-[500px] bg-card border-l border-border overflow-y-auto transition-transform',
+          'fixed top-0 right-0 z-[71] h-full bg-card border-l border-border overflow-y-auto transition-transform',
+          DETAIL_PANEL_WIDTH,
           closing && 'translate-x-full'
         )}
       >

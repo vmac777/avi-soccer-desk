@@ -8,6 +8,7 @@ import {
   useDeleteFollowUp,
   type FollowUp,
 } from '@/hooks/useFollowUps';
+import { todayKey } from '@/lib/dateKeys';
 
 interface Props {
   onOpenPitch: (pitchId: string) => void;
@@ -23,7 +24,7 @@ const BuyPitchPendingActions = ({ onOpenPitch }: Props) => {
   const complete = useCompleteFollowUp();
   const del = useDeleteFollowUp();
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayKey();
 
   const buyFollowUps = useMemo(
     () => followUps.filter(f => f.target_type === 'buy_pitch' && !f.completed),

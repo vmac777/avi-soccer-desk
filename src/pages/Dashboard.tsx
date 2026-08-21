@@ -240,7 +240,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-[11px] tracking-[0.15em] font-bold text-primary uppercase">
           CONTACT NETWORK OVERVIEW
         </h1>
@@ -248,7 +248,7 @@ const Dashboard = () => {
           placeholder="Search contacts, clubs, leagues..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm h-8 text-xs bg-card border-border"
+          className="w-full sm:w-72 h-8 text-xs bg-card border-border"
         />
       </div>
 
@@ -332,7 +332,7 @@ const Dashboard = () => {
                 </span>
                 <span>{typeIcons[a.interaction_type] || '📝'}</span>
                 <span className="text-foreground font-medium">{a.contacts?.club || '—'}</span>
-                <span className="text-muted-foreground truncate">{a.note}</span>
+                <span className="text-muted-foreground truncate min-w-0 flex-1">{a.note}</span>
                 <span className="text-muted-foreground ml-auto shrink-0">{a.logged_by}</span>
               </div>
             ))}

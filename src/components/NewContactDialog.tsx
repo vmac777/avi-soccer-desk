@@ -97,7 +97,7 @@ const NewContactDialog = ({ onClose }: NewContactDialogProps) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative w-[400px] bg-card border border-border rounded-lg p-6"
+        className="relative w-full max-w-[400px] mx-4 bg-card border border-border rounded-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">

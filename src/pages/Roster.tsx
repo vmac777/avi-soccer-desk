@@ -731,7 +731,7 @@ export default function ScoutedTargetsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-[11px] tracking-[0.15em] font-bold text-primary uppercase">ROSTER</h1>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-0.5 bg-card border border-border rounded-md p-0.5">
@@ -793,8 +793,8 @@ export default function ScoutedTargetsPage() {
       )}
 
       {viewMode === 'table' && (
-        <div className="bg-card border border-border rounded-md overflow-hidden">
-          <table className="w-full text-xs">
+        <div className="bg-card border border-border rounded-md overflow-x-auto">
+          <table className="w-full min-w-[860px] text-xs">
             <thead>
               <tr className="border-b border-border text-[10px] uppercase tracking-wider text-muted-foreground">
                 <th className="px-3 py-2 text-left font-medium">Name</th>

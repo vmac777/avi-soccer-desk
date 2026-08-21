@@ -241,7 +241,7 @@ const ContactsPage = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-[11px] tracking-[0.15em] font-bold text-primary uppercase">CONTACTS</h1>
         <Button
           onClick={() => setShowNewDialog(true)}

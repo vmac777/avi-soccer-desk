@@ -126,8 +126,8 @@ export default function RosterPlayerPage() {
   const onLoan = player.tenure === 'loan';
 
   return (
-    <div className="space-y-5 max-w-5xl">
-      <div className="flex items-center justify-between">
+    <div className="space-y-5 max-w-5xl xl:max-w-7xl">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <button
           onClick={() => navigate('/roster')}
           className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"

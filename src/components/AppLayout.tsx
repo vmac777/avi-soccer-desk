@@ -16,17 +16,17 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <AppSidebar />
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="h-14 border-b border-border flex items-center px-6 shrink-0">
+        <header className="h-14 border-b border-border flex items-center px-4 sm:px-6 shrink-0">
           {/* Spacer for hamburger on mobile */}
-          {isMobile && <div className="w-10" />}
+          {isMobile && <div className="w-10 shrink-0" />}
           <BrandMark height={26} />
-          <span className="text-muted-foreground mx-3">|</span>
-          <span className="text-[11px] tracking-[0.15em] text-muted-foreground uppercase truncate">
+          <span className="text-muted-foreground mx-2 sm:mx-3">|</span>
+          <span className="text-[11px] tracking-[0.15em] text-muted-foreground uppercase truncate min-w-0">
             {CLIENT.deskName}
           </span>
         </header>
         {/* Main */}
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-4 sm:p-6">
           {children}
         </main>
       </div>
