@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { SellingTrack, BuyingTrack, PlayerTrack } from '@/lib/placementStage';
+import { hasCounterparty } from '@/lib/pitchPairing';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -343,7 +344,7 @@ export function useAddBuyPitch() {
       const contact_id = input.contact_id || null;
       const buying_contact_id = input.buying_contact_id || null;
 
-      if (!contact_id && !buying_contact_id) {
+      if (!hasCounterparty(contact_id, buying_contact_id)) {
         throw new Error('A pitch needs a club on at least one side.');
       }
 
@@ -426,14 +427,16 @@ export function useAddBuyPitch() {
         if (insErr) throw insErr;
         return { pitch: created as unknown as BuyPitch, action: 'created' };
       } catch (e: any) {
-        // 23505 = unique_violation (lost a race). Re-read & return the winner.
+        // 23505 = unique_violation (lost a race). Re-read & return the winner
+        // on the same three-way pairing — reading by player alone would find
+        // one of his other pitches, and single() would throw outright once he
+        // has two, which offering one player to several clubs guarantees.
         if (e?.code === '23505' || /duplicate key/i.test(String(e?.message))) {
-          const { data: winner } = await supabase
-            .from('buy_pitches' as any)
-            .select('*')
-            .eq('scouted_target_id', scouted_target_id)
-            .single();
-          return { pitch: winner as unknown as BuyPitch, action: 'opened' };
+          let w = supabase.from('buy_pitches' as any).select('*').eq('scouted_target_id', scouted_target_id);
+          w = contact_id ? w.eq('contact_id', contact_id) : w.is('contact_id', null);
+          w = buying_contact_id ? w.eq('buying_contact_id', buying_contact_id) : w.is('buying_contact_id', null);
+          const { data: winner } = await w.limit(1);
+          if (winner?.[0]) return { pitch: winner[0] as unknown as BuyPitch, action: 'opened' };
         }
         throw e;
       }

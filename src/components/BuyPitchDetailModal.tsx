@@ -160,6 +160,7 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
   const [negNote, setNegNote] = useState('');
   const [closePromptOpen, setClosePromptOpen] = useState(false);
   const [deletePromptOpen, setDeletePromptOpen] = useState(false);
+  const [pendingCloseStage, setPendingCloseStage] = useState<BuyPitchStage | null>(null);
 
   // Milestone draft state (per key)
   const [msDraft, setMsDraft] = useState<{ key: MilestoneKey; at: string; amount: string; inProgress: boolean } | null>(null);
@@ -249,6 +250,11 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
 
   const handleStageChange = (stage: BuyPitchStage) => {
     if ((BUY_CLOSED_STAGES as readonly string[]).includes(stage)) {
+      // Remember which one was asked for. The prompt used to discard it, so
+      // acting on "the player has declined — move to Walked?" reopened the same
+      // question with nothing chosen, and "Close instead" was a dialog that
+      // asked what you had already said.
+      setPendingCloseStage(stage);
       setClosePromptOpen(true);
       return;
     }
@@ -838,16 +844,24 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
         </DialogContent>
       </Dialog>
 
-      <Dialog open={closePromptOpen} onOpenChange={v => { if (!v) setClosePromptOpen(false); }}>
+      <Dialog open={closePromptOpen} onOpenChange={v => { if (!v) { setClosePromptOpen(false); setPendingCloseStage(null); } }}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Close pitch as…</DialogTitle></DialogHeader>
+          {pendingCloseStage && (
+            <p className="text-[11px] text-muted-foreground -mt-1">
+              Suggested: <span className="text-[hsl(var(--gold))]">{pendingCloseStage}</span>
+            </p>
+          )}
           <div className="grid grid-cols-2 gap-2 mt-2">
             {CLOSED_STAGES_UI.map(s => (
-              <Button key={s.value} variant="outline" className="h-9 text-xs"
+              <Button key={s.value}
+                variant={pendingCloseStage === s.value ? 'default' : 'outline'}
+                className="h-9 text-xs"
                 onClick={() => {
                   const reason = CLOSED_STAGE_TO_LOSS_REASON[s.value] ?? null;
                   setLoss.mutate({ id: pitchId, stage: s.value, loss_reason: reason });
                   setClosePromptOpen(false);
+                  setPendingCloseStage(null);
                 }}>
                 {s.label}
               </Button>
