@@ -51,6 +51,7 @@ if (!backupDir) {
 
 const clubsPath = join(backupDir, 'tables', 'clubs.json');
 const contactsPath = join(backupDir, 'tables', 'contacts.json');
+const settingsPath = join(backupDir, 'tables', 'settings.json');
 for (const p of [clubsPath, contactsPath]) {
   if (!existsSync(p)) { console.error(`Not found: ${p}`); process.exit(1); }
 }
@@ -74,6 +75,25 @@ if (!dryRun && (!URL || !KEY || !EMAIL || !PASSWORD)) {
 
 const clubs = JSON.parse(readFileSync(clubsPath, 'utf8'));
 const contacts = JSON.parse(readFileSync(contactsPath, 'utf8'));
+
+/**
+ * Which clubs went up and which went down.
+ *
+ * Held in `settings` as two JSON lists, and the Contacts page reads them to
+ * split a league into existing, promoted and relegated. Without them every club
+ * lands in one undifferentiated block — and for an agent that distinction is the
+ * point: a promoted club is a club with a budget and a squad to rebuild.
+ *
+ * Season fact, not anyone's private information. Copied verbatim.
+ */
+const SETTING_KEYS = ['promoted_clubs_2025', 'relegated_clubs_2025'];
+let settingRows = [];
+if (existsSync(settingsPath)) {
+  const all = JSON.parse(readFileSync(settingsPath, 'utf8'));
+  settingRows = all
+    .filter((r) => SETTING_KEYS.includes(r.key))
+    .map((r) => ({ key: r.key, value: r.value }));
+}
 
 /**
  * Reference data: carried over as-is.
@@ -148,6 +168,9 @@ console.log(`  contacts: ${namedContacts.length}  (names, roles, LinkedIn)`);
 if (nameless > 0) console.log(`            ${nameless} rows have no name and are skipped`);
 console.log(`  leagues:  ${new Set(clubRows.map((c) => c.league).filter(Boolean)).size}`);
 console.log(`  TR-mapped: ${clubRows.filter((c) => c.tr_team_id && c.tr_competition_id).length}  (needed for TransferRoom enrichment)`);
+console.log(`  promoted/relegated lists: ${settingRows.length}/2${settingRows.length < 2
+  ? '  — re-export with --tables=clubs,contacts,settings to get them'
+  : ''}`);
 console.log(`\n  leaving behind, from ${carriedNonEmpty} rows that carried something:`);
 console.log(`    ${DROPPED.join(', ')}`);
 console.log(`    ${sourcePhones} phone numbers are NOT copied`);
@@ -163,6 +186,13 @@ if (dryRun) {
 const supabase = createClient(URL, KEY, { auth: { persistSession: false, autoRefreshToken: false } });
 const { error: authErr } = await supabase.auth.signInWithPassword({ email: EMAIL, password: PASSWORD });
 if (authErr) { console.error(`Sign-in failed: ${authErr.message}`); process.exit(1); }
+
+// --- promoted / relegated lists ---
+for (const row of settingRows) {
+  const { error } = await supabase.from('settings').upsert(row, { onConflict: 'key' });
+  if (error) console.error(`  !! ${row.key}: ${error.message}`);
+}
+if (settingRows.length) console.log(`\nsettings: ${settingRows.length} club lists`);
 
 // --- clubs: unique on name, so upsert is idempotent ---
 let clubsOk = 0;

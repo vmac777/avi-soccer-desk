@@ -17,6 +17,7 @@ import ClubTmLinks from '@/components/ClubTmLinks';
 import { useClubNewsCounts, urgencyClasses } from '@/hooks/useNewsCounts';
 import NewsFlagBadge from '@/components/NewsFlagBadge';
 import { usePromotedClubs, useRelegatedClubs } from '@/hooks/usePromotedClubs';
+import { useClubs } from '@/hooks/useClubsAndSources';
 
 const STAGES = ['', 'Contacted - No Answer', 'Contacted', 'Offered', 'Negotiating', 'Closed Won', 'Closed Lost', 'Dormant'];
 
@@ -70,8 +71,21 @@ const ContactsPage = () => {
   const [flashId, setFlashId] = useState<string | null>(null);
 
   // Build hierarchy
+  const { data: allClubs = [] } = useClubs();
+
   const leagues = useMemo(() => {
     const leagueMap: Record<string, Record<string, ContactEnriched[]>> = {};
+
+    // Seed from the clubs table first, so a league shows every club in it and
+    // not only the ones somebody has already spoken to. A club you hold no
+    // contact for is the most useful cell on this page — it is the gap in the
+    // network — and building the grid from contacts alone hides exactly those.
+    allClubs.forEach(c => {
+      if (!c.league || !c.name) return;
+      if (!leagueMap[c.league]) leagueMap[c.league] = {};
+      if (!leagueMap[c.league][c.name]) leagueMap[c.league][c.name] = [];
+    });
+
     contacts.forEach(c => {
       if (!leagueMap[c.market]) leagueMap[c.market] = {};
       if (!leagueMap[c.market][c.club]) leagueMap[c.market][c.club] = [];
@@ -102,7 +116,7 @@ const ContactsPage = () => {
         };
       })
       .sort((a, b) => a.league.localeCompare(b.league));
-  }, [contacts]);
+  }, [contacts, allClubs]);
 
   const globalStageCounts = useMemo(() => {
     const counts: Record<string, number> = {};

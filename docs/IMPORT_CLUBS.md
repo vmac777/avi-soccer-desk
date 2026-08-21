@@ -20,10 +20,10 @@ SUPABASE_URL=https://<source-project-ref>.supabase.co \
 SUPABASE_ANON_KEY=<source publishable/anon key> \
 ADMIN_EMAIL=<your admin email there> \
 ADMIN_PASSWORD=<that password> \
-node scripts/export-backup.mjs --tables=clubs,contacts --skip-storage
+node scripts/export-backup.mjs --tables=clubs,contacts,settings --skip-storage
 ```
 
-`--tables=clubs,contacts` is the important part. Without it the script walks all
+`--tables=clubs,contacts,settings` is the important part. Without it the script walks all
 thirty-five tables, including the multi-megabyte TransferRoom history blobs. An
 earlier full run of this script saturated that database and took the live CRM
 down with HTTP 522s for its users. Two small reference tables is a completely
@@ -32,7 +32,8 @@ different amount of work — a few hundred rows, seconds, not minutes.
 It still reads a production database people are using, so run it off-peak and
 keep the app open in another tab while it goes. If the app slows, Ctrl-C it.
 
-Output lands in `backups/<timestamp>/tables/clubs.json` and `contacts.json`.
+Output lands in `backups/<timestamp>/tables/` as `clubs.json`, `contacts.json`
+and `settings.json`.
 
 ## 2. Import here
 
