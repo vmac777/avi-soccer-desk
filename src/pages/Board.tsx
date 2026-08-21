@@ -13,8 +13,10 @@ import { useShortlistEntries } from '@/hooks/useShortlist';
 import { useFollowUps } from '@/hooks/useFollowUps';
 import { useClubs } from '@/hooks/useClubsAndSources';
 import { toRosterPlayer } from '@/lib/rosterMapping';
+import { getAge, getLatestXtvM } from '@/lib/rosterData';
+import { formatMoneyShort } from '@/lib/money';
 import { buildBoard, rosterCoverage, type Opportunity, type OpportunityKind } from '@/lib/deskBoard';
-import { todayKey } from '@/lib/dateKeys';
+import { todayKey, parseDateKey } from '@/lib/dateKeys';
 
 /**
  * What to do next, rather than how tidy the book is.
@@ -61,7 +63,7 @@ function OpportunityCard({ item, onOpen, hero = false }: {
       onClick={onOpen}
       className={cn(
         'group flex w-full items-start gap-3 rounded-lg border border-l-[3px] border-border bg-card text-left transition-colors hover:border-primary/40',
-        hero ? 'p-5' : 'px-4 py-3',
+        hero ? 'p-5 xl:col-span-2' : 'px-4 py-3',
         edgeFor(item.urgency),
       )}
     >
@@ -115,6 +117,27 @@ export default function BoardPage() {
       .slice(0, 5),
     [followUps, today],
   );
+
+  /**
+   * The top of the book by valuation, with how long each contract has left.
+   *
+   * Sorted by value because that is the order an agent thinks in, and the
+   * contract chip is here rather than only in a card so the page shows
+   * leverage running out at a glance.
+   */
+  const topOfBook = useMemo(() => roster
+    .map((p) => {
+      const xtv = getLatestXtvM(p);
+      const monthsLeft = p.contractEndDate
+        ? Math.round(
+          (parseDateKey(p.contractEndDate.slice(0, 10)).getTime() - parseDateKey(today).getTime())
+          / (86_400_000 * 30))
+        : null;
+      return { player: p, xtv, monthsLeft: monthsLeft != null && monthsLeft >= 0 ? monthsLeft : null };
+    })
+    .sort((a, b) => (b.xtv ?? -1) - (a.xtv ?? -1))
+    .slice(0, 8),
+  [roster, today]);
 
   const recentPitches = useMemo(
     () => [...pitches].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 4),
@@ -184,9 +207,8 @@ export default function BoardPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
       {/* ── Opportunities ── */}
-      <div className="lg:col-span-2">
+      <div>
         <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
           WHERE TO SPEND TODAY
         </h2>
@@ -224,7 +246,7 @@ export default function BoardPage() {
             </ul>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="grid gap-2 xl:grid-cols-2">
             {board.map((item, i) => (
               <OpportunityCard
                 key={item.id}
@@ -245,9 +267,60 @@ export default function BoardPage() {
         )}
       </div>
 
+      {/* ── The book ──
+          Who he actually represents, biggest first. Not a count of the roster —
+          the names, which is the thing an agent points at. It carries the
+          contract chip too, so the page shows leverage running out rather than
+          only telling you about it in a card. */}
+      {topOfBook.length > 0 && (
+        <div>
+          <div className="mb-2 flex items-baseline justify-between gap-2">
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
+              THE BOOK
+            </h2>
+            <button
+              onClick={() => navigate('/roster')}
+              className="text-[10px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+            >
+              all {roster.length} →
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-4">
+            {topOfBook.map(({ player: p, xtv, monthsLeft }) => (
+              <button
+                key={p.id}
+                onClick={() => navigate(`/roster/${p.id}`)}
+                className="rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-primary/40"
+              >
+                <p className="truncate text-sm font-medium text-foreground">{p.name}</p>
+                <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
+                  {[p.position, getAge(p.dob) ?? p.age, p.currentClub].filter(Boolean).join(' · ')}
+                </p>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <span className="font-mono text-xs text-foreground">
+                    {xtv != null ? formatMoneyShort(xtv * 1_000_000) : '—'}
+                  </span>
+                  {monthsLeft != null && monthsLeft <= 12 && (
+                    <span className={cn(
+                      'shrink-0 rounded border px-1.5 py-0.5 text-[9px] uppercase tracking-wide',
+                      monthsLeft <= 6
+                        ? 'border-status-cold/30 bg-status-cold/10 text-status-cold'
+                        : 'border-primary/30 bg-primary/10 text-primary',
+                    )}>
+                      {monthsLeft}m left
+                    </span>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
-      {/* ── The rail: what is due, and what you were last in ── */}
-      <div className="space-y-6">
+      {/* ── What is due, and what you were last in ──
+          A footer strip rather than a side rail: DUE is usually one line, and a
+          third of the screen given to one line reads worse than no rail. */}
+      <div className="grid gap-6 sm:grid-cols-2">
         <div>
           <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
             DUE
@@ -293,7 +366,6 @@ export default function BoardPage() {
             </div>
           </div>
         )}
-      </div>
       </div>
     </div>
   );

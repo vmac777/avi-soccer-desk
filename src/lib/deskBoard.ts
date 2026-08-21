@@ -178,7 +178,7 @@ function unworkedMatches(input: BoardInput): Opportunity[] {
     // stacking "Bahia want…" twice reads as repetition rather than as demand.
     .filter((x, _i, all) => all.findIndex(
       (y) => clubOf(y.r, input) === clubOf(x.r, input)) === all.indexOf(x))
-    .slice(0, 3)
+    .slice(0, 4)
     .map(({ r, fits }) => {
       const club = clubOf(r, input);
       const alsoAtClub = input.requirements.filter((o) =>
@@ -213,7 +213,7 @@ function contractClocks(input: BoardInput): Opportunity[] {
     .map((p) => ({ p, days: daysBetween(input.today, p.contractEndDate!.slice(0, 10)) }))
     .filter(({ days }) => days >= 0 && days <= CONTRACT_CLOCK_MONTHS * 30)
     .sort((a, b) => a.days - b.days)
-    .slice(0, 2)
+    .slice(0, 3)
     .map(({ p, days }) => {
       const months = Math.max(1, Math.round(days / 30));
       const age = getAge(p.dob) ?? p.age;
@@ -262,7 +262,7 @@ function quietClubs(input: BoardInput): Opportunity[] {
     .filter((x): x is { club: string; openCount: number; days: number } =>
       x.days != null && x.days >= QUIET_DAYS)
     .sort((a, b) => b.days - a.days)
-    .slice(0, 2)
+    .slice(0, 3)
     .map(({ club, openCount, days }) => ({
       kind: 'quiet_club' as const,
       id: `quiet:${club}`,
@@ -292,7 +292,7 @@ function valueMoved(input: BoardInput): Opportunity[] {
     }))
     .filter(({ wanting }) => wanting.length > 0)
     .sort((a, b) => b.change - a.change)
-    .slice(0, 2)
+    .slice(0, 3)
     .map(({ p, change, wanting }) => {
       const xtv = getLatestXtvM(p);
       return {
