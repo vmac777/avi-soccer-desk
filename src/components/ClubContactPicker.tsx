@@ -90,6 +90,18 @@ export default function ClubContactPicker({
 
   const clubRow = clubs.find(c => c.name === club);
 
+  const addPerson = async () => {
+    const name = newPerson.trim();
+    if (!name || !clubRow || !onCreateAtClub || creating) return;
+    setCreating(true);
+    try {
+      const id = await onCreateAtClub(clubRow, name);
+      if (id) { onChange(id); setNewPerson(''); }
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <div className="space-y-1.5">
       <select
@@ -131,27 +143,26 @@ export default function ClubContactPicker({
         </select>
       )}
 
-      {/* A club we hold nobody at is the normal case for a first approach, so
-          naming the person here beats sending someone to the Contacts page. */}
-      {club && peopleAtClub.length === 0 && onCreateAtClub && clubRow && (
+      {/* Always available, not only when the club is empty.
+          Holding one person at a club does not mean they are the person for
+          this deal — a sporting director is not the academy lead — and being
+          able to name someone here is the difference between logging the deal
+          now and going to the Contacts page first. */}
+      {club && onCreateAtClub && clubRow && (
         <div className="flex gap-1.5">
           <Input
             value={newPerson}
             onChange={e => setNewPerson(e.target.value)}
-            placeholder={`Nobody at ${club} yet — name them`}
+            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); void addPerson(); } }}
+            placeholder={peopleAtClub.length === 0
+              ? `Nobody at ${club} yet — name them`
+              : `Someone else at ${club}`}
             className="h-8 text-xs flex-1"
           />
           <button
+            type="button"
             disabled={!newPerson.trim() || creating}
-            onClick={async () => {
-              setCreating(true);
-              try {
-                const id = await onCreateAtClub(clubRow, newPerson.trim());
-                if (id) { onChange(id); setNewPerson(''); }
-              } finally {
-                setCreating(false);
-              }
-            }}
+            onClick={() => void addPerson()}
             className="h-8 px-2 text-xs rounded-md border border-border text-muted-foreground hover:text-foreground disabled:opacity-40"
           >
             {creating ? '…' : 'Add'}
