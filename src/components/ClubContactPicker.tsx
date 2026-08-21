@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import type { Club } from '@/hooks/useClubsAndSources';
+import { countryFromMarket } from '@/lib/market';
 
 export interface PickableContact {
   id: string;
@@ -180,8 +181,3 @@ export default function ClubContactPicker({
  * would otherwise be cut in half and its clubs filed under a country that does
  * not exist.
  */
-export function countryFromMarket(market?: string | null): string {
-  if (!market) return '';
-  const [country] = market.split(/\s+[-–]\s+/);
-  return (country ?? '').trim();
-}
