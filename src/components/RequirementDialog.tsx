@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import MoneyInput from '@/components/MoneyInput';
+import { parseMoney } from '@/lib/money';
 import type { RequirementInput, RequirementRow } from '@/hooks/useClubRequirements';
 
 /**
@@ -16,20 +20,19 @@ import type { RequirementInput, RequirementRow } from '@/hooks/useClubRequiremen
  */
 
 const POSITIONS = ['GK', 'CB', 'LB', 'RB', 'LWB', 'RWB', 'DM', 'CM', 'AM', 'LW', 'RW', 'CF', 'SS'];
-const FEET = ['Left', 'Right', 'Both'];
 
-/** Money is entered in millions, because that is how it is spoken. */
-const toM = (v: number | null) => (v == null ? '' : String(v / 1_000_000));
-const fromM = (v: string) => {
-  const n = parseFloat(v);
-  return Number.isFinite(n) ? Math.round(n * 1_000_000) : null;
-};
-/** Wages are spoken in thousands per year. */
-const toK = (v: number | null) => (v == null ? '' : String(Math.round(v / 1_000)));
-const fromK = (v: string) => {
-  const n = parseFloat(v);
-  return Number.isFinite(n) ? Math.round(n * 1_000) : null;
-};
+/**
+ * "Both" sat next to Left and Right and read as "either is fine", which is not
+ * what it does — it asks for a genuinely two-footed player and rejects
+ * everyone else. Leaving this unset is how you say you do not mind.
+ */
+const FEET: { value: string; label: string }[] = [
+  { value: 'Left', label: 'Left' },
+  { value: 'Right', label: 'Right' },
+  { value: 'Both', label: 'Two-footed' },
+];
+
+const toDigits = (v: number | null) => (v == null ? '' : String(Math.round(v)));
 const toInt = (v: string) => {
   const n = parseInt(v, 10);
   return Number.isFinite(n) ? n : null;
@@ -59,8 +62,8 @@ export default function RequirementDialog({
   const [position, setPosition] = useState(initial?.position ?? '');
   const [ageMin, setAgeMin] = useState(initial?.age_min != null ? String(initial.age_min) : '');
   const [ageMax, setAgeMax] = useState(initial?.age_max != null ? String(initial.age_max) : '');
-  const [budgetMax, setBudgetMax] = useState(toM(initial?.budget_max ?? null));
-  const [salaryMax, setSalaryMax] = useState(toK(initial?.salary_max ?? null));
+  const [budgetMax, setBudgetMax] = useState(toDigits(initial?.budget_max ?? null));
+  const [salaryMax, setSalaryMax] = useState(toDigits(initial?.salary_max ?? null));
   const [foot, setFoot] = useState(initial?.foot ?? '');
   const [needsEu, setNeedsEu] = useState(initial?.needs_eu_passport ?? false);
   const [leagues, setLeagues] = useState((initial?.league_experience ?? []).join(', '));
@@ -75,7 +78,22 @@ export default function RequirementDialog({
   const ageReversed = min != null && max != null && min > max;
   const canSave = position.trim().length > 0 && !ageReversed && !saving;
 
-  const handleSubmit = async () => {
+  /**
+   * Back to a blank need, keeping the club.
+   *
+   * A sporting director does not ring about one gap. "We want a right back, a
+   * holding midfielder and a nine" is one call, and closing the dialog after
+   * each of them made the second and third feel like starting over.
+   */
+  const reset = () => {
+    setPosition('');
+    setAgeMin(''); setAgeMax('');
+    setBudgetMax(''); setSalaryMax('');
+    setFoot(''); setNeedsEu(false);
+    setLeagues(''); setWindowTarget(''); setNotes('');
+  };
+
+  const handleSubmit = async (andAnother = false) => {
     if (!canSave) return;
     setSaving(true);
     try {
@@ -86,15 +104,20 @@ export default function RequirementDialog({
         age_min: min,
         age_max: max,
         budget_min: null,
-        budget_max: fromM(budgetMax),
-        salary_max: fromK(salaryMax),
+        budget_max: parseMoney(budgetMax),
+        salary_max: parseMoney(salaryMax),
         foot: foot || null,
         needs_eu_passport: needsEu,
         league_experience: leagues.split(',').map((s) => s.trim()).filter(Boolean),
         window_target: windowTarget.trim() || null,
         notes: notes.trim() || null,
       });
-      onClose();
+      if (andAnother) {
+        toast.success(`${position.trim()} saved — next one?`);
+        reset();
+      } else {
+        onClose();
+      }
     } finally {
       setSaving(false);
     }
@@ -136,11 +159,11 @@ export default function RequirementDialog({
             <Field label="Age to">
               <Input value={ageMax} onChange={(e) => setAgeMax(e.target.value)} type="number" placeholder="—" className="h-8 text-xs" />
             </Field>
-            <Field label="Fee ceiling (€m)">
-              <Input value={budgetMax} onChange={(e) => setBudgetMax(e.target.value)} type="number" step="0.1" placeholder="—" className="h-8 text-xs" />
+            <Field label="Fee ceiling">
+              <MoneyInput value={budgetMax} onChange={setBudgetMax} />
             </Field>
-            <Field label="Wage ceiling (€k/yr)">
-              <Input value={salaryMax} onChange={(e) => setSalaryMax(e.target.value)} type="number" placeholder="—" className="h-8 text-xs" />
+            <Field label="Wage ceiling">
+              <MoneyInput value={salaryMax} onChange={setSalaryMax} suffix="/yr" />
             </Field>
           </div>
 
@@ -153,16 +176,16 @@ export default function RequirementDialog({
               <div className="flex gap-1">
                 {FEET.map((f) => (
                   <button
-                    key={f}
-                    onClick={() => setFoot(foot === f ? '' : f)}
+                    key={f.value}
+                    onClick={() => setFoot(foot === f.value ? '' : f.value)}
                     className={cn(
                       'px-2 py-1 rounded text-[11px] border transition-colors',
-                      foot === f
+                      foot === f.value
                         ? 'bg-primary text-primary-foreground border-primary'
                         : 'bg-card border-border text-muted-foreground hover:text-foreground',
                     )}
                   >
-                    {f}
+                    {f.label}
                   </button>
                 ))}
               </div>
@@ -200,14 +223,24 @@ export default function RequirementDialog({
             />
           </Field>
 
-          <div className="flex justify-end gap-2 pt-1">
+          <div className="flex flex-wrap justify-end gap-2 pt-1">
             <Button variant="outline" onClick={onClose} className="h-8 text-xs">Cancel</Button>
+            {!initial && (
+              <Button
+                variant="outline"
+                onClick={() => handleSubmit(true)}
+                disabled={!canSave}
+                className="h-8 text-xs"
+              >
+                <Plus className="mr-1 h-3 w-3" /> Save &amp; add another
+              </Button>
+            )}
             <Button
-              onClick={handleSubmit}
+              onClick={() => handleSubmit(false)}
               disabled={!canSave}
               className="h-8 text-xs bg-primary text-primary-foreground"
             >
-              {saving ? 'Saving…' : initial ? 'Save' : 'Add requirement'}
+              {saving ? 'Saving…' : initial ? 'Save' : 'Save & close'}
             </Button>
           </div>
         </div>

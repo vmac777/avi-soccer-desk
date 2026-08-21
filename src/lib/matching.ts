@@ -17,6 +17,7 @@
  */
 
 import { defaultComparablePositions } from '@/lib/marketBriefTypes';
+import { formatMoneyShort } from '@/lib/money';
 import {
   type RosterPlayer,
   getAge,
@@ -180,7 +181,7 @@ function scoreBudget(
       reason: { factor: 'budget', verdict: 'fits', detail: 'No budget stated' },
     };
   }
-  const m = (n: number) => `€${(n / 1_000_000).toFixed(1)}m`;
+  const m = formatMoneyShort;
   if (value <= req.budget_max) {
     return {
       points: WEIGHTS.budget,
@@ -236,7 +237,7 @@ function scoreSalary(
     };
   }
 
-  const k = (n: number) => `€${Math.round(n / 1_000)}k/yr`;
+  const k = (n: number) => `${formatMoneyShort(n)}/yr`;
   if (salary <= req.salary_max) {
     return {
       points: WEIGHTS.salary,

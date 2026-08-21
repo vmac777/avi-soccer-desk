@@ -1,3 +1,5 @@
+import { formatMoneyShort } from '@/lib/money';
+
 /**
  * Turning a shortlisted player into a pitch.
  *
@@ -103,7 +105,7 @@ export function requirementSummary(req: {
   else if (req.age_max != null) bits.push(`under ${req.age_max + 1}`);
   else if (req.age_min != null) bits.push(`${req.age_min}+`);
 
-  if (req.budget_max != null) bits.push(`≤ €${(req.budget_max / 1_000_000).toFixed(1)}m`);
+  if (req.budget_max != null) bits.push(`≤ ${formatMoneyShort(req.budget_max)}`);
   if (req.foot) bits.push(`${req.foot}-footed`);
 
   return bits.join(', ');

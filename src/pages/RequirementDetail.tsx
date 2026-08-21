@@ -18,6 +18,7 @@ import { toRosterPlayer } from '@/lib/rosterMapping';
 import { matchRosterToRequirement, unmatchableFields, type MatchReason } from '@/lib/matching';
 import { getAge, getLatestXtvM, type RosterPlayer } from '@/lib/rosterData';
 import { pitchArgsFromShortlist, requirementSummary } from '@/lib/shortlistToPitch';
+import { formatMoneyShort } from '@/lib/money';
 import { exportShortlistPdf } from '@/lib/exportShortlistPdf';
 
 /**
@@ -211,7 +212,7 @@ export default function RequirementDetailPage() {
         <div className="mt-2 flex flex-wrap gap-1.5 text-[10px]">
           {requirement.salary_max != null && (
             <span className="rounded border border-border px-1.5 py-0.5 text-muted-foreground">
-              wages ≤ €{Math.round(requirement.salary_max / 1_000)}k/yr
+              wages ≤ {formatMoneyShort(requirement.salary_max)}/yr
             </span>
           )}
           {requirement.needs_eu_passport && (
