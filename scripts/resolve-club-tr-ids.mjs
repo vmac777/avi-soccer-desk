@@ -6,6 +6,7 @@
  *     node scripts/resolve-club-tr-ids.mjs                      # report only
  *     node scripts/resolve-club-tr-ids.mjs --apply               # write them
  *     node scripts/resolve-club-tr-ids.mjs --list-competitions   # dump the TR list
+ *     node scripts/resolve-club-tr-ids.mjs --list-teams --competition=1526
  *     node scripts/resolve-club-tr-ids.mjs --only="Shakhtar"     # one club
  *
  * TransferRoom enrichment needs a club's tr_team_id and tr_competition_id. Ours
@@ -33,6 +34,7 @@ import { readFileSync } from 'node:fs';
 const args = process.argv.slice(2);
 const apply = args.includes('--apply');
 const listCompetitions = args.includes('--list-competitions');
+const listTeams = args.includes('--list-teams');
 const onlyArg = args.find((a) => a.startsWith('--only='));
 const only = onlyArg ? onlyArg.slice('--only='.length).toLowerCase() : null;
 
@@ -298,6 +300,29 @@ async function teamsIn(competitionId) {
   }
   rosterCache.set(competitionId, teams);
   return teams;
+}
+
+// ── Every team in one competition, for when no string match can get there ──
+//
+// A club is often known by a completely different word in another language —
+// "Estrela Vermelha" is "Crvena Zvezda" is "Red Star", and no amount of
+// normalising bridges that. Print the list and let a person recognise it.
+if (listTeams) {
+  if (forceCompetition == null) {
+    console.error('--list-teams needs --competition=<id>. Find one with --list-competitions.');
+    process.exit(1);
+  }
+  const c = competitions.find((x) => Number(compId(x)) === forceCompetition);
+  if (!c) { console.error(`No competition ${forceCompetition} in the list.`); process.exit(1); }
+
+  const teams = await teamsIn(forceCompetition);
+  const rows = [...teams.entries()]
+    .filter(([, name]) => !only || name.toLowerCase().includes(only))
+    .sort((a, b) => a[1].localeCompare(b[1]));
+  console.log(`${rows.length} teams in ${compCountry(c)} — ${compName(c)}\n`);
+  for (const [id, name] of rows) console.log(`  ${String(id).padStart(7)}  ${name}`);
+  console.log('\n  Map one with:  --only="<roster name>" --competition=' + forceCompetition + ' --team=<id> --apply');
+  process.exit(0);
 }
 
 const resolved = [];
