@@ -37,3 +37,6 @@ out
 # that 403s outside Lovable, and Vercel auto-detects it. npm is the only path.
 bun.lock
 bun.lockb
+
+# Supabase CLI scratch (project ref cache, pooler URLs)
+supabase/.temp/
