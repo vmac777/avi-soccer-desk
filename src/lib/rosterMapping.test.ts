@@ -179,3 +179,40 @@ describe('xTV units', () => {
     expect(getLatestXtvM(p)).toBeCloseTo(5.5);
   });
 });
+
+describe('history from the player payload', () => {
+  // Both of these come back inside the same /players?playerid= response that
+  // enrichment already fetches — no second call, no scheduled job.
+  it("reads TransferRoom's TeamHistory as transfer history", () => {
+    const p = toRosterPlayer(row({
+      tr_data: {
+        TeamHistory: [
+          { FromTeam: 'Internacional', ToTeam: 'CSKA Moscow', Date: '2024-07-01', TransferType: 'Loan', TransferFeeEuros: '0' },
+          { FromTeam: 'Cruzeiro', ToTeam: 'Internacional', Date: '2022-01-15', TransferType: 'Permanent', TransferFeeEuros: '3500000' },
+        ],
+      },
+    } as unknown as Partial<ScoutedTarget>));
+
+    expect(p.transferHistory).toHaveLength(2);
+    expect(p.transferHistory[1].fee).toBe(3_500_000);
+    expect(p.transferHistory[1].feeEurM).toBeCloseTo(3.5);
+    expect(p.transferHistory[0].transferType).toBe('Loan');
+  });
+
+  it('reads an array that arrived as a JSON string', () => {
+    const p = toRosterPlayer(row({
+      tr_data: {
+        xTVHistory: JSON.stringify([{ Year: 2026, Month: 3, xTV: 4_200_000 }]),
+      },
+    } as unknown as Partial<ScoutedTarget>));
+
+    expect(p.xtvHistory).toEqual([{ year: 2026, month: 3, xtv: 4_200_000 }]);
+  });
+
+  it('drops history rows with no club at either end', () => {
+    const p = toRosterPlayer(row({
+      tr_data: { TeamHistory: [{ Date: '2020-01-01' }, { FromTeam: 'Santos', ToTeam: 'Ajax' }] },
+    } as unknown as Partial<ScoutedTarget>));
+    expect(p.transferHistory).toHaveLength(1);
+  });
+});

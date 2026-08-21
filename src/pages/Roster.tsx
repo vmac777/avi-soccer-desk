@@ -593,6 +593,7 @@ export default function ScoutedTargetsPage() {
   const [search, setSearch] = useState('');
   const [posFilter, setPosFilter] = useState<string>('All');
   const [viewMode, setViewMode] = useState<'card' | 'table'>('table');
+  const [sortBy, setSortBy] = useState<'name' | 'xtv' | 'tm'>('name');
   const [showCreate, setShowCreate] = useState(false);
   const [editTarget, setEditTarget] = useState<ScoutedTarget | null>(null);
   const [pitchTarget, setPitchTarget] = useState<ScoutedTarget | null>(null);
@@ -621,8 +622,24 @@ export default function ScoutedTargetsPage() {
       const s = search.toLowerCase();
       list = list.filter(t => t.name.toLowerCase().includes(s) || t.current_club.toLowerCase().includes(s) || t.nationality.toLowerCase().includes(s));
     }
+
+    // Sorting by value asks a different question to sorting by name — it ranks
+    // the book by what it is worth. Players with no figure sink rather than
+    // sorting as zero, so an unenriched player is not mistaken for a cheap one.
+    if (sortBy !== 'name') {
+      const of = (t: ScoutedTarget) =>
+        sortBy === 'xtv' ? t.xtv : sortBy === 'tm' ? t.market_value : null;
+      list = [...list].sort((a, b) => {
+        const av = of(a), bv = of(b);
+        if (av == null && bv == null) return a.name.localeCompare(b.name);
+        if (av == null) return 1;
+        if (bv == null) return -1;
+        return bv - av;
+      });
+    }
+
     return list;
-  }, [targets, posFilter, search]);
+  }, [targets, posFilter, search, sortBy]);
 
   const handleCreate = async (form: TargetFormData) => {
     try {
@@ -731,6 +748,23 @@ export default function ScoutedTargetsPage() {
           {POSITION_FILTERS.map(f => (
             <button key={f} onClick={() => setPosFilter(f)} className={cn('px-2.5 py-1 rounded text-xs font-medium transition-colors', posFilter === f ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground')}>
               {f}
+            </button>
+          ))}
+        </div>
+        {/* Sorting by value ranks the book by what it is worth, which is a
+            different question to finding a name. */}
+        <div className="flex items-center gap-0.5 bg-card border border-border rounded-md p-0.5">
+          {([['name', 'A–Z'], ['xtv', 'xTV'], ['tm', 'TM']] as const).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setSortBy(key)}
+              title={key === 'name' ? 'Alphabetical' : `Highest ${label} first`}
+              className={cn(
+                'px-2 py-1 rounded text-[11px] font-medium transition-colors',
+                sortBy === key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {label}
             </button>
           ))}
         </div>

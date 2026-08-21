@@ -48,15 +48,36 @@ function field(tr: Record<string, unknown>, ...names: string[]): unknown {
   return undefined;
 }
 
-const num = (v: unknown): number | undefined =>
-  typeof v === 'number' && Number.isFinite(v) ? v : undefined;
+/** TransferRoom returns some numbers as strings — "4000000" for a fee. */
+const num = (v: unknown): number | undefined => {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : undefined;
+  if (typeof v === 'string' && v.trim() !== '') {
+    const n = Number(v.replace(/[^0-9.-]/g, ''));
+    return Number.isFinite(n) ? n : undefined;
+  }
+  return undefined;
+};
+
+/**
+ * Some of these arrays arrive as a JSON string rather than an array. Nothing
+ * says which, so try to read it either way before giving up.
+ */
+function asArray(raw: unknown): unknown[] {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch { return []; }
+  }
+  return [];
+}
 
 const str = (v: unknown): string | undefined =>
   typeof v === 'string' && v.trim() !== '' ? v : undefined;
 
 function xtvHistoryFrom(tr: Record<string, unknown>): XtvHistoryEntry[] {
-  const raw = field(tr, 'xtvHistory', 'xTVHistory', 'valuationHistory');
-  if (!Array.isArray(raw)) return [];
+  const raw = asArray(field(tr, 'xtvHistory', 'xTVHistory', 'valuationHistory'));
   return raw
     .map((e) => {
       const o = readTr(e);
@@ -67,20 +88,30 @@ function xtvHistoryFrom(tr: Record<string, unknown>): XtvHistoryEntry[] {
     .filter((e): e is XtvHistoryEntry => e !== null);
 }
 
+/**
+ * TransferRoom calls this `TeamHistory`, not `TransferHistory` — every club the
+ * player has been at, with the fee in whole euros under `TransferFeeEuros`.
+ * It comes back in the same player payload enrichment already fetches, so this
+ * needs no extra call and no scheduled job: the data was there all along, under
+ * a name nothing was looking for.
+ */
 function transferHistoryFrom(tr: Record<string, unknown>): TransferHistoryEntry[] {
-  const raw = field(tr, 'transferHistory', 'transfers');
-  if (!Array.isArray(raw)) return [];
-  return raw.map((e) => {
-    const o = readTr(e);
-    return {
-      fromTeam: str(field(o, 'fromTeam', 'fromClub', 'sellingTeam')) ?? '',
-      toTeam: str(field(o, 'toTeam', 'toClub', 'buyingTeam')) ?? '',
-      date: str(field(o, 'date', 'transferDate')) ?? '',
-      fee: num(field(o, 'fee', 'transferFee')) ?? null,
-      feeEurM: num(field(o, 'feeEurM')) ?? null,
-      transferType: str(field(o, 'transferType', 'type')) ?? '',
-    };
-  });
+  const raw = asArray(field(tr, 'teamHistory', 'transferHistory', 'transfers'));
+  return raw
+    .map((e) => {
+      const o = readTr(e);
+      const fee = num(field(o, 'transferFeeEuros', 'fee', 'transferFee'));
+      return {
+        fromTeam: str(field(o, 'fromTeam', 'fromClub', 'sellingTeam')) ?? '',
+        toTeam: str(field(o, 'toTeam', 'toClub', 'buyingTeam')) ?? '',
+        date: str(field(o, 'date', 'transferDate', 'startDate')) ?? '',
+        fee: fee ?? null,
+        feeEurM: num(field(o, 'feeEurM')) ?? (fee != null ? fee / 1_000_000 : null),
+        transferType: str(field(o, 'transferType', 'type')) ?? '',
+      };
+    })
+    // A row with neither club is a blank the chart cannot use.
+    .filter((e) => e.fromTeam || e.toTeam);
 }
 
 export function toRosterPlayer(row: ScoutedTarget): RosterPlayer {
