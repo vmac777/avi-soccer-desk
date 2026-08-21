@@ -76,3 +76,33 @@ what the Country → League → Club pickers are built on. Plus each stakeholder
 
 The importer prints how many phone numbers it left behind and how many LinkedIn
 URLs it is carrying, so you can see the filter did its job.
+
+## Clubs the directory never had
+
+The imported directory is one desk's contact list, so it does not contain every
+club the roster points at — its own club least of all. Those clubs have no
+TransferRoom identifiers, and a player at one cannot be enriched however his
+club is spelled.
+
+`scripts/resolve-club-tr-ids.mjs` fills them in. TransferRoom has no "look up a
+team" endpoint; the API is organised by competition, and each player row carries
+its team's id and name. So the script finds the competition matching the club's
+league, reads it once, and pulls the distinct teams out.
+
+```bash
+TR_PROXY_BEARER_TOKEN=<the edge-function secret> \
+ADMIN_EMAIL=... ADMIN_PASSWORD=... \
+node scripts/resolve-club-tr-ids.mjs
+```
+
+Read-only. It prints three groups: resolved (the team name matches exactly
+inside the competition), close-but-not-exact, and unresolved with the reason.
+`--apply` writes only the first group — a wrong `tr_team_id` does not fail
+loudly, it attaches another squad's valuations to your player.
+
+Useful flags: `--only="Shakhtar"` for one club, `--list-competitions` to see
+what TransferRoom offers when a league name is what is failing to match.
+
+Competition rosters are written to `tr_competition_players_cache`, the same
+24-hour cache enrichment reads, so running this makes the next enrichment
+cheaper rather than more expensive.

@@ -124,7 +124,6 @@ for (const c of clubs) {
  * wrong, and they are the reason the automatic pass refuses to guess:
  *
  *   Botafogo FR      is NOT Botafogo-SP        — Rio and Ribeirao Preto
- *   Miami FC         is NOT Inter Miami        — different clubs
  *   Estrela Vermelha is NOT Estrela Amadora    — Red Star Belgrade
  *   Spartak Praga    is NOT Spartak Moscou     — Sparta Prague
  *   Shabab Al-Ahli   is NOT Al Ahli            — Shabab Al-Ahli Dubai
@@ -144,6 +143,9 @@ const ALIASES = {
   'Bragantino': 'Red Bull Bragantino',
   'Atlético Mineiro': 'Atlético-MG',              // Mineiro = Minas Gerais; NOT Atlético-GO,
                                                   // Atlético de Madrid or Atlético San Luis
+  'Miami FC': 'Inter Miami',                      // confirmed: the roster meant Inter Miami.
+                                                  // Miami FC is a different, real club — this
+                                                  // one is right because of who the player is
 };
 
 const COLUMNS = ['current_club', 'owner_club', 'loan_club'];
