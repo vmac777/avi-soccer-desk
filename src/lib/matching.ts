@@ -26,7 +26,10 @@ import {
 
 export interface ClubRequirement {
   id: string;
-  contact_id: string;
+  /** Whose need this is. Null only for a legacy row filed against a person. */
+  club_id: string | null;
+  /** Who told us. Null once that person has left the club. */
+  contact_id: string | null;
   position: string;
   age_min: number | null;
   age_max: number | null;
@@ -43,7 +46,7 @@ export interface ClubRequirement {
 
 /** Why a player scored the way they did, in words the desk can read. */
 export interface MatchReason {
-  factor: 'age' | 'budget' | 'foot' | 'eu_passport' | 'league';
+  factor: 'age' | 'budget' | 'salary' | 'foot' | 'eu_passport' | 'league';
   verdict: 'fits' | 'close' | 'misses' | 'unknown';
   detail: string;
 }
@@ -60,6 +63,7 @@ export interface MatchResult {
 const WEIGHTS = {
   age: 30,
   budget: 35,
+  salary: 15,
   foot: 10,
   eu_passport: 15,
   league: 10,
@@ -101,6 +105,19 @@ function valuationOf(player: RosterPlayer): number | undefined {
   const xtvM = getLatestXtvM(player);
   if (xtvM != null) return xtvM * 1_000_000;
   return player.marketValue;
+}
+
+/**
+ * What this player would have to be paid, per year in EUR.
+ *
+ * Prefers our own estimate, since it usually comes from the agent's side of a
+ * real conversation. TransferRoom's band is the fallback, and the top of it is
+ * the honest number to test a ceiling against — quoting the bottom would let a
+ * player clear a budget he will not actually sign for.
+ */
+function salaryOf(player: RosterPlayer): number | undefined {
+  if (player.salaryEstimate != null) return player.salaryEstimate;
+  return player.trEstSalaryHigh ?? player.trEstSalaryLow;
 }
 
 function scoreAge(
@@ -195,6 +212,63 @@ function scoreBudget(
   };
 }
 
+/**
+ * Against the wage ceiling.
+ *
+ * A fee is one negotiation and a wage is another, and clubs lose deals on the
+ * second far more often than the first. A shortlist that ignores what the club
+ * can pay puts up players they cannot sign, which is the quickest way to stop
+ * being the agent they call.
+ *
+ * Returns null when no ceiling was stated, so silence neither helps nor hurts.
+ */
+function scoreSalary(
+  player: RosterPlayer,
+  req: ClubRequirement,
+): { points: number; reason: MatchReason } | null {
+  if (req.salary_max == null) return null;
+
+  const salary = salaryOf(player);
+  if (salary == null) {
+    return {
+      points: 0,
+      reason: { factor: 'salary', verdict: 'unknown', detail: 'No salary held' },
+    };
+  }
+
+  const k = (n: number) => `€${Math.round(n / 1_000)}k/yr`;
+  if (salary <= req.salary_max) {
+    return {
+      points: WEIGHTS.salary,
+      reason: {
+        factor: 'salary',
+        verdict: 'fits',
+        detail: `${k(salary)} within ${k(req.salary_max)}`,
+      },
+    };
+  }
+  // Same tolerance as the fee: a fifth over is something an agent can work on,
+  // through a signing bonus or a shorter deal.
+  if (salary <= req.salary_max * 1.2) {
+    return {
+      points: Math.round(WEIGHTS.salary * 0.5),
+      reason: {
+        factor: 'salary',
+        verdict: 'close',
+        detail: `${k(salary)} slightly over ${k(req.salary_max)}`,
+      },
+    };
+  }
+  return {
+    points: 0,
+    reason: {
+      factor: 'salary',
+      verdict: 'misses',
+      detail: `${k(salary)} over ${k(req.salary_max)}`,
+    },
+  };
+}
+
 function scoreFoot(
   player: RosterPlayer,
   req: ClubRequirement,
@@ -284,6 +358,7 @@ export function scoreMatch(
   const parts = [
     scoreAge(player, req),
     scoreBudget(player, req),
+    scoreSalary(player, req),
     scoreFoot(player, req),
     scoreEuPassport(player, req),
     scoreLeague(player, req),

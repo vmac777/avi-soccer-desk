@@ -26,6 +26,7 @@ function player(over: Partial<RosterPlayer> = {}): RosterPlayer {
 function requirement(over: Partial<ClubRequirement> = {}): ClubRequirement {
   return {
     id: 'r1',
+    club_id: 'club-1',
     contact_id: 'c1',
     position: 'CM',
     age_min: null,
@@ -96,6 +97,46 @@ describe('scoreMatch', () => {
     const well = scoreMatch(player({ marketValue: 30_000_000 }), r)!;
     expect(slightly.score).toBeGreaterThan(well.score);
     expect(well.score).toBe(0);
+  });
+
+  it('scores the wage ceiling, not just the fee', () => {
+    const cheap = player({ salaryEstimate: 800_000 });
+    const dear = player({ salaryEstimate: 3_000_000 });
+    const r = requirement({ salary_max: 1_000_000 });
+
+    expect(scoreMatch(cheap, r)!.reasons.find(x => x.factor === 'salary')?.verdict).toBe('fits');
+    expect(scoreMatch(dear, r)!.reasons.find(x => x.factor === 'salary')?.verdict).toBe('misses');
+    expect(scoreMatch(cheap, r)!.score).toBeGreaterThan(scoreMatch(dear, r)!.score);
+  });
+
+  it('treats slightly over the wage ceiling as workable', () => {
+    const r = requirement({ salary_max: 1_000_000 });
+    const near = scoreMatch(player({ salaryEstimate: 1_100_000 }), r)!;
+    const far = scoreMatch(player({ salaryEstimate: 5_000_000 }), r)!;
+    expect(near.reasons.find(x => x.factor === 'salary')?.verdict).toBe('close');
+    expect(near.score).toBeGreaterThan(far.score);
+  });
+
+  it('says nothing about salary when the club stated no ceiling', () => {
+    // Silence must not invent a factor, and must not move the score — even for
+    // a player on wages no club in the brief could afford.
+    const p = player({ age: 24, marketValue: 2_000_000, salaryEstimate: 9_000_000 });
+    const silent = scoreMatch(p, requirement({ age_min: 21, age_max: 26, budget_max: 5_000_000 }))!;
+
+    expect(silent.reasons.find(x => x.factor === 'salary')).toBeUndefined();
+    expect(silent.score).toBe(100);
+  });
+
+  it('falls back to the top of the TransferRoom band, not the bottom', () => {
+    // Quoting the low end would clear a ceiling he will not actually sign for.
+    const p = player({ trEstSalaryLow: 500_000, trEstSalaryHigh: 2_000_000 });
+    const m = scoreMatch(p, requirement({ salary_max: 1_000_000 }))!;
+    expect(m.reasons.find(x => x.factor === 'salary')?.verdict).toBe('misses');
+  });
+
+  it('marks an unknown salary as unknown rather than a miss', () => {
+    const m = scoreMatch(player(), requirement({ salary_max: 1_000_000 }))!;
+    expect(m.reasons.find(x => x.factor === 'salary')?.verdict).toBe('unknown');
   });
 
   it('prefers live xTV over the stored market value', () => {

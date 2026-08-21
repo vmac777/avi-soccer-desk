@@ -357,7 +357,8 @@ export type Database = {
           age_min: number | null
           budget_max: number | null
           budget_min: number | null
-          contact_id: string
+          club_id: string | null
+          contact_id: string | null
           created_at: string
           created_by: string | null
           foot: string | null
@@ -376,7 +377,8 @@ export type Database = {
           age_min?: number | null
           budget_max?: number | null
           budget_min?: number | null
-          contact_id: string
+          club_id?: string | null
+          contact_id?: string | null
           created_at?: string
           created_by?: string | null
           foot?: string | null
@@ -395,7 +397,8 @@ export type Database = {
           age_min?: number | null
           budget_max?: number | null
           budget_min?: number | null
-          contact_id?: string
+          club_id?: string | null
+          contact_id?: string | null
           created_at?: string
           created_by?: string | null
           foot?: string | null
@@ -1456,6 +1459,70 @@ export type Database = {
           value?: string
         }
         Relationships: []
+      }
+      shortlist_entries: {
+        Row: {
+          buy_pitch_id: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          match_score: number | null
+          note: string | null
+          presented_at: string | null
+          rank: number
+          requirement_id: string
+          scouted_target_id: string
+          status: string
+        }
+        Insert: {
+          buy_pitch_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          match_score?: number | null
+          note?: string | null
+          presented_at?: string | null
+          rank?: number
+          requirement_id: string
+          scouted_target_id: string
+          status?: string
+        }
+        Update: {
+          buy_pitch_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          match_score?: number | null
+          note?: string | null
+          presented_at?: string | null
+          rank?: number
+          requirement_id?: string
+          scouted_target_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shortlist_entries_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "club_requirements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shortlist_entries_scouted_target_id_fkey"
+            columns: ["scouted_target_id"]
+            isOneToOne: false
+            referencedRelation: "scouted_targets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shortlist_entries_buy_pitch_id_fkey"
+            columns: ["buy_pitch_id"]
+            isOneToOne: false
+            referencedRelation: "buy_pitches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       squad_player_xtv_history: {
         Row: {
