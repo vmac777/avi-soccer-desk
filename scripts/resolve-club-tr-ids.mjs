@@ -36,6 +36,33 @@ const listCompetitions = args.includes('--list-competitions');
 const onlyArg = args.find((a) => a.startsWith('--only='));
 const only = onlyArg ? onlyArg.slice('--only='.length).toLowerCase() : null;
 
+/**
+ * Manual overrides, for when the league recorded on the roster does not lead to
+ * the right competition.
+ *
+ *   --only="PAFOS" --competition=1234            scan that competition only
+ *   --only="Botafogo FR" --competition=545 --team=7400 --apply
+ *
+ * The second form writes a mapping outright. It exists because the automatic
+ * pass only accepts an exact team-name match, and the registered name is often
+ * not what anyone calls the club — "Botafogo de Futebol e Regatas" is never
+ * going to string-match "Botafogo FR". A human reading both names can see they
+ * are the same club; a string comparison cannot.
+ */
+const numArg = (flag) => {
+  const a = args.find((x) => x.startsWith(`${flag}=`));
+  if (!a) return null;
+  const n = Number(a.slice(flag.length + 1));
+  return Number.isFinite(n) ? n : null;
+};
+const forceCompetition = numArg('--competition');
+const forceTeam = numArg('--team');
+
+if (forceTeam != null && (forceCompetition == null || !only)) {
+  console.error('--team needs both --only="<club>" and --competition=<id>.');
+  process.exit(1);
+}
+
 function envFromDotenv(key) {
   try {
     const m = readFileSync('.env', 'utf8').match(new RegExp(`^${key}="?([^"\\n]+)"?`, 'm'));
@@ -96,6 +123,32 @@ const supabase = createClient(URL, KEY, { auth: { persistSession: false, autoRef
 const { error: authErr } = await supabase.auth.signInWithPassword({ email: EMAIL, password: PASSWORD });
 if (authErr) { console.error(`Sign-in failed: ${authErr.message}`); process.exit(1); }
 
+// ── Direct mapping, decided by a human ──
+if (forceTeam != null) {
+  const { data: existing } = await supabase
+    .from('clubs').select('*').ilike('name', `%${only}%`).limit(2);
+
+  if (!existing?.length) {
+    console.error(`No club matching "${only}". Give the name as it appears on the roster.`);
+    process.exit(1);
+  }
+  if (existing.length > 1) {
+    console.error(`"${only}" matches more than one club: ${existing.map((c) => c.name).join(', ')}`);
+    process.exit(1);
+  }
+
+  const club = existing[0];
+  console.log(`${club.name}  ->  team ${forceTeam}, competition ${forceCompetition}`);
+  if (!apply) { console.log('\nRead-only. Add --apply to write it.'); process.exit(0); }
+
+  const { error } = await supabase.from('clubs')
+    .update({ tr_team_id: forceTeam, tr_competition_id: forceCompetition })
+    .eq('id', club.id);
+  if (error) { console.error(`Failed: ${error.message}`); process.exit(1); }
+  console.log('Written. Re-run enrichment from the roster to pick it up.');
+  process.exit(0);
+}
+
 // ── The competition list, once ──
 const competitions = await proxy('/competitions');
 if (!Array.isArray(competitions)) {
@@ -108,8 +161,13 @@ const compName = (c) => c.Name ?? c.CompetitionName ?? c.name ?? '';
 const compCountry = (c) => c.Country ?? c.CountryName ?? c.country ?? '';
 
 if (listCompetitions) {
-  console.log(`${competitions.length} competitions\n`);
-  for (const c of competitions.sort((a, b) => String(compCountry(a)).localeCompare(String(compCountry(b))))) {
+  // Hundreds of competitions, so --only doubles as a filter here.
+  const shown = competitions
+    .filter((c) => !only
+      || `${compCountry(c)} ${compName(c)}`.toLowerCase().includes(only))
+    .sort((a, b) => String(compCountry(a)).localeCompare(String(compCountry(b))));
+  console.log(`${shown.length} of ${competitions.length} competitions${only ? ` matching "${only}"` : ''}\n`);
+  for (const c of shown) {
     console.log(`  ${String(compId(c)).padStart(6)}  ${compCountry(c) || '—'} — ${compName(c)}`);
   }
   process.exit(0);
@@ -157,6 +215,10 @@ console.log(`${wanted.size} clubs on the roster have no TransferRoom mapping\n`)
 
 /** Competitions worth opening for a given league string. */
 function candidateCompetitions(league) {
+  if (forceCompetition != null) {
+    const c = competitions.find((x) => Number(compId(x)) === forceCompetition);
+    return c ? [c] : [];
+  }
   const n = normalize(league);
   if (!n) return [];
   return competitions
