@@ -4,7 +4,7 @@ import { useContacts, useLogTouch, useSetPrimaryContact } from '@/hooks/useData'
 import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
-import { healthColor, healthBg, stagePill, formatDaysAgo } from '@/lib/contactUtils';
+import { healthColor, healthBg, stagePill, formatDaysAgo, UNCONTACTED_LABEL } from '@/lib/contactUtils';
 import ContactDetail from '@/components/ContactDetail';
 import NewContactDialog from '@/components/NewContactDialog';
 import { Input } from '@/components/ui/input';
@@ -389,7 +389,7 @@ const ContactsPage = () => {
             .filter(t => !isNaN(t));
           const mostRecentDate = contactDates.length > 0 ? Math.max(...contactDates) : null;
           const teamDaysAgo = mostRecentDate !== null ? Math.floor((Date.now() - mostRecentDate) / (1000 * 60 * 60 * 24)) : null;
-          const teamFreshnessLabel = teamDaysAgo === null ? 'Never' : `${teamDaysAgo}d ago`;
+          const teamFreshnessLabel = teamDaysAgo === null ? UNCONTACTED_LABEL : `${teamDaysAgo}d ago`;
           const teamFreshnessColor = teamDaysAgo === null
             ? 'text-muted-foreground bg-muted'
             : teamDaysAgo < 10

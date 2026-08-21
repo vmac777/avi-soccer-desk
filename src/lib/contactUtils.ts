@@ -74,6 +74,19 @@ export const getMarketStats = (contacts: ContactEnriched[]) => {
 // Cutoff: contacts touched on/after April 1, 2026 = active; older = recent
 const ACTIVE_CUTOFF = new Date('2026-04-01');
 
+/**
+ * How a club with no recorded contact reads.
+ *
+ * The status key stays 'unknown' because that is what the data says — we hold
+ * no date — but "unknown" is the wrong word on screen. Nobody has called them.
+ * That is not missing information, it is the state of the relationship, and it
+ * is the most actionable one on the page: it is the gap in the network.
+ *
+ * The app said "Unknown" on the dashboard, "Never" on a club card and "No
+ * contact" on a contact — three words for one thing. One word now.
+ */
+export const UNCONTACTED_LABEL = 'Uncontacted';
+
 export const getHealthStatus = (days: number | null): string => {
   if (days === null) return 'unknown';
   const lastContact = new Date();

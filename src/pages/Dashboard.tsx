@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useContacts, useRecentInteractions } from '@/hooks/useData';
 import { useBuyPitches, BUY_ACTIVE_STAGES } from '@/hooks/useBuyData';
-import { healthColor, healthBg, getMarketStats, stagePill } from '@/lib/contactUtils';
+import { healthColor, healthBg, getMarketStats, stagePill, UNCONTACTED_LABEL } from '@/lib/contactUtils';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
@@ -23,7 +23,7 @@ function buildDonutData(contacts: ContactEnriched[]) {
     { name: 'Active (<27d)', value: counts.active, color: 'hsl(142, 71%, 45%)' },
     { name: 'Recent (27-90d)', value: counts.recent, color: 'hsl(48, 96%, 47%)' },
     { name: 'Stale (90d+)', value: counts.stale, color: 'hsl(0, 84%, 60%)' },
-    { name: 'Unknown', value: counts.unknown, color: '#5a5548' },
+    { name: UNCONTACTED_LABEL, value: counts.unknown, color: '#5a5548' },
   ].filter((d) => d.value > 0);
 }
 

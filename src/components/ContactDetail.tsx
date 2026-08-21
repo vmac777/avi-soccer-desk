@@ -5,7 +5,7 @@ import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useAuth } from '@/hooks/useAuth';
 import { useBuyPitches, useScoutedTargets } from '@/hooks/useBuyData';
 import { cn } from '@/lib/utils';
-import { healthColor, healthBg, stagePill, formatDaysAgo } from '@/lib/contactUtils';
+import { healthColor, healthBg, stagePill, formatDaysAgo, UNCONTACTED_LABEL } from '@/lib/contactUtils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X, Phone, MessageCircle, Mail, Smartphone, Trash2, Linkedin, ArrowRightLeft, Plus, Star, Pencil, Check } from 'lucide-react';
@@ -191,7 +191,7 @@ const ContactDetail = ({ contactId, onClose }: ContactDetailProps) => {
                     healthColor(contact.health_status),
                     healthBg(contact.health_status)
                   )}>
-                    {contact.health_status === 'unknown' ? 'No contact' :
+                    {contact.health_status === 'unknown' ? UNCONTACTED_LABEL :
                       `${contact.health_status.toUpperCase()} — ${formatDaysAgo(contact.days_since_contact)} ago`}
                   </span>
                 </div>
