@@ -250,7 +250,7 @@ export function useScoutedTargets() {
     queryKey: ['scouted_targets'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('scouted_targets' as any)
+        .from('scouted_targets')
         .select('*')
         .order('name');
       if (error) throw error;
@@ -265,7 +265,7 @@ export function useAddScoutedTarget() {
     mutationFn: async (target: Omit<ScoutedTarget, 'id' | 'created_at' | 'updated_at' | 'slug'> & { slug?: string }) => {
       const slug = target.slug || slugify(target.name);
       const { data, error } = await supabase
-        .from('scouted_targets' as any)
+        .from('scouted_targets')
         .insert({ ...target, slug } as any)
         .select()
         .single();
@@ -281,7 +281,7 @@ export function useUpdateScoutedTarget() {
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<ScoutedTarget> & { id: string }) => {
       const { error } = await supabase
-        .from('scouted_targets' as any)
+        .from('scouted_targets')
         .update(updates as any)
         .eq('id', id);
       if (error) throw error;
@@ -294,7 +294,7 @@ export function useDeleteScoutedTarget() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('scouted_targets' as any).delete().eq('id', id);
+      const { error } = await supabase.from('scouted_targets').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['scouted_targets'] }),
@@ -308,7 +308,7 @@ export function useBuyPitches() {
     queryKey: ['buy_pitches'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('buy_pitches' as any)
+        .from('buy_pitches')
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
@@ -355,7 +355,7 @@ export function useAddBuyPitch() {
       // on scouted_target_id would find an unrelated pitch and quietly return
       // it instead of opening the new one.
       let q = supabase
-        .from('buy_pitches' as any)
+        .from('buy_pitches')
         .select('*')
         .eq('scouted_target_id', scouted_target_id);
       q = contact_id ? q.eq('contact_id', contact_id) : q.is('contact_id', null);
@@ -376,7 +376,7 @@ export function useAddBuyPitch() {
         const prevStage = ex.stage;
         const prevLoss = ex.loss_reason;
         const { data: reopened, error: upErr } = await supabase
-          .from('buy_pitches' as any)
+          .from('buy_pitches')
           .update({
             stage: 'Enquiry',
             loss_reason: null,
@@ -391,7 +391,7 @@ export function useAddBuyPitch() {
           .select()
           .single();
         if (upErr) throw upErr;
-        await supabase.from('buy_negotiation_entries' as any).insert({
+        await supabase.from('buy_negotiation_entries').insert({
           buy_pitch_id: ex.id,
           entry_type: NEUTRAL_ENTRY_TYPE,
           amount: null,
@@ -404,7 +404,7 @@ export function useAddBuyPitch() {
       // 2. Insert
       try {
         const { data: created, error: insErr } = await supabase
-          .from('buy_pitches' as any)
+          .from('buy_pitches')
           .insert({
             scouted_target_id,
             contact_id,
@@ -432,7 +432,7 @@ export function useAddBuyPitch() {
         // one of his other pitches, and single() would throw outright once he
         // has two, which offering one player to several clubs guarantees.
         if (e?.code === '23505' || /duplicate key/i.test(String(e?.message))) {
-          let w = supabase.from('buy_pitches' as any).select('*').eq('scouted_target_id', scouted_target_id);
+          let w = supabase.from('buy_pitches').select('*').eq('scouted_target_id', scouted_target_id);
           w = contact_id ? w.eq('contact_id', contact_id) : w.is('contact_id', null);
           w = buying_contact_id ? w.eq('buying_contact_id', buying_contact_id) : w.is('buying_contact_id', null);
           const { data: winner } = await w.limit(1);
@@ -450,7 +450,7 @@ export function useUpdateBuyPitch() {
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<BuyPitch> & { id: string }) => {
       const { error } = await supabase
-        .from('buy_pitches' as any)
+        .from('buy_pitches')
         .update(updates as any)
         .eq('id', id);
       if (error) throw error;
@@ -490,7 +490,7 @@ export function useDeleteBuyPitch() {
     mutationFn: async (id: string) => {
       // Storage first: read the paths while the notes still exist.
       const { data: notes } = await supabase
-        .from('buy_pitch_notes' as any)
+        .from('buy_pitch_notes')
         .select('attachments')
         .eq('buy_pitch_id', id);
 
@@ -506,13 +506,13 @@ export function useDeleteBuyPitch() {
       }
 
       const { error: linkErr } = await supabase
-        .from('follow_up_links' as any)
+        .from('follow_up_links')
         .delete()
         .eq('link_type', 'buy_pitch')
         .eq('link_id', id);
       if (linkErr) throw linkErr;
 
-      const { error } = await supabase.from('buy_pitches' as any).delete().eq('id', id);
+      const { error } = await supabase.from('buy_pitches').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -555,7 +555,7 @@ export function useSetBallInCourt() {
   return useMutation({
     mutationFn: async ({ id, value }: { id: string; value: BallInCourt | null }) => {
       const { error } = await supabase
-        .from('buy_pitches' as any)
+        .from('buy_pitches')
         .update({ ball_in_court: value } as any)
         .eq('id', id);
       if (error) throw error;
@@ -582,7 +582,7 @@ export function useSetTracks() {
       if (selling_track !== undefined) patch.selling_track = selling_track;
       if (buying_track !== undefined) patch.buying_track = buying_track;
       if (player_track !== undefined) patch.player_track = player_track;
-      const { error } = await supabase.from('buy_pitches' as any).update(patch as any).eq('id', id);
+      const { error } = await supabase.from('buy_pitches').update(patch as any).eq('id', id);
       if (error) throw error;
     },
     onMutate: async ({ id, selling_track, buying_track, player_track }) => {
@@ -606,7 +606,7 @@ export function useSetMilestone() {
       if (entry === null) delete next[key];
       else next[key] = entry;
       const { error } = await supabase
-        .from('buy_pitches' as any)
+        .from('buy_pitches')
         .update({ milestones: next } as any)
         .eq('id', id);
       if (error) throw error;
@@ -629,7 +629,7 @@ export function useSetLossReason() {
   return useMutation({
     mutationFn: async ({ id, stage, loss_reason }: { id: string; stage: BuyPitchStage; loss_reason: LossReason | null }) => {
       const { error } = await supabase
-        .from('buy_pitches' as any)
+        .from('buy_pitches')
         .update({ stage, loss_reason } as any)
         .eq('id', id);
       if (error) throw error;
@@ -652,11 +652,11 @@ export function useChangeBuyPitchCounterparty() {
   return useMutation({
     mutationFn: async ({ id, contact_id, fromLabel, toLabel }: { id: string; contact_id: string; fromLabel: string; toLabel: string }) => {
       const { error } = await supabase
-        .from('buy_pitches' as any)
+        .from('buy_pitches')
         .update({ contact_id } as any)
         .eq('id', id);
       if (error) throw error;
-      await supabase.from('buy_negotiation_entries' as any).insert({
+      await supabase.from('buy_negotiation_entries').insert({
         buy_pitch_id: id,
         entry_type: NEUTRAL_ENTRY_TYPE,
         amount: null,
@@ -683,7 +683,7 @@ export function useBuyPitchNotes(pitchId: string) {
     queryKey: ['buy_pitch_notes', pitchId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('buy_pitch_notes' as any)
+        .from('buy_pitch_notes')
         .select('*')
         .eq('buy_pitch_id', pitchId)
         .order('created_at', { ascending: false });
@@ -699,7 +699,7 @@ export function useAddBuyPitchNote() {
   return useMutation({
     mutationFn: async (note: Omit<BuyPitchNote, 'id' | 'created_at'>) => {
       const { data, error } = await supabase
-        .from('buy_pitch_notes' as any)
+        .from('buy_pitch_notes')
         .insert(note as any)
         .select()
         .single();
@@ -717,7 +717,7 @@ export function useBuyNegotiationEntries(pitchId: string) {
     queryKey: ['buy_negotiation_entries', pitchId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('buy_negotiation_entries' as any)
+        .from('buy_negotiation_entries')
         .select('*')
         .eq('buy_pitch_id', pitchId)
         .order('created_at', { ascending: true });
@@ -733,7 +733,7 @@ export function useAddBuyNegotiationEntry() {
   return useMutation({
     mutationFn: async (entry: Omit<BuyNegotiationEntry, 'id' | 'created_at'>) => {
       const { data, error } = await supabase
-        .from('buy_negotiation_entries' as any)
+        .from('buy_negotiation_entries')
         .insert(entry as any)
         .select()
         .single();
@@ -748,7 +748,7 @@ export function useDeleteBuyNegotiationEntry() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, buy_pitch_id }: { id: string; buy_pitch_id: string }) => {
-      const { error } = await supabase.from('buy_negotiation_entries' as any).delete().eq('id', id);
+      const { error } = await supabase.from('buy_negotiation_entries').delete().eq('id', id);
       if (error) throw error;
       return { buy_pitch_id };
     },

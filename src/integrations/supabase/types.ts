@@ -23,6 +23,7 @@ export type Database = {
           id: string
           logged_by: string
           note: string | null
+          side: string
         }
         Insert: {
           amount?: number | null
@@ -32,6 +33,7 @@ export type Database = {
           id?: string
           logged_by: string
           note?: string | null
+          side?: string
         }
         Update: {
           amount?: number | null
@@ -41,6 +43,7 @@ export type Database = {
           id?: string
           logged_by?: string
           note?: string | null
+          side?: string
         }
         Relationships: [
           {
@@ -132,11 +135,13 @@ export type Database = {
         Row: {
           asking_price: number | null
           ball_in_court: string | null
-          selling_track: string
+          buying_contact_id: string | null
           buying_track: string
-          contact_id: string
+          contact_id: string | null
+          contract_years: number | null
           created_at: string
           current_offer: number | null
+          deadline: string | null
           final_price: number | null
           id: string
           loan_trigger_value: number | null
@@ -146,18 +151,23 @@ export type Database = {
           negotiation_type: string | null
           notes: string | null
           player_track: string
+          salary_offer: number | null
           scouted_target_id: string
+          selling_track: string
+          signing_bonus: number | null
           stage: string
           updated_at: string
         }
         Insert: {
           asking_price?: number | null
           ball_in_court?: string | null
-          selling_track?: string
+          buying_contact_id?: string | null
           buying_track?: string
-          contact_id: string
+          contact_id?: string | null
+          contract_years?: number | null
           created_at?: string
           current_offer?: number | null
+          deadline?: string | null
           final_price?: number | null
           id?: string
           loan_trigger_value?: number | null
@@ -167,18 +177,23 @@ export type Database = {
           negotiation_type?: string | null
           notes?: string | null
           player_track?: string
+          salary_offer?: number | null
           scouted_target_id: string
+          selling_track?: string
+          signing_bonus?: number | null
           stage?: string
           updated_at?: string
         }
         Update: {
           asking_price?: number | null
           ball_in_court?: string | null
-          selling_track?: string
+          buying_contact_id?: string | null
           buying_track?: string
-          contact_id?: string
+          contact_id?: string | null
+          contract_years?: number | null
           created_at?: string
           current_offer?: number | null
+          deadline?: string | null
           final_price?: number | null
           id?: string
           loan_trigger_value?: number | null
@@ -188,7 +203,10 @@ export type Database = {
           negotiation_type?: string | null
           notes?: string | null
           player_track?: string
+          salary_offer?: number | null
           scouted_target_id?: string
+          selling_track?: string
+          signing_bonus?: number | null
           stage?: string
           updated_at?: string
         }
@@ -1157,37 +1175,52 @@ export type Database = {
           age: number | null
           agent_contact: string | null
           agent_name: string | null
+          commission_pct: number | null
           contract_end: string | null
           created_at: string
           current_club: string | null
+          data_provenance: Json
           date_of_birth: string | null
           enrichment_notes: string | null
+          exclusive: boolean | null
           foot: string | null
           gbe_score: string | null
           has_valuation: boolean
           height: string | null
           id: string
           league: string
+          loan_club: string | null
+          loan_contract_end: string | null
+          loan_league: string | null
+          mandate_end: string | null
+          mandate_start: string | null
           market_value: number | null
           name: string
           nationality: string | null
           notes: string | null
+          owner_club: string | null
+          owner_league: string | null
           photo_url: string | null
           position: string | null
           priority_ranking: string | null
           salary_estimate: number | null
+          sell_on_pct: number | null
           slug: string
+          tenure: string | null
+          tm_fail_reason: string | null
           tm_link: string
           tm_player_id: string | null
           tm_status: string | null
           tr_asking_price: number | null
           tr_availability: string | null
           tr_data: Json | null
+          tr_fail_reason: string | null
           tr_player_id: number | null
           tr_salary: number | null
           tr_status: string | null
           updated_at: string
           valuation_url: string
+          video_url: string | null
           xtv: number | null
           xtv_as_of: string | null
         }
@@ -1195,37 +1228,52 @@ export type Database = {
           age?: number | null
           agent_contact?: string | null
           agent_name?: string | null
+          commission_pct?: number | null
           contract_end?: string | null
           created_at?: string
           current_club?: string | null
+          data_provenance?: Json
           date_of_birth?: string | null
           enrichment_notes?: string | null
+          exclusive?: boolean | null
           foot?: string | null
           gbe_score?: string | null
           has_valuation?: boolean
           height?: string | null
           id?: string
           league?: string
+          loan_club?: string | null
+          loan_contract_end?: string | null
+          loan_league?: string | null
+          mandate_end?: string | null
+          mandate_start?: string | null
           market_value?: number | null
           name: string
           nationality?: string | null
           notes?: string | null
+          owner_club?: string | null
+          owner_league?: string | null
           photo_url?: string | null
           position?: string | null
           priority_ranking?: string | null
           salary_estimate?: number | null
+          sell_on_pct?: number | null
           slug: string
+          tenure?: string | null
+          tm_fail_reason?: string | null
           tm_link?: string
           tm_player_id?: string | null
           tm_status?: string | null
           tr_asking_price?: number | null
           tr_availability?: string | null
           tr_data?: Json | null
+          tr_fail_reason?: string | null
           tr_player_id?: number | null
           tr_salary?: number | null
           tr_status?: string | null
           updated_at?: string
           valuation_url?: string
+          video_url?: string | null
           xtv?: number | null
           xtv_as_of?: string | null
         }
@@ -1233,37 +1281,52 @@ export type Database = {
           age?: number | null
           agent_contact?: string | null
           agent_name?: string | null
+          commission_pct?: number | null
           contract_end?: string | null
           created_at?: string
           current_club?: string | null
+          data_provenance?: Json
           date_of_birth?: string | null
           enrichment_notes?: string | null
+          exclusive?: boolean | null
           foot?: string | null
           gbe_score?: string | null
           has_valuation?: boolean
           height?: string | null
           id?: string
           league?: string
+          loan_club?: string | null
+          loan_contract_end?: string | null
+          loan_league?: string | null
+          mandate_end?: string | null
+          mandate_start?: string | null
           market_value?: number | null
           name?: string
           nationality?: string | null
           notes?: string | null
+          owner_club?: string | null
+          owner_league?: string | null
           photo_url?: string | null
           position?: string | null
           priority_ranking?: string | null
           salary_estimate?: number | null
+          sell_on_pct?: number | null
           slug?: string
+          tenure?: string | null
+          tm_fail_reason?: string | null
           tm_link?: string
           tm_player_id?: string | null
           tm_status?: string | null
           tr_asking_price?: number | null
           tr_availability?: string | null
           tr_data?: Json | null
+          tr_fail_reason?: string | null
           tr_player_id?: number | null
           tr_salary?: number | null
           tr_status?: string | null
           updated_at?: string
           valuation_url?: string
+          video_url?: string | null
           xtv?: number | null
           xtv_as_of?: string | null
         }

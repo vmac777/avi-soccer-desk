@@ -129,7 +129,7 @@ const PROVENANCE_KEY: Record<string, string> = {
 
 async function applyPatch(id: string, patch: Patch) {
   if (Object.keys(patch).length === 0) return;
-  await supabase.from('scouted_targets' as any).update(patch as any).eq('id', id);
+  await supabase.from('scouted_targets').update(patch as any).eq('id', id);
 }
 
 /**
@@ -150,7 +150,7 @@ async function applyEnrichment(id: string, patch: Patch, source: FieldProvenance
   if (values.length === 0) return;
 
   const { data: row } = await supabase
-    .from('scouted_targets' as any)
+    .from('scouted_targets')
     .select('data_provenance, enrichment_notes, ' + Object.keys(PROVENANCE_KEY).join(','))
     .eq('id', id)
     .maybeSingle();
@@ -205,7 +205,7 @@ async function applyTrWithBackfill(id: string, trPatch: Patch, tmKeys: Set<strin
   }
   if (Object.keys(candidates).length === 0) return;
   const { data: row } = await supabase
-    .from('scouted_targets' as any)
+    .from('scouted_targets')
     .select(BIO_KEYS.join(','))
     .eq('id', id)
     .maybeSingle();

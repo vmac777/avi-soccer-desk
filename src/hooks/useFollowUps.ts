@@ -47,7 +47,7 @@ export function useFollowUps() {
     queryKey: ['follow_ups'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('follow_ups' as any)
+        .from('follow_ups')
         .select('*')
         .order('due_date', { ascending: true });
       if (error) throw error;
@@ -64,7 +64,7 @@ export function useFollowUpsForTarget(target: { type: FollowUpTargetType; id: st
       if (!target) return [];
       // Primary target hits
       const primary = await supabase
-        .from('follow_ups' as any)
+        .from('follow_ups')
         .select('*')
         .eq('target_type', target.type)
         .eq('target_id', target.id)
@@ -73,7 +73,7 @@ export function useFollowUpsForTarget(target: { type: FollowUpTargetType; id: st
 
       // Cross-link hits
       const links = await supabase
-        .from('follow_up_links' as any)
+        .from('follow_up_links')
         .select('follow_up_id')
         .eq('link_type', target.type)
         .eq('link_id', target.id);
@@ -83,7 +83,7 @@ export function useFollowUpsForTarget(target: { type: FollowUpTargetType; id: st
       let linked: any[] = [];
       if (linkedIds.length > 0) {
         const res = await supabase
-          .from('follow_ups' as any)
+          .from('follow_ups')
           .select('*')
           .in('id', linkedIds)
           .eq('completed', false);
@@ -115,7 +115,7 @@ export function useFollowUpLinks(followUpId: string | null) {
     queryFn: async () => {
       if (!followUpId) return [];
       const { data, error } = await supabase
-        .from('follow_up_links' as any)
+        .from('follow_up_links')
         .select('*')
         .eq('follow_up_id', followUpId)
         .order('created_at', { ascending: true });
@@ -151,7 +151,7 @@ export function useCreateFollowUp() {
         row.contact_club = target.sublabel ?? '';
       }
       const { data, error } = await supabase
-        .from('follow_ups' as any)
+        .from('follow_ups')
         .insert([row])
         .select()
         .single();
@@ -166,7 +166,7 @@ export function useCreateFollowUp() {
           link_label: l.label,
           link_sublabel: l.sublabel ?? null,
         }));
-        const linkRes = await supabase.from('follow_up_links' as any).insert(linkRows);
+        const linkRes = await supabase.from('follow_up_links').insert(linkRows);
         if (linkRes.error) throw linkRes.error;
       }
       return data;
@@ -181,7 +181,7 @@ export function useAddFollowUpLink() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: { follow_up_id: string; link: FollowUpTarget }) => {
-      const { error } = await supabase.from('follow_up_links' as any).insert([{
+      const { error } = await supabase.from('follow_up_links').insert([{
         follow_up_id: input.follow_up_id,
         link_type: input.link.type,
         link_id: input.link.id,
@@ -201,7 +201,7 @@ export function useDeleteFollowUpLink() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('follow_up_links' as any).delete().eq('id', id);
+      const { error } = await supabase.from('follow_up_links').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -216,7 +216,7 @@ export function useCompleteFollowUp() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('follow_ups' as any)
+        .from('follow_ups')
         .update({ completed: true, completed_at: new Date().toISOString() })
         .eq('id', id);
       if (error) throw error;
@@ -242,7 +242,7 @@ export function useDeleteFollowUp() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('follow_ups' as any)
+        .from('follow_ups')
         .delete()
         .eq('id', id);
       if (error) throw error;
@@ -273,7 +273,7 @@ export function useRescheduleFollowUp() {
   return useMutation({
     mutationFn: async ({ id, dueDate }: { id: string; dueDate: string }) => {
       const { error } = await supabase
-        .from('follow_ups' as any)
+        .from('follow_ups')
         .update({ due_date: dueDate })
         .eq('id', id);
       if (error) throw error;
