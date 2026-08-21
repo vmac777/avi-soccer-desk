@@ -1,0 +1,70 @@
+# The pipeline had no quality gate at all.
+#
+# Vercel runs `vite build`, which is esbuild — it strips types without checking
+# them. So `tsc` and the test suite only ever ran when somebody remembered to
+# run them by hand, and a push that broke either one still deployed green. That
+# is how a page that crashed on a missing field reached a user.
+#
+# Everything gated here is green as of the commit that adds it, so a red check
+# means something actually broke. Lint is the exception and is advisory — see
+# the note on that job.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push supersedes the first; no point finishing a run for a commit
+# nobody will deploy.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, schema, tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # `npm ci` and not `npm install`: it fails loudly when the lockfile and
+      # package.json disagree, which is the exact failure that broke a Vercel
+      # deploy once already.
+      - run: npm ci --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Catches a migration that adds a column the generated types never learned
+      # about. Reads the DDL, so it needs no database credentials.
+      - name: Schema drift
+        run: npm run check:schema
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  lint:
+    name: Lint (advisory)
+    runs-on: ubuntu-latest
+    # ~180 pre-existing violations, and no-unused-vars is switched off in the
+    # config. Gating on a check that is red on day one just teaches people to
+    # ignore red. Make this required once the backlog is cleared.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
