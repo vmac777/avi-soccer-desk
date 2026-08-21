@@ -163,18 +163,55 @@ Deno.serve(async (req) => {
     });
   }
 
+  /**
+   * The same player, addressed a few different ways.
+   *
+   * A Transfermarkt profile URL is `/<slug>/profil/spieler/<id>`, and the slug
+   * is decoration — the id identifies the player. But the site does not always
+   * serve a page whose slug it does not recognise: Gabriel Magalhaes is filed
+   * under a bare `/gabriel/` and that 404s, while every other link in the same
+   * roster works.
+   *
+   * The id is right there in the URL, so rather than fail, ask again with a
+   * slug the site does recognise, and on the .com host as a last resort. Each
+   * attempt is one cheap GET and the first success wins.
+   */
+  const playerId = m[1];
+  const host = (tmUrl.match(/^https?:\/\/([^/]+)/i)?.[1]) ?? 'www.transfermarkt.com';
+  const candidates = [
+    tmUrl,
+    `https://${host}/-/profil/spieler/${playerId}`,
+    `https://www.transfermarkt.com/-/profil/spieler/${playerId}`,
+  ].filter((u, i, all) => all.indexOf(u) === i);
+
   try {
-    const r = await fetch(tmUrl, { headers: BROWSER_HEADERS, signal: AbortSignal.timeout(8000) });
-    if (r.status === 403 || r.status === 429) {
-      return new Response(JSON.stringify({ ok: false, reason: 'blocked', status: r.status }), {
+    let r: Response | null = null;
+    const tried: Array<{ url: string; status: number }> = [];
+
+    for (const url of candidates) {
+      const attempt = await fetch(url, { headers: BROWSER_HEADERS, signal: AbortSignal.timeout(8000) });
+      tried.push({ url, status: attempt.status });
+      // Blocked is about us, not about the address — trying another spelling of
+      // the same URL will not help and only makes us look more like a scraper.
+      if (attempt.status === 403 || attempt.status === 429) {
+        return new Response(JSON.stringify({ ok: false, reason: 'blocked', status: attempt.status }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (attempt.ok) { r = attempt; break; }
+    }
+
+    if (!r) {
+      return new Response(JSON.stringify({
+        ok: false,
+        reason: 'http_error',
+        status: tried[tried.length - 1]?.status ?? 0,
+        tried,
+      }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    if (!r.ok) {
-      return new Response(JSON.stringify({ ok: false, reason: 'http_error', status: r.status }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+
     const html = await r.text();
     if (html.length < 1000 || /captcha|access denied/i.test(html.slice(0, 4000))) {
       return new Response(JSON.stringify({ ok: false, reason: 'blocked' }), {

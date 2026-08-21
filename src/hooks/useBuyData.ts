@@ -42,6 +42,8 @@ export interface ScoutedTarget {
   tr_status?: 'pending' | 'ok' | 'failed' | null;
   /** Why TransferRoom gave up, when tr_status is 'failed'. Cleared on success. */
   tr_fail_reason?: string | null;
+  /** Why Transfermarkt gave up, when tm_status is 'failed'. Cleared on success. */
+  tm_fail_reason?: string | null;
   enrichment_notes?: string | null;
 
   // Roster tenure. A player out on loan has two clubs and two live contracts:
@@ -54,7 +56,7 @@ export interface ScoutedTarget {
   loan_club?: string | null;
   loan_league?: string | null;
   loan_contract_end?: string | null;
-  data_provenance?: Record<string, 'verified' | 'transfermarkt' | 'placeholder'> | null;
+  data_provenance?: Record<string, 'verified' | 'transfermarkt' | 'transferroom' | 'placeholder'> | null;
 }
 
 export type BallInCourt = 'us' | 'them';

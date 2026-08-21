@@ -445,8 +445,10 @@ function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, 
           <div className="flex items-center gap-1.5 pt-1 text-[10px] text-amber-500/90">
             <AlertTriangle className="h-3 w-3" />
             <span>
-              {tmFailed && trFailed ? "Couldn't fetch TM or TR"
-                : tmFailed ? "Couldn't fetch from TM"
+              {tmFailed
+                ? `TM: ${target.tm_fail_reason === 'http_error 404'
+                    ? 'Transfermarkt has no page at that link'
+                    : target.tm_fail_reason ?? "couldn't fetch"}`
                 : trFailMessage(target.tr_fail_reason)}
             </span>
             <button

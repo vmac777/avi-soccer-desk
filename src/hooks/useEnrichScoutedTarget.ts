@@ -25,9 +25,16 @@ async function runTm(target: { id: string; tmUrl: string; current_club: string }
     const { data, error } = await supabase.functions.invoke('tm-fetch', {
       body: { tmUrl: target.tmUrl },
     });
-    if (error || !data?.ok) return { tm_status: 'failed' as const };
+    if (error || !data?.ok) {
+      const reason = (data as any)?.reason;
+      const status = (data as any)?.status;
+      return {
+        tm_status: 'failed' as const,
+        tm_fail_reason: [reason, status].filter(Boolean).join(' ') || error?.message || 'unknown',
+      };
+    }
     const tm = data.data as Record<string, any>;
-    const patch: Patch = { tm_status: 'ok' };
+    const patch: Patch = { tm_status: 'ok', tm_fail_reason: null };
     if (tm.position) patch.position = tm.position;
     if (tm.age) patch.age = tm.age;
     if (tm.date_of_birth) patch.date_of_birth = tm.date_of_birth;
