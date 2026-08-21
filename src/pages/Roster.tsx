@@ -343,10 +343,11 @@ function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, 
           <Trash2 className="h-3 w-3 text-muted-foreground" />
         </button>
       </div>
-      {/* Transfermarkt portraits are 3:4 head-and-shoulders; a square card crops
-          a quarter of the height. Take it off the bottom, not the top, or the
-          hairline gets clipped and every player looks cut off. */}
-      <div className="aspect-square relative overflow-hidden bg-muted">
+      {/* Match the source ratio. Transfermarkt portraits are 3:4, so a square
+          frame discards a quarter of the image whatever you do with
+          object-position — the head fills what is left and the player looks
+          cropped at the neck. At 3:4 nothing is thrown away. */}
+      <div className="aspect-[3/4] relative overflow-hidden bg-muted">
         {target.photo_url ? (
           <img src={target.photo_url} alt={target.name} className="w-full h-full object-cover" style={{ objectPosition: 'center top' }} />
         ) : tmPending ? (
