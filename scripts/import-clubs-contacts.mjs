@@ -99,11 +99,18 @@ const DROPPED = [
   'phone1', 'phone2', 'phone3', 'linkedin',
 ];
 
+/**
+ * Trimmed, because contact_person is half the key this script dedupes on. A
+ * trailing space makes "Murad " and "Murad" two different people, so a second
+ * run would insert the whole directory again.
+ */
+const clean = (v) => (typeof v === 'string' ? v.trim() : '');
+
 const contactRows = contacts.map((c) => ({
-  market: c.market,
-  club: c.club,
-  contact_person: c.contact_person ?? '',
-  role: c.role ?? '',
+  market: clean(c.market),
+  club: clean(c.club),
+  contact_person: clean(c.contact_person),
+  role: clean(c.role),
   is_primary: false,
 
   // Left behind deliberately — see the header.
@@ -122,13 +129,19 @@ const contactRows = contacts.map((c) => ({
   priority: 'Normal',
 }));
 
+// A row with no name is not a directory entry — it is a club with a gap where
+// a person should be. Those carry nothing this import is for.
+const nameless = contactRows.filter((c) => !c.contact_person).length;
+const namedContacts = contactRows.filter((c) => c.contact_person);
+
 const sourcePhones = contacts.filter((c) => c.phone1 || c.phone2 || c.phone3).length;
 const sourceLinkedin = contacts.filter((c) => c.linkedin).length;
 const carriedNonEmpty = contacts.filter((c) => DROPPED.some((f) => c[f])).length;
 
 console.log(`from ${backupDir}`);
 console.log(`  clubs:    ${clubRows.length}`);
-console.log(`  contacts: ${contactRows.length}  (names and roles only)`);
+console.log(`  contacts: ${namedContacts.length}  (names and roles only)`);
+if (nameless > 0) console.log(`            ${nameless} rows have no name and are skipped`);
 console.log(`  leagues:  ${new Set(clubRows.map((c) => c.league).filter(Boolean)).size}`);
 console.log(`  TR-mapped: ${clubRows.filter((c) => c.tr_team_id && c.tr_competition_id).length}  (needed for TransferRoom enrichment)`);
 console.log(`\n  leaving behind, from ${carriedNonEmpty} rows that carried something:`);
@@ -138,7 +151,7 @@ console.log(`    ${sourcePhones} phone numbers and ${sourceLinkedin} LinkedIn UR
 if (dryRun) {
   console.log('\n--dry-run: first club and contact as they would be written\n');
   console.log(JSON.stringify(clubRows[0], null, 2));
-  console.log(JSON.stringify(contactRows[0], null, 2));
+  console.log(JSON.stringify(namedContacts[0], null, 2));
   process.exit(0);
 }
 
@@ -164,8 +177,8 @@ const { data: existing, error: readErr } = await supabase
 if (readErr) { console.error(`Could not read existing contacts: ${readErr.message}`); process.exit(1); }
 
 const seen = new Set((existing ?? []).map((c) => `${c.club}::${c.contact_person}`));
-const fresh = contactRows.filter((c) => !seen.has(`${c.club}::${c.contact_person}`));
-console.log(`contacts: ${fresh.length} new, ${contactRows.length - fresh.length} already present`);
+const fresh = namedContacts.filter((c) => !seen.has(`${c.club}::${c.contact_person}`));
+console.log(`contacts: ${fresh.length} new, ${namedContacts.length - fresh.length} already present`);
 
 let contactsOk = 0;
 const contactFails = [];
