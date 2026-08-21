@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { toRosterPlayer } from './rosterMapping';
-import { getAge, hasCommercialData, hasMandateData, isPrintable, parsePlayerDob, provenanceOf } from './rosterData';
+import { getAge, getLatestXtvM, hasCommercialData, hasMandateData, isPrintable, parsePlayerDob, provenanceOf } from './rosterData';
 import type { ScoutedTarget } from '@/hooks/useBuyData';
 
 /**
@@ -119,5 +119,63 @@ describe('section gating', () => {
   it('recognises our own terms', () => {
     const p = toRosterPlayer(row({ commission_pct: 10 } as unknown as Partial<ScoutedTarget>));
     expect(hasMandateData(p)).toBe(true);
+  });
+});
+
+describe('TransferRoom field casing', () => {
+  // tr_data is TransferRoom's own response, stored verbatim, and it is
+  // PascalCase. Reading only camelCase left every dossier section empty.
+  it('reads PascalCase as the API actually returns it', () => {
+    const p = toRosterPlayer(row({
+      tr_data: {
+        GBEScore: 15,
+        GBEResult: 'Pass',
+        PreferredFoot: 'Left',
+        PlayingStyle: 'Deep-lying playmaker',
+        Rating: 78,
+      },
+    } as unknown as Partial<ScoutedTarget>));
+
+    expect(p.trGbeScore).toBe(15);
+    expect(p.trGbeResult).toBe('Pass');
+    expect(p.trPreferredFoot).toBe('Left');
+    expect(p.trPlayingStyle).toBe('Deep-lying playmaker');
+    expect(p.trRating).toBe(78);
+  });
+
+  it('reads a PascalCase transfer history', () => {
+    const p = toRosterPlayer(row({
+      tr_data: {
+        TransferHistory: [
+          { FromTeam: 'Fluminense', ToTeam: 'Corinthians', Date: '2023-07-01', Fee: 4000000, TransferType: 'Permanent' },
+        ],
+      },
+    } as unknown as Partial<ScoutedTarget>));
+
+    expect(p.transferHistory).toHaveLength(1);
+    expect(p.transferHistory[0].fromTeam).toBe('Fluminense');
+    expect(p.transferHistory[0].fee).toBe(4_000_000);
+  });
+
+  it('still reads camelCase and snake_case', () => {
+    const camel = toRosterPlayer(row({ tr_data: { gbeScore: 9 } } as unknown as Partial<ScoutedTarget>));
+    const snake = toRosterPlayer(row({ tr_data: { gbe_score: 9 } } as unknown as Partial<ScoutedTarget>));
+    expect(camel.trGbeScore).toBe(9);
+    expect(snake.trGbeScore).toBe(9);
+  });
+});
+
+describe('xTV units', () => {
+  it('reports millions from a figure stored in euros', () => {
+    const p = toRosterPlayer(row({ xtv: 4_200_000 } as unknown as Partial<ScoutedTarget>));
+    expect(getLatestXtvM(p)).toBeCloseTo(4.2);
+  });
+
+  it('reports millions from history entries too', () => {
+    const p = toRosterPlayer(row({
+      xtv: 1_000_000,
+      tr_data: { xtvHistory: [{ year: 2026, month: 6, xtv: 5_500_000 }] },
+    } as unknown as Partial<ScoutedTarget>));
+    expect(getLatestXtvM(p)).toBeCloseTo(5.5);
   });
 });

@@ -23,6 +23,31 @@ function readTr(raw: unknown): Record<string, unknown> {
   return raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
 }
 
+/**
+ * Look a field up regardless of how it is spelled.
+ *
+ * `tr_data` is TransferRoom's own response, stored verbatim, and it is
+ * PascalCase: `XTV`, `GBEScore`, `PreferredFoot`, `TransferHistory`. This file
+ * originally read camelCase and snake_case only, so every one of those came back
+ * undefined — which is why a player could carry a valuation, a GBE score and a
+ * transfer history and still show an empty dossier.
+ *
+ * Rather than guess at each field's casing, flatten the keys: strip separators,
+ * lowercase, and match on that. `xtvChange6m`, `XTVChange6M` and `xtv_change_6m`
+ * all collapse to the same lookup.
+ */
+const flatten = (k: string) => k.replace(/[^a-z0-9]/gi, '').toLowerCase();
+
+function field(tr: Record<string, unknown>, ...names: string[]): unknown {
+  const index = new Map<string, unknown>();
+  for (const [k, v] of Object.entries(tr)) index.set(flatten(k), v);
+  for (const n of names) {
+    const v = index.get(flatten(n));
+    if (v !== undefined && v !== null && v !== '') return v;
+  }
+  return undefined;
+}
+
 const num = (v: unknown): number | undefined =>
   typeof v === 'number' && Number.isFinite(v) ? v : undefined;
 
@@ -30,29 +55,30 @@ const str = (v: unknown): string | undefined =>
   typeof v === 'string' && v.trim() !== '' ? v : undefined;
 
 function xtvHistoryFrom(tr: Record<string, unknown>): XtvHistoryEntry[] {
-  const raw = tr.xtvHistory ?? tr.xtv_history;
+  const raw = field(tr, 'xtvHistory', 'xTVHistory', 'valuationHistory');
   if (!Array.isArray(raw)) return [];
   return raw
     .map((e) => {
       const o = readTr(e);
-      const year = num(o.year), month = num(o.month), xtv = num(o.xtv);
+      const year = num(field(o, 'year')), month = num(field(o, 'month'));
+      const xtv = num(field(o, 'xtv', 'value', 'expectedTransferValue'));
       return year && month && xtv != null ? { year, month, xtv } : null;
     })
     .filter((e): e is XtvHistoryEntry => e !== null);
 }
 
 function transferHistoryFrom(tr: Record<string, unknown>): TransferHistoryEntry[] {
-  const raw = tr.transferHistory ?? tr.transfer_history;
+  const raw = field(tr, 'transferHistory', 'transfers');
   if (!Array.isArray(raw)) return [];
   return raw.map((e) => {
     const o = readTr(e);
     return {
-      fromTeam: str(o.fromTeam ?? o.from_team) ?? '',
-      toTeam: str(o.toTeam ?? o.to_team) ?? '',
-      date: str(o.date) ?? '',
-      fee: num(o.fee) ?? null,
-      feeEurM: num(o.feeEurM ?? o.fee_eur_m) ?? null,
-      transferType: str(o.transferType ?? o.transfer_type) ?? '',
+      fromTeam: str(field(o, 'fromTeam', 'fromClub', 'sellingTeam')) ?? '',
+      toTeam: str(field(o, 'toTeam', 'toClub', 'buyingTeam')) ?? '',
+      date: str(field(o, 'date', 'transferDate')) ?? '',
+      fee: num(field(o, 'fee', 'transferFee')) ?? null,
+      feeEurM: num(field(o, 'feeEurM')) ?? null,
+      transferType: str(field(o, 'transferType', 'type')) ?? '',
     };
   });
 }
@@ -102,32 +128,32 @@ export function toRosterPlayer(row: ScoutedTarget): RosterPlayer {
     // TransferRoom
     trId: row.tr_player_id ?? undefined,
     trXtv: row.xtv ?? undefined,
-    trXtvChange6m: num(tr.xtvChange6m ?? tr.xtv_change_6m),
-    trXtvChange12m: num(tr.xtvChange12m ?? tr.xtv_change_12m),
-    trBaseValue: num(tr.baseValue ?? tr.base_value),
-    trSellOnPct: num(tr.sellOnPct ?? tr.sell_on_pct),
-    trAgency: str(tr.agency),
-    trAgencyVerified: str(tr.agencyVerified ?? tr.agency_verified),
-    trEstSalaryLow: num(tr.estSalaryLow ?? tr.est_salary_low),
-    trEstSalaryHigh: num(tr.estSalaryHigh ?? tr.est_salary_high),
-    trGbeScore: num(row.gbe_score) ?? num(tr.gbeScore),
-    trGbeResult: str(tr.gbeResult ?? tr.gbe_result),
-    trPlayingStyle: str(tr.playingStyle ?? tr.playing_style),
-    trSecondPosition: str(tr.secondPosition ?? tr.second_position),
-    trInjuryRisk: str(tr.injuryRisk ?? tr.injury_risk),
+    trXtvChange6m: num(field(tr, 'xtvChange6m', 'xtvChange6Months')),
+    trXtvChange12m: num(field(tr, 'xtvChange12m', 'xtvChange12Months')),
+    trBaseValue: num(field(tr, 'baseValue')),
+    trSellOnPct: num(field(tr, 'sellOnPct', 'sellOnPercentage')),
+    trAgency: str(field(tr, 'agency', 'agencyName')),
+    trAgencyVerified: str(field(tr, 'agencyVerified')),
+    trEstSalaryLow: num(field(tr, 'estSalaryLow', 'salaryLow')),
+    trEstSalaryHigh: num(field(tr, 'estSalaryHigh', 'salaryHigh')),
+    trGbeScore: num(row.gbe_score) ?? num(field(tr, 'gbeScore', 'GBEScore', 'gbe')),
+    trGbeResult: str(field(tr, 'gbeResult', 'GBEResult', 'gbeStatus')),
+    trPlayingStyle: str(field(tr, 'playingStyle')),
+    trSecondPosition: str(field(tr, 'secondPosition')),
+    trInjuryRisk: str(field(tr, 'injuryRisk')),
     trAvailableForSale: row.tr_availability || undefined,
     trAskingPrice: row.tr_asking_price ?? undefined,
-    trRating: num(tr.rating),
-    trPotential: num(tr.potential),
-    trEuPassport: tr.euPassport === true || tr.eu_passport === true,
-    trPreferredFoot: str(tr.preferredFoot ?? tr.preferred_foot) ?? row.foot ?? undefined,
-    trRecentMinsPct: num(tr.recentMinsPct ?? tr.recent_mins_pct),
-    trGbeIntAppPts: num(tr.gbeIntAppPts),
-    trGbeDomMinsPts: num(tr.gbeDomMinsPts),
-    trGbeContMinsPts: num(tr.gbeContMinsPts),
-    trGbeLeaguePosPts: num(tr.gbeLeaguePosPts),
-    trGbeContProgPts: num(tr.gbeContProgPts),
-    trGbeLeagueStdPts: num(tr.gbeLeagueStdPts),
+    trRating: num(field(tr, 'rating')),
+    trPotential: num(field(tr, 'potential')),
+    trEuPassport: field(tr, 'euPassport', 'hasEUPassport') === true,
+    trPreferredFoot: str(field(tr, 'preferredFoot', 'foot')) ?? row.foot ?? undefined,
+    trRecentMinsPct: num(field(tr, 'recentMinsPct', 'recentMinutesPercentage')),
+    trGbeIntAppPts: num(field(tr, 'gbeIntAppPts', 'GBEInternationalAppearancePoints')),
+    trGbeDomMinsPts: num(field(tr, 'gbeDomMinsPts', 'GBEDomesticMinutesPoints')),
+    trGbeContMinsPts: num(field(tr, 'gbeContMinsPts', 'GBEContinentalMinutesPoints')),
+    trGbeLeaguePosPts: num(field(tr, 'gbeLeaguePosPts', 'GBELeaguePositionPoints')),
+    trGbeContProgPts: num(field(tr, 'gbeContProgPts', 'GBEContinentalProgressionPoints')),
+    trGbeLeagueStdPts: num(field(tr, 'gbeLeagueStdPts', 'GBELeagueStandardPoints')),
 
     xtvHistory: xtvHistoryFrom(tr),
     transferHistory: transferHistoryFrom(tr),

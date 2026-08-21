@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { RosterPlayer as Player, formatHeight, getAge, getPositionGroup, parsePlayerDob, hasCommercialData, hasTrData, getLatestXtvM, getXtvChange6mPct, getXtvChange12mPct, isPrintable } from '@/lib/rosterData';
+import { RosterPlayer as Player, eurToM, formatHeight, getAge, getPositionGroup, parsePlayerDob, hasCommercialData, hasTrData, getLatestXtvM, getXtvChange6mPct, getXtvChange12mPct, isPrintable } from '@/lib/rosterData';
 import { formatCurrency } from '@/lib/currency';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -521,12 +521,12 @@ export default function ExportPdfDialog({ player, open, onClose }: ExportPdfDial
                 <PdfField label={tr('xtvLabel', lang)} value={formatEurM(latestXtv)} />
                 <PdfField label={tr('xtv6m', lang)} value={change6m != null ? `${change6m > 0 ? '+' : ''}${change6m}%` : '—'} />
                 <PdfField label={tr('xtv12m', lang)} value={change12m != null ? `${change12m > 0 ? '+' : ''}${change12m}%` : '—'} />
-                <PdfField label={tr('baseValue', lang)} value={formatEurM(player.trBaseValue)} />
+                <PdfField label={tr('baseValue', lang)} value={formatEurM(eurToM(player.trBaseValue))} />
               </div>
               <div>
                 <PdfSubheading>{tr('availability', lang)}</PdfSubheading>
                 <PdfField label={tr('availableForSale', lang)} value={player.trAvailableForSale || tr('notListed', lang)} />
-                <PdfField label={tr('askingPrice', lang)} value={formatEurM(player.trAskingPrice)} />
+                <PdfField label={tr('askingPrice', lang)} value={formatEurM(eurToM(player.trAskingPrice))} />
                 <PdfField label={tr('sellOn', lang)} value={player.trSellOnPct != null ? `${player.trSellOnPct}%` : '—'} />
                 <PdfField label={tr('agency', lang)} value={player.trAgency ? `${player.trAgency}${player.trAgencyVerified === 'Yes' ? ' ✓' : ''}` : '—'} />
               </div>

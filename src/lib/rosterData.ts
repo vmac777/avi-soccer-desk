@@ -257,10 +257,19 @@ function sortedHistory(player: RosterPlayer) {
 }
 
 /** Latest xTV in €M (raw € / 1,000,000). Falls back to the static trXtv field. */
+/**
+ * Millions of euros. TransferRoom reports whole euros, and both the history
+ * entries and the single stored figure are in those units — returning one
+ * converted and the other raw printed "€4200000.0M" for a €4.2M player.
+ */
+export function eurToM(v?: number): number | undefined {
+  return v == null ? undefined : v / 1_000_000;
+}
+
 export function getLatestXtvM(player: RosterPlayer): number | undefined {
   const hist = sortedHistory(player);
-  if (hist.length > 0) return hist[hist.length - 1].xtv / 1_000_000;
-  return player.trXtv;
+  if (hist.length > 0) return eurToM(hist[hist.length - 1].xtv);
+  return eurToM(player.trXtv);
 }
 
 /**

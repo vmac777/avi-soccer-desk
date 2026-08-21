@@ -464,7 +464,6 @@ const ContactsPage = () => {
                   clubId={news?.club_id}
                   unreadCount={news?.unread_count ?? 0}
                 />
-                <span>{club.club}</span>
               </div>
             </div>
           );

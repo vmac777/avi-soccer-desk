@@ -1,4 +1,4 @@
-import { RosterPlayer as Player, hasTrData, getLatestXtvM, getXtvChange6mPct, getXtvChange12mPct } from '@/lib/rosterData';
+import { RosterPlayer as Player, hasTrData, getLatestXtvM, getXtvChange6mPct, getXtvChange12mPct, eurToM } from '@/lib/rosterData';
 import { cn } from '@/lib/utils';
 import SectionWrapper from './SectionWrapper';
 import InfoField from './InfoField';
@@ -38,14 +38,14 @@ export default function MarketIntelligenceSection({ player }: { player: Player }
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">xTV 12m Change</p>
                 <p className="text-sm"><TrendValue value={change12m} /></p>
               </div>
-              <InfoField label="Base Value" value={formatEurM(player.trBaseValue)} />
+              <InfoField label="Base Value" value={formatEurM(eurToM(player.trBaseValue))} />
             </div>
           </div>
           <div className="space-y-3">
             <h3 className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Availability & Representation</h3>
             <div className="space-y-3">
               <InfoField label="Available for Sale" value={player.trAvailableForSale || <span className="text-muted-foreground">Not Listed</span>} />
-              <InfoField label="Asking Price" value={formatEurM(player.trAskingPrice)} />
+              <InfoField label="Asking Price" value={formatEurM(eurToM(player.trAskingPrice))} />
               <InfoField label="Sell-On %" value={player.trSellOnPct != null ? `${player.trSellOnPct}%` : '—'} />
               <InfoField label="Agency" value={
                 player.trAgency ? (
