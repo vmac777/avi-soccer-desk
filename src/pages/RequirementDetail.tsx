@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { useRequirement, useUpdateRequirement, REQUIREMENT_STATUSES, type RequirementStatus } from '@/hooks/useClubRequirements';
+import { useRequirement, useUpdateRequirement, useDeleteRequirement, REQUIREMENT_STATUSES, type RequirementStatus } from '@/hooks/useClubRequirements';
 import {
   useShortlist, useAddToShortlist, useUpdateShortlistEntry,
   useRemoveFromShortlist, useMarkShortlistPresented,
@@ -54,6 +54,7 @@ export default function RequirementDetailPage() {
   const { data: targets = [] } = useScoutedTargets();
 
   const updateRequirement = useUpdateRequirement();
+  const deleteRequirement = useDeleteRequirement();
   const addToShortlist = useAddToShortlist();
   const updateEntry = useUpdateShortlistEntry();
   const removeEntry = useRemoveFromShortlist();
@@ -163,6 +164,20 @@ export default function RequirementDetailPage() {
     }
   };
 
+  const handleDelete = () => {
+    const listed = entries.length;
+    const warning = listed > 0
+      ? ` Its shortlist of ${listed} goes too.`
+      : '';
+    if (!window.confirm(`Delete this ${requirement.position} need?${warning}`)) return;
+    deleteRequirement.mutate(requirement.id, {
+      onSuccess: () => {
+        toast.success('Need deleted');
+        navigate('/needs');
+      },
+    });
+  };
+
   const handlePrint = () => {
     if (entries.length === 0) {
       toast.error('Nothing on the shortlist to print yet.');
@@ -187,7 +202,8 @@ export default function RequirementDetailPage() {
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Club needs
         </button>
-        <div className="flex items-center gap-0.5 rounded-md border border-border bg-card p-0.5">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-0.5 rounded-md border border-border bg-card p-0.5">
           {REQUIREMENT_STATUSES.map((s) => (
             <button
               key={s}
@@ -202,6 +218,18 @@ export default function RequirementDetailPage() {
               {s}
             </button>
           ))}
+        </div>
+
+          {/* Deleting was only possible from the club contact panel, which is
+              not where anyone looks for it. Withdrawn keeps the record; this
+              removes it, and the shortlist with it. */}
+          <Button
+            variant="outline"
+            onClick={handleDelete}
+            className="h-8 text-xs text-muted-foreground hover:text-destructive"
+          >
+            <Trash2 className="mr-1 h-3 w-3" /> Delete need
+          </Button>
         </div>
       </div>
 

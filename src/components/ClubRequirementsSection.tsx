@@ -122,14 +122,14 @@ export default function ClubRequirementsSection({
 
               <button
                 onClick={() => { setEditing(r); setDialogOpen(true); }}
-                className="p-1 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:text-foreground"
+                className="p-1 text-muted-foreground/60 transition-colors hover:text-foreground"
                 aria-label="Edit requirement"
               >
                 <Pencil className="h-3 w-3" />
               </button>
               <button
                 onClick={() => handleDelete(r)}
-                className="p-1 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+                className="p-1 text-muted-foreground/60 transition-colors hover:text-destructive"
                 aria-label="Delete requirement"
               >
                 <Trash2 className="h-3 w-3" />
