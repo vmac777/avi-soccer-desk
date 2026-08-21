@@ -437,11 +437,14 @@ function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, 
 
         {/* Failure banner + retry */}
         {anyFailed && (
-          <div className="flex items-center gap-1.5 pt-1 text-[10px] text-amber-500/90">
+          <div
+            className="flex items-center gap-1.5 pt-1 text-[10px] text-amber-500/90"
+            title={target.tm_fail_reason ?? target.tr_fail_reason ?? undefined}
+          >
             <AlertTriangle className="h-3 w-3" />
-            <span>
+            <span className="truncate">
               {tmFailed
-                ? `TM: ${target.tm_fail_reason === 'http_error 404'
+                ? `TM: ${target.tm_fail_reason?.startsWith('http_error 404')
                     ? 'Transfermarkt has no page at that link'
                     : target.tm_fail_reason ?? "couldn't fetch"}`
                 : trFailMessage(target.tr_fail_reason)}

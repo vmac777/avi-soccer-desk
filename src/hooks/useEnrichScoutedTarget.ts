@@ -28,9 +28,28 @@ async function runTm(target: { id: string; tmUrl: string; current_club: string }
     if (error || !data?.ok) {
       const reason = (data as any)?.reason;
       const status = (data as any)?.status;
+      /**
+       * Keep what was actually tried, not just that it failed.
+       *
+       * tm-fetch asks for the same player three ways — the stored link, the
+       * `/-/` slug on the same host, then the .com host — and returns every
+       * attempt with its status. Throwing that away left "http_error 404",
+       * which cannot distinguish the three things it might mean: the link on
+       * the row is wrong, Transfermarkt does not serve that slug, or the site
+       * is refusing this server. One of those is fixed by editing a field, one
+       * by code, and one not at all. A player failed for a week because the
+       * message could not tell them apart.
+       */
+      const tried = ((data as { tried?: { url: string; status: number }[] })?.tried) ?? [];
+      const trail = tried
+        .map((t) => `${t.url.replace(/^https?:\/\/(www\.)?transfermarkt\./, '')}→${t.status}`)
+        .join(', ');
       return {
         tm_status: 'failed' as const,
-        tm_fail_reason: [reason, status].filter(Boolean).join(' ') || error?.message || 'unknown',
+        tm_fail_reason: [
+          [reason, status].filter(Boolean).join(' ') || error?.message || 'unknown',
+          trail ? `tried ${trail}` : null,
+        ].filter(Boolean).join(' · '),
       };
     }
     const tm = data.data as Record<string, any>;
