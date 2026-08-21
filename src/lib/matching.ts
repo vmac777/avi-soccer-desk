@@ -16,7 +16,6 @@
  *      recommendation that reads as evidence.
  */
 
-import { defaultComparablePositions } from '@/lib/marketBriefTypes';
 import { formatMoneyShort } from '@/lib/money';
 import {
   type RosterPlayer,
@@ -71,22 +70,89 @@ const WEIGHTS = {
 } as const;
 
 /**
- * Does this player play the position the club is asking for?
+ * Position codes reduced to the job the club is actually asking for.
  *
- * Compares comparable-position clusters rather than exact codes, so a club
- * asking for a DM sees a CM, using the same mapping the brief generator uses.
+ * Not the same thing as `defaultComparablePositions` in marketBriefTypes, and
+ * deliberately different. That map answers "whose transfer fee is a fair comp
+ * for this player's", where a €10m right back genuinely is a comp for a €10m
+ * left back. This one answers "did the club ask for this player", where the
+ * side of the pitch he plays on can decide everything.
+ *
+ * Eight buckets, agreed with the desk:
+ *
+ *   GK · CB · LB(+LWB) · RB(+RWB) · CM(+DM) · AM · W(wide) · CF(+SS)
+ *
+ * Three of those are naming conventions collapsing (ST/FW→CF, CDM→CM,
+ * CAM→AM). The rest are judgement calls:
+ *
+ *   * **Full backs keep their side.** A club needing a left back does not want
+ *     a right back, whatever their fees have in common.
+ *   * **Wingers do not.** An inverted left-footer plays on the right as a
+ *     matter of course, so LW/RW/LM/RM are one wide-attacker bucket.
+ *   * **DM sits with CM**, because plenty of clubs say "central midfielder"
+ *     and mean either.
+ *   * **SS sits with CF and pointedly not with AM.** That last part is the
+ *     whole reason an AM brief used to return centre-forwards: SS appeared in
+ *     both clusters, and expanding both sides made AM≈SS and CF≈SS into
+ *     AM≈CF — a pairing nothing ever asserted. A ten and a nine stay apart.
  */
-export function positionMatches(
-  player: RosterPlayer,
-  requirement: ClubRequirement,
-): boolean {
-  const wanted = defaultComparablePositions(requirement.position);
-  const has = defaultComparablePositions(player.position);
-  if (wanted.length === 0 || has.length === 0) return false;
-  return has.some((code) => wanted.includes(code));
+const POSITION_BUCKET: Record<string, string> = {
+  // Forwards: one job, four labels, plus the second striker.
+  ST: 'CF', FW: 'CF', SS: 'CF',
+  // Wide attackers, either flank.
+  LW: 'W', RW: 'W', LM: 'W', RM: 'W',
+  // Central midfield, holding or otherwise.
+  DM: 'CM', CDM: 'CM',
+  CAM: 'AM',
+  // Full backs keep their side; the wing-back variant does not change it.
+  LWB: 'LB', RWB: 'RB',
+};
+
+/** Split "DM/CM" or "RB-CB" and reduce each part to its bucket. */
+function positionCodes(position: string | null | undefined): string[] {
+  const raw = (position || '').toUpperCase().trim();
+  if (!raw) return [];
+  return raw
+    .split(/[/,\-|&+\s]+/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => POSITION_BUCKET[part] ?? part);
 }
 
-/** A player's age, preferring a real date of birth over a stored integer. */
+/**
+ * Does this player play the position the club asked for?
+ *
+ * A hard filter, not a weight: a wrong-position player should not appear at
+ * all rather than appear with a low score.
+ *
+ * Both sides reduce to buckets and are compared for equality, rather than each
+ * expanding into a cluster and being intersected. Expansion on both sides makes
+ * the relation transitive — which is exactly how an AM brief started returning
+ * centre-forwards.
+ *
+ * A player listed with more than one position matches on any of them: a
+ * "DM/CM" plays both, and the club asking for either is entitled to see him.
+ */
+export function positionMatches(player: RosterPlayer, requirement: ClubRequirement): boolean {
+  const wanted = new Set(positionCodes(requirement.position));
+  const has = positionCodes(player.position);
+  if (wanted.size === 0 || has.length === 0) return false;
+  return has.some((code) => wanted.has(code));
+}
+
+/**
+ * Beyond what the club can pay, rather than merely expensive.
+ *
+ * Reads the verdict the scorer already produced, so the tolerance lives in one
+ * place. `close` — inside a fifth over — is deliberately not priced out: a
+ * club saying four million will often do four-eight with add-ons, and hiding
+ * that band would hide real deals. An unknown valuation is never priced out
+ * either; not knowing what a player is worth is not evidence he is too dear.
+ */
+export function isPricedOut(match: MatchResult): boolean {
+  return match.reasons.some((r) => r.factor === 'budget' && r.verdict === 'misses');
+}
+
 function ageOf(player: RosterPlayer): number | undefined {
   if (player.dob) {
     try {

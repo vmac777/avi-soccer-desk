@@ -15,7 +15,7 @@ import { useClubs } from '@/hooks/useClubsAndSources';
 import { useContacts } from '@/hooks/useData';
 import { useScoutedTargets, useAddBuyPitch } from '@/hooks/useBuyData';
 import { toRosterPlayer } from '@/lib/rosterMapping';
-import { matchRosterToRequirement, unmatchableFields, type MatchReason } from '@/lib/matching';
+import { matchRosterToRequirement, unmatchableFields, isPricedOut, type MatchReason } from '@/lib/matching';
 import { getAge, getLatestXtvM, type RosterPlayer } from '@/lib/rosterData';
 import { pitchArgsFromShortlist, requirementSummary } from '@/lib/shortlistToPitch';
 import { formatMoneyShort } from '@/lib/money';
@@ -62,6 +62,7 @@ export default function RequirementDetailPage() {
   const addPitch = useAddBuyPitch();
 
   const [noteDraft, setNoteDraft] = useState<Record<string, string>>({});
+  const [showPricedOut, setShowPricedOut] = useState(false);
 
   const roster = useMemo(() => targets.map(toRosterPlayer), [targets]);
   const playerById = useMemo(
@@ -82,9 +83,24 @@ export default function RequirementDetailPage() {
     [entries],
   );
 
-  const matches = useMemo(
+  const allMatches = useMemo(
     () => (requirement ? matchRosterToRequirement(roster, requirement) : []),
     [roster, requirement],
+  );
+
+  /**
+   * Everyone the club could not sign at the price.
+   *
+   * Split out rather than scored low and left in the list: a €70m player
+   * against a €5m brief is not a weak match, he is not a match. Only clear
+   * misses go — a player inside the negotiable band still shows, and a player
+   * we hold no valuation for is never hidden, because not knowing what he is
+   * worth is not evidence he is too dear.
+   */
+  const pricedOut = useMemo(() => allMatches.filter(isPricedOut), [allMatches]);
+  const matches = useMemo(
+    () => (showPricedOut ? allMatches : allMatches.filter((m) => !isPricedOut(m))),
+    [allMatches, showPricedOut],
   );
 
   if (isLoading) {
@@ -261,16 +277,32 @@ export default function RequirementDetailPage() {
       <div className="grid gap-5 lg:grid-cols-2">
         {/* Who fits */}
         <div>
-          <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
-            WHO WE HOLD ({matches.length})
-          </h2>
+          <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
+              WHO WE HOLD ({matches.length})
+            </h2>
+            {/* Never hide players without saying how many, or the list quietly
+                becomes the whole truth. */}
+            {pricedOut.length > 0 && (
+              <button
+                onClick={() => setShowPricedOut((v) => !v)}
+                className="text-[10px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+              >
+                {showPricedOut
+                  ? `hide ${pricedOut.length} over the fee`
+                  : `${pricedOut.length} over the fee — show`}
+              </button>
+            )}
+          </div>
           {requirement.status !== 'open' ? (
             <p className="font-mono text-xs text-muted-foreground">
               Matching only runs on open requirements.
             </p>
           ) : matches.length === 0 ? (
             <p className="font-mono text-xs text-muted-foreground">
-              Nobody on the roster plays this position.
+              {pricedOut.length > 0
+                ? `Everyone who plays this position is over the fee ceiling (${pricedOut.length}).`
+                : 'Nobody on the roster plays this position.'}
             </p>
           ) : (
             <div className="space-y-1.5">

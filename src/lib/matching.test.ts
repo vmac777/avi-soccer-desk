@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   positionMatches,
+  isPricedOut,
   scoreMatch,
   matchRosterToRequirement,
   matchRequirementsToPlayer,
@@ -45,24 +46,99 @@ function requirement(over: Partial<ClubRequirement> = {}): ClubRequirement {
 }
 
 describe('positionMatches', () => {
+  const matches = (playerPos: string, briefPos: string) =>
+    positionMatches(player({ position: playerPos }), requirement({ position: briefPos }));
+
   it('matches a position to itself', () => {
-    expect(positionMatches(player({ position: 'CB' }), requirement({ position: 'CB' }))).toBe(true);
+    expect(matches('CB', 'CB')).toBe(true);
   });
 
-  it('matches across a comparable cluster — a DM brief sees a CM', () => {
-    expect(positionMatches(player({ position: 'CM' }), requirement({ position: 'DM' }))).toBe(true);
+  it('collapses labels for the same job', () => {
+    expect(matches('ST', 'CF')).toBe(true);
+    expect(matches('FW', 'CF')).toBe(true);
+    expect(matches('CDM', 'DM')).toBe(true);
+    expect(matches('CAM', 'AM')).toBe(true);
   });
 
-  it('matches composite positions like DM/CM', () => {
-    expect(positionMatches(player({ position: 'DM/CM' }), requirement({ position: 'AM' }))).toBe(true);
+  it('matches a player on any position he is listed at', () => {
+    // "DM/CM" plays both; a club asking for either should see him.
+    expect(matches('DM/CM', 'CM')).toBe(true);
+    expect(matches('CB/RB', 'RB')).toBe(true);
+  });
+
+  it('does not return a centre-forward for an attacking-midfield brief', () => {
+    // The reported bug. SS sits with CF and pointedly not with AM — if it sat
+    // in both, AM≈SS and CF≈SS would bridge into AM≈CF all over again.
+    expect(matches('CF', 'AM')).toBe(false);
+    expect(matches('SS', 'AM')).toBe(false);
+    expect(matches('AM', 'CF')).toBe(false);
+  });
+
+  it('keeps full backs on their own side', () => {
+    // A club that needs a left back does not want a right back, whatever the
+    // transfer-comparables map says about their fees being alike.
+    expect(matches('RB', 'LB')).toBe(false);
+    expect(matches('LWB', 'LB')).toBe(true);
+    expect(matches('RWB', 'RB')).toBe(true);
+    expect(matches('LWB', 'RB')).toBe(false);
+  });
+
+  it('treats wingers as one wide bucket, either flank', () => {
+    // Inverted wingers swap sides as a matter of course, so unlike full backs
+    // these are deliberately not lateral.
+    expect(matches('LW', 'RW')).toBe(true);
+    expect(matches('LM', 'RW')).toBe(true);
+    expect(matches('RM', 'LW')).toBe(true);
+  });
+
+  it('puts the second striker with the forwards', () => {
+    expect(matches('SS', 'CF')).toBe(true);
+    expect(matches('CF', 'SS')).toBe(true);
+  });
+
+  it('lets a holding midfielder answer a central-midfield brief', () => {
+    expect(matches('DM', 'CM')).toBe(true);
+    expect(matches('CM', 'DM')).toBe(true);
+  });
+
+  it('keeps the ten out of central midfield', () => {
+    expect(matches('AM', 'CM')).toBe(false);
+    expect(matches('CM', 'AM')).toBe(false);
   });
 
   it('rejects an unrelated position', () => {
-    expect(positionMatches(player({ position: 'GK' }), requirement({ position: 'CF' }))).toBe(false);
+    expect(matches('GK', 'CF')).toBe(false);
   });
 
   it('rejects when either side is blank', () => {
-    expect(positionMatches(player({ position: '' }), requirement({ position: 'CM' }))).toBe(false);
+    expect(matches('', 'CM')).toBe(false);
+    expect(matches('CM', '')).toBe(false);
+  });
+});
+
+describe('isPricedOut', () => {
+  const at = (valueEur: number, budget: number | null) =>
+    scoreMatch(player({ marketValue: valueEur }), requirement({ budget_max: budget }))!;
+
+  it('is true only beyond the negotiable band', () => {
+    expect(isPricedOut(at(30_000_000, 10_000_000))).toBe(true);
+  });
+
+  it('leaves a player just over budget in the list', () => {
+    // Four million often does four-eight with add-ons. Hiding that band would
+    // hide real deals, so `close` is not priced out.
+    expect(isPricedOut(at(11_000_000, 10_000_000))).toBe(false);
+  });
+
+  it('never prices out a player we hold no valuation for', () => {
+    // Not knowing what he is worth is not evidence that he is too dear, and
+    // hiding him would quietly shrink the roster to only the enriched players.
+    const m = scoreMatch(player(), requirement({ budget_max: 1_000_000 }))!;
+    expect(isPricedOut(m)).toBe(false);
+  });
+
+  it('is false when the club stated no ceiling', () => {
+    expect(isPricedOut(at(80_000_000, null))).toBe(false);
   });
 });
 
