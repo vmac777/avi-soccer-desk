@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, Plus, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
@@ -59,31 +60,53 @@ function CreateBuyPitchDialog({ open, onClose, targets, contacts, allClubs, onSu
   targets: ScoutedTarget[];
   contacts: { id: string; market: string; club: string; contact_person: string | null }[];
   allClubs: Club[];
-  onSubmit: (data: { scouted_target_id: string; contact_id: string; notes: string }) => Promise<void> | void;
+  onSubmit: (data: {
+    scouted_target_id: string;
+    contact_id: string | null;
+    buying_contact_id: string | null;
+    notes: string;
+  }) => Promise<void> | void;
 }) {
-  const [form, setForm] = useState({ scouted_target_id: '', contact_id: '', notes: '' });
+  const [form, setForm] = useState({ scouted_target_id: '', contact_id: '', buying_contact_id: '', notes: '' });
   const [newAgentName, setNewAgentName] = useState<string | null>(null);
   const createContact = useCreateContact();
   const { session } = useAuth();
 
   const target = targets.find(t => t.id === form.scouted_target_id);
-  const teamContacts = target
-    ? contacts.filter(c => c.club && target.current_club && c.club.toLowerCase() === target.current_club.toLowerCase())
+
+  // The selling side is whoever holds his registration — the parent club on a
+  // loan, not the club he happens to be turning out for.
+  const sellingClub = target?.owner_club || target?.current_club || '';
+  const sellingContacts = sellingClub
+    ? contacts.filter(c => c.club && c.club.toLowerCase() === sellingClub.toLowerCase())
     : [];
-  const otherContacts = target
-    ? contacts.filter(c => !teamContacts.find(tc => tc.id === c.id))
-    : contacts;
 
   const reset = () => {
-    setForm({ scouted_target_id: '', contact_id: '', notes: '' });
+    setForm({ scouted_target_id: '', contact_id: '', buying_contact_id: '', notes: '' });
     setNewAgentName(null);
     onClose();
   };
 
-  const handleSubmit = async () => {
-    if (!form.scouted_target_id) { toast.error('Select a scouted target'); return; }
+  /** Naming someone at a club we hold nobody at, without leaving the dialog. */
+  const addAtClub = async (clubRow: Club, person: string) => {
     try {
-      let contactId = form.contact_id;
+      const created = await createContact.mutateAsync({
+        market: clubRow.league || clubRow.country || '',
+        club: clubRow.name,
+        contact_person: person,
+        created_by: session?.user?.id,
+      } as never);
+      return (created as { id: string }).id;
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Could not add that contact');
+      return null;
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!form.scouted_target_id) { toast.error('Pick a player'); return; }
+    try {
+      let sellingId: string | null = form.contact_id || null;
       if (newAgentName !== null) {
         const name = newAgentName.trim();
         if (!name) { toast.error('Agent name required'); return; }
@@ -92,96 +115,113 @@ function CreateBuyPitchDialog({ open, onClose, targets, contacts, allClubs, onSu
           club: name,
           contact_person: name,
           created_by: session?.user?.id,
-        } as any);
-        contactId = created.id;
+        } as never);
+        sellingId = (created as { id: string }).id;
       }
-      if (!contactId) { toast.error('Select a counterparty'); return; }
-      await onSubmit({ scouted_target_id: form.scouted_target_id, contact_id: contactId, notes: form.notes });
+      // Either side alone opens a deal: a free agent has no selling club, and an
+      // approach usually starts with a buying club before the current one hears
+      // anything about it.
+      if (!sellingId && !form.buying_contact_id) {
+        toast.error('Pick a club on one side or the other');
+        return;
+      }
+      await onSubmit({
+        scouted_target_id: form.scouted_target_id,
+        contact_id: sellingId,
+        buying_contact_id: form.buying_contact_id || null,
+        notes: form.notes,
+      });
       reset();
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Could not create the pitch');
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={v => { if (!v) reset(); }}>
-      <DialogContent className="max-w-md">
-        <DialogHeader><DialogTitle>New Buy-Side Pitch</DialogTitle></DialogHeader>
+      <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogHeader><DialogTitle>New pitch</DialogTitle></DialogHeader>
         <div className="space-y-3">
           <div>
-            <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Scouted Target *</label>
+            <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Player *</label>
             <select
               value={form.scouted_target_id}
-              onChange={e => { setForm(p => ({ ...p, scouted_target_id: e.target.value, contact_id: '' })); setNewAgentName(null); }}
+              onChange={e => {
+                setForm(p => ({ ...p, scouted_target_id: e.target.value, contact_id: '', buying_contact_id: '' }));
+                setNewAgentName(null);
+              }}
               className="w-full h-8 text-xs bg-background border border-border rounded-md px-2"
             >
-              <option value="">Select target...</option>
+              <option value="">Select a player…</option>
               {targets.map(t => <option key={t.id} value={t.id}>{t.name} — {t.current_club}</option>)}
             </select>
           </div>
-          <div>
-            <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Counterparty (club / agent) *</label>
-            <div className="space-y-1.5">
-              {target && teamContacts.length > 0 && (
-                <select
-                  value={newAgentName !== null ? '__new_agent__' : form.contact_id}
-                  onChange={e => {
-                    const v = e.target.value;
-                    if (v === '__new_agent__') { setNewAgentName(''); setForm(p => ({ ...p, contact_id: '' })); }
-                    else { setNewAgentName(null); setForm(p => ({ ...p, contact_id: v })); }
-                  }}
-                  className="w-full h-8 text-xs bg-background border border-border rounded-md px-2"
-                >
-                  <option value="">At {target.current_club}…</option>
-                  {teamContacts.map(c => <option key={c.id} value={c.id}>{c.contact_person || c.club}</option>)}
-                  <option value="__new_agent__">＋ Create new — agent</option>
-                </select>
-              )}
-              {/* Anyone else: a thousand contacts is not a list, so narrow by
-                  country and club before asking for a person. */}
-              <ClubContactPicker
-                contacts={contacts as never}
-                clubs={allClubs}
-                value={newAgentName !== null ? '' : form.contact_id}
-                onChange={id => { setNewAgentName(null); setForm(p => ({ ...p, contact_id: id })); }}
-                emptyLabel="Anyone else"
-                onCreateAtClub={async (clubRow, person) => {
-                  try {
-                    const created = await createContact.mutateAsync({
-                      market: clubRow.league || clubRow.country || '',
-                      club: clubRow.name,
-                      contact_person: person,
-                      created_by: session?.user?.id,
-                    } as never);
-                    return (created as { id: string }).id;
-                  } catch (e: unknown) {
-                    toast.error(e instanceof Error ? e.message : 'Could not add that contact');
-                    return null;
-                  }
-                }}
-              />
-            </div>
-          </div>
-          {newAgentName !== null && (
-            <div>
-              <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Agent Name *</label>
+
+          <p className="text-[11px] text-muted-foreground">
+            Fill in whichever side you have. At least one is needed; the other can follow
+            once that conversation starts.
+          </p>
+
+          {/* Two sides of the same deal, kept visibly apart. Which club is
+              selling and which is buying is the whole shape of it, and one
+              combined list made that a guess. */}
+          <div className="rounded-md border border-border p-2.5 space-y-1.5">
+            <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Selling side {sellingClub ? `— ${sellingClub}` : '— none (free agent)'}
+            </label>
+            <select
+              value={newAgentName !== null ? '__new_agent__' : form.contact_id}
+              onChange={e => {
+                const v = e.target.value;
+                if (v === '__new_agent__') { setNewAgentName(''); setForm(p => ({ ...p, contact_id: '' })); }
+                else { setNewAgentName(null); setForm(p => ({ ...p, contact_id: v })); }
+              }}
+              className="w-full h-8 text-xs bg-background border border-border rounded-md px-2"
+            >
+              <option value="">None</option>
+              {sellingContacts.map(c => (
+                <option key={c.id} value={c.id}>{c.contact_person || c.club}</option>
+              ))}
+              <option value="__new_agent__">＋ Create new — agent</option>
+            </select>
+            {newAgentName !== null && (
               <Input
                 value={newAgentName}
                 onChange={e => setNewAgentName(e.target.value)}
-                placeholder="e.g. Giuliano Bertolucci"
+                placeholder="Agent name"
                 className="h-8 text-xs"
-                autoComplete="off"
                 autoFocus
               />
-            </div>
-          )}
+            )}
+          </div>
+
+          <div className="rounded-md border border-border p-2.5 space-y-1.5">
+            <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Buying side — club being approached
+            </label>
+            <ClubContactPicker
+              contacts={contacts as never}
+              clubs={allClubs}
+              value={form.buying_contact_id}
+              onChange={id => setForm(p => ({ ...p, buying_contact_id: id }))}
+              excludeClub={sellingClub || undefined}
+              emptyLabel="None yet"
+              onCreateAtClub={addAtClub}
+            />
+          </div>
+
           <div>
             <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Notes</label>
-            <textarea value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} autoComplete="off" className="w-full h-16 text-xs bg-background border border-border rounded-md p-2 resize-none" />
+            <Textarea
+              value={form.notes}
+              onChange={e => setForm(p => ({ ...p, notes: e.target.value }))}
+              className="text-xs min-h-[70px]"
+            />
           </div>
+
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={reset} className="h-8 text-xs">Cancel</Button>
-            <Button onClick={handleSubmit} disabled={createContact.isPending} className="h-8 text-xs">Create Pitch</Button>
+            <Button onClick={handleSubmit} className="h-8 text-xs">Create pitch</Button>
           </div>
         </div>
       </DialogContent>
@@ -343,7 +383,12 @@ export default function BuyPitchesPage() {
     updateMutation.mutate(patch);
   };
 
-  const handleCreate = async (form: { scouted_target_id: string; contact_id: string; notes: string }) => {
+  const handleCreate = async (form: {
+    scouted_target_id: string;
+    contact_id: string | null;
+    buying_contact_id: string | null;
+    notes: string;
+  }) => {
     try {
       const { pitch, action } = await addMutation.mutateAsync(form);
       if (action === 'reopened') toast.success('Pitch re-opened');
