@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import type { SellingTrack, BuyingTrack, PlayerTrack } from '@/lib/placementStage';
 
 // ─── Types ───────────────────────────────────────────────
@@ -521,6 +522,19 @@ export function useDeleteBuyPitch() {
 
 // ─── Specialized optimistic mutations ────────────────────
 
+/**
+ * Undo an optimistic change the database refused, and say so.
+ *
+ * Rolling back silently is why a rejected write reads as a button that does
+ * nothing: the chip lights up, the row never changes, and the UI puts it back
+ * with no explanation. A constraint the schema and the code disagree about can
+ * sit there for a whole session looking like a UI bug.
+ */
+function rollback(qc: ReturnType<typeof useQueryClient>, ctx: { prev?: unknown } | undefined, e: unknown) {
+  if (ctx?.prev) qc.setQueryData(['buy_pitches'], ctx.prev);
+  toast.error(e instanceof Error ? e.message : 'That change was rejected');
+}
+
 function optimisticPitchPatch<T extends Partial<BuyPitch>>(
   qc: ReturnType<typeof useQueryClient>,
   id: string,
@@ -547,7 +561,7 @@ export function useSetBallInCourt() {
       await qc.cancelQueries({ queryKey: ['buy_pitches'] });
       return { prev: optimisticPitchPatch(qc, id, { ball_in_court: value }) };
     },
-    onError: (_e, _v, ctx) => ctx?.prev && qc.setQueryData(['buy_pitches'], ctx.prev),
+    onError: (e, _v, ctx) => rollback(qc, ctx, e),
     onSettled: () => qc.invalidateQueries({ queryKey: ['buy_pitches'] }),
   });
 }
@@ -576,7 +590,7 @@ export function useSetTracks() {
       if (player_track !== undefined) patch.player_track = player_track;
       return { prev: optimisticPitchPatch(qc, id, patch as Partial<BuyPitch>) };
     },
-    onError: (_e, _v, ctx) => ctx?.prev && qc.setQueryData(['buy_pitches'], ctx.prev),
+    onError: (e, _v, ctx) => rollback(qc, ctx, e),
     onSettled: () => qc.invalidateQueries({ queryKey: ['buy_pitches'] }),
   });
 }
@@ -602,7 +616,7 @@ export function useSetMilestone() {
       else next[key] = entry;
       return { prev: optimisticPitchPatch(qc, id, { milestones: next }) };
     },
-    onError: (_e, _v, ctx) => ctx?.prev && qc.setQueryData(['buy_pitches'], ctx.prev),
+    onError: (e, _v, ctx) => rollback(qc, ctx, e),
     onSettled: () => qc.invalidateQueries({ queryKey: ['buy_pitches'] }),
   });
 }
@@ -621,7 +635,7 @@ export function useSetLossReason() {
       await qc.cancelQueries({ queryKey: ['buy_pitches'] });
       return { prev: optimisticPitchPatch(qc, id, { stage, loss_reason }) };
     },
-    onError: (_e, _v, ctx) => ctx?.prev && qc.setQueryData(['buy_pitches'], ctx.prev),
+    onError: (e, _v, ctx) => rollback(qc, ctx, e),
     onSettled: () => qc.invalidateQueries({ queryKey: ['buy_pitches'] }),
   });
 }
@@ -651,7 +665,7 @@ export function useChangeBuyPitchCounterparty() {
       await qc.cancelQueries({ queryKey: ['buy_pitches'] });
       return { prev: optimisticPitchPatch(qc, id, { contact_id }) };
     },
-    onError: (_e, _v, ctx) => ctx?.prev && qc.setQueryData(['buy_pitches'], ctx.prev),
+    onError: (e, _v, ctx) => rollback(qc, ctx, e),
     onSettled: (_d, _e, vars) => {
       qc.invalidateQueries({ queryKey: ['buy_pitches'] });
       qc.invalidateQueries({ queryKey: ['buy_negotiation_entries', vars.id] });
