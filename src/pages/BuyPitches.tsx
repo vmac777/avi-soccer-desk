@@ -16,6 +16,8 @@ import { Search, Plus, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
 import BuyPitchDetailModal from '@/components/BuyPitchDetailModal';
 import BuyPitchCard from '@/components/BuyPitchCard';
+import ClubContactPicker from '@/components/ClubContactPicker';
+import { useClubs, type Club } from '@/hooks/useClubsAndSources';
 import { exportBuyKanbanPdf } from '@/lib/exportBuyKanbanPdf';
 
 /**
@@ -51,11 +53,12 @@ const closedReasonLabels: { value: BuyPitchStage; label: string }[] = [
   { value: 'Collapsed', label: 'Collapsed' },
 ];
 
-function CreateBuyPitchDialog({ open, onClose, targets, contacts, onSubmit }: {
+function CreateBuyPitchDialog({ open, onClose, targets, contacts, allClubs, onSubmit }: {
   open: boolean;
   onClose: () => void;
   targets: ScoutedTarget[];
-  contacts: { id: string; club: string; contact_person: string | null }[];
+  contacts: { id: string; market: string; club: string; contact_person: string | null }[];
+  allClubs: Club[];
   onSubmit: (data: { scouted_target_id: string; contact_id: string; notes: string }) => Promise<void> | void;
 }) {
   const [form, setForm] = useState({ scouted_target_id: '', contact_id: '', notes: '' });
@@ -118,28 +121,46 @@ function CreateBuyPitchDialog({ open, onClose, targets, contacts, onSubmit }: {
           </div>
           <div>
             <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Counterparty (club / agent) *</label>
-            <select
-              value={newAgentName !== null ? '__new_agent__' : form.contact_id}
-              onChange={e => {
-                const v = e.target.value;
-                if (v === '__new_agent__') { setNewAgentName(''); setForm(p => ({ ...p, contact_id: '' })); }
-                else { setNewAgentName(null); setForm(p => ({ ...p, contact_id: v })); }
-              }}
-              className="w-full h-8 text-xs bg-background border border-border rounded-md px-2"
-            >
-              <option value="">Select contact...</option>
+            <div className="space-y-1.5">
               {target && teamContacts.length > 0 && (
-                <optgroup label={target.current_club}>
+                <select
+                  value={newAgentName !== null ? '__new_agent__' : form.contact_id}
+                  onChange={e => {
+                    const v = e.target.value;
+                    if (v === '__new_agent__') { setNewAgentName(''); setForm(p => ({ ...p, contact_id: '' })); }
+                    else { setNewAgentName(null); setForm(p => ({ ...p, contact_id: v })); }
+                  }}
+                  className="w-full h-8 text-xs bg-background border border-border rounded-md px-2"
+                >
+                  <option value="">At {target.current_club}…</option>
                   {teamContacts.map(c => <option key={c.id} value={c.id}>{c.contact_person || c.club}</option>)}
-                </optgroup>
+                  <option value="__new_agent__">＋ Create new — agent</option>
+                </select>
               )}
-              <option value="__new_agent__">＋ Create New — Agent</option>
-              {otherContacts.length > 0 && (
-                <optgroup label={target ? 'Other contacts' : 'Contacts'}>
-                  {otherContacts.map(c => <option key={c.id} value={c.id}>{c.contact_person || c.club} — {c.club}</option>)}
-                </optgroup>
-              )}
-            </select>
+              {/* Anyone else: a thousand contacts is not a list, so narrow by
+                  country and club before asking for a person. */}
+              <ClubContactPicker
+                contacts={contacts as never}
+                clubs={allClubs}
+                value={newAgentName !== null ? '' : form.contact_id}
+                onChange={id => { setNewAgentName(null); setForm(p => ({ ...p, contact_id: id })); }}
+                emptyLabel="Anyone else"
+                onCreateAtClub={async (clubRow, person) => {
+                  try {
+                    const created = await createContact.mutateAsync({
+                      market: clubRow.league || clubRow.country || '',
+                      club: clubRow.name,
+                      contact_person: person,
+                      created_by: session?.user?.id,
+                    } as never);
+                    return (created as { id: string }).id;
+                  } catch (e: unknown) {
+                    toast.error(e instanceof Error ? e.message : 'Could not add that contact');
+                    return null;
+                  }
+                }}
+              />
+            </div>
           </div>
           {newAgentName !== null && (
             <div>
@@ -191,6 +212,7 @@ export default function BuyPitchesPage() {
   const { data: pitches = [], isLoading } = useBuyPitches();
   const { data: targets = [] } = useScoutedTargets();
   const { data: contacts = [] } = useContacts();
+  const { data: allClubs = [] } = useClubs();
   const updateMutation = useUpdateBuyPitch();
   const setLoss = useSetLossReason();
   const addMutation = useAddBuyPitch();
@@ -585,7 +607,8 @@ export default function BuyPitchesPage() {
           open={showCreate}
           onClose={() => setShowCreate(false)}
           targets={targets}
-          contacts={contacts.filter(c => c.id).map(c => ({ id: c.id!, club: c.club, contact_person: c.contact_person }))}
+          allClubs={allClubs}
+          contacts={contacts.filter(c => c.id).map(c => ({ id: c.id!, market: c.market, club: c.club, contact_person: c.contact_person }))}
           onSubmit={handleCreate}
         />
       )}

@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useScoutedTargets, useAddScoutedTarget, useUpdateScoutedTarget, useDeleteScoutedTarget, useAddBuyPitch, type ScoutedTarget } from '@/hooks/useBuyData';
 import { useContacts, useCreateContact } from '@/hooks/useData';
+import { useClubs } from '@/hooks/useClubsAndSources';
+import ClubContactPicker from '@/components/ClubContactPicker';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnrichScoutedTarget } from '@/hooks/useEnrichScoutedTarget';
 import { useBulkEnrich, isPending } from '@/hooks/useBulkEnrich';
@@ -584,6 +586,7 @@ export default function ScoutedTargetsPage() {
   const { data: targets = [], isLoading } = useScoutedTargets();
   const bulk = useBulkEnrich();
   const { data: contacts = [] } = useContacts();
+  const { data: allClubs = [] } = useClubs();
   const addMutation = useAddScoutedTarget();
   const updateMutation = useUpdateScoutedTarget();
   const deleteMutation = useDeleteScoutedTarget();
@@ -942,17 +945,6 @@ export default function ScoutedTargetsPage() {
         const sellingContacts = contacts.filter(
           c => c.club && sellingClub && c.club.toLowerCase() === sellingClub.toLowerCase());
 
-        // Anyone but the selling club — the whole directory is a buying side.
-        const buyingContacts = contacts
-          .filter(c => !sellingClub || (c.club ?? '').toLowerCase() !== sellingClub.toLowerCase())
-          .filter(c => c.contact_person || c.club);
-
-        const buyingByLeague = buyingContacts.reduce<Record<string, typeof buyingContacts>>((acc, c) => {
-          const k = c.market || 'Other';
-          (acc[k] ||= []).push(c);
-          return acc;
-        }, {});
-
         const reset = () => {
           setPitchTarget(null); setPitchContactId(''); setPitchBuyingContactId(''); setNewAgentName(null);
         };
@@ -1008,24 +1000,28 @@ export default function ScoutedTargetsPage() {
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
                   Buying side — club being approached
                 </label>
-                <select
+                <ClubContactPicker
+                  contacts={contacts as never}
+                  clubs={allClubs}
                   value={pitchBuyingContactId}
-                  onChange={e => setPitchBuyingContactId(e.target.value)}
-                  className="w-full h-8 text-xs bg-background border border-border rounded-md px-2"
-                >
-                  <option value="">None yet</option>
-                  {Object.keys(buyingByLeague).sort().map(league => (
-                    <optgroup key={league} label={league}>
-                      {buyingByLeague[league]
-                        .sort((a, b) => (a.club ?? '').localeCompare(b.club ?? ''))
-                        .map(c => (
-                          <option key={c.id} value={c.id}>
-                            {c.club} — {c.contact_person || 'unnamed'}
-                          </option>
-                        ))}
-                    </optgroup>
-                  ))}
-                </select>
+                  onChange={setPitchBuyingContactId}
+                  excludeClub={sellingClub || undefined}
+                  emptyLabel="None yet"
+                  onCreateAtClub={async (clubRow, person) => {
+                    try {
+                      const created = await createContact.mutateAsync({
+                        market: clubRow.league || clubRow.country || '',
+                        club: clubRow.name,
+                        contact_person: person,
+                        created_by: session?.user?.id,
+                      } as never);
+                      return (created as { id: string }).id;
+                    } catch (e: unknown) {
+                      toast.error(e instanceof Error ? e.message : 'Could not add that contact');
+                      return null;
+                    }
+                  }}
+                />
               </div>
 
               <div className="flex justify-end gap-2">

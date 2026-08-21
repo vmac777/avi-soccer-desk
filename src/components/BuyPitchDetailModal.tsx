@@ -3,7 +3,7 @@ import {
   useBuyPitches, useBuyPitchNotes, useAddBuyPitchNote, useUpdateBuyPitch,
   useBuyNegotiationEntries, useAddBuyNegotiationEntry, useDeleteBuyNegotiationEntry,
   useScoutedTargets, useSetBallInCourt, useSetTracks, useSetMilestone, useSetLossReason,
-  useChangeBuyPitchCounterparty,
+  useChangeBuyPitchCounterparty, useDeleteBuyPitch,
   BUY_ACTIVE_STAGES, BUY_CLOSED_STAGES,
   CLOSED_STAGE_TO_LOSS_REASON,
   NEGOTIATION_TYPES, LOAN_TYPES_WITH_TRIGGER,
@@ -138,6 +138,7 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
   const deleteNegEntry = useDeleteBuyNegotiationEntry();
   const updatePitch = useUpdateBuyPitch();
   const setBic = useSetBallInCourt();
+  const deletePitch = useDeleteBuyPitch();
   const setTracks = useSetTracks();
   const setMilestone = useSetMilestone();
   const setLoss = useSetLossReason();
@@ -158,6 +159,7 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
   const [negAmount, setNegAmount] = useState('');
   const [negNote, setNegNote] = useState('');
   const [closePromptOpen, setClosePromptOpen] = useState(false);
+  const [deletePromptOpen, setDeletePromptOpen] = useState(false);
 
   // Milestone draft state (per key)
   const [msDraft, setMsDraft] = useState<{ key: MilestoneKey; at: string; amount: string; inProgress: boolean } | null>(null);
@@ -182,6 +184,9 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
 
   // Entries written before the three-sided model carry no side; they were all
   // selling-side, so read them as such rather than hiding them behind a filter.
+  // Whether there is anything here worth keeping.
+  const hasHistory = negotiations.length > 0 || notes.length > 0;
+
   const visibleEntries = logFilter === 'all'
     ? negotiations
     : negotiations.filter(e => (e.side ?? 'selling') === logFilter);
@@ -361,10 +366,18 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
                   </div>
                 )}
               </div>
-              <SetReminderButton
-                target={{ type: 'buy_pitch', id: pitch.id, label: `Buy: ${target?.name || 'Target'}`, sublabel: contact?.club || undefined }}
-                className="mt-1"
-              />
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                <SetReminderButton
+                  target={{ type: 'buy_pitch', id: pitch.id, label: `Pitch: ${target?.name || 'Target'}`, sublabel: buyingName || sellingName || undefined }}
+                  className="mt-1"
+                />
+                <button
+                  onClick={() => setDeletePromptOpen(true)}
+                  className="text-[10px] text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  Delete pitch
+                </button>
+              </div>
             </div>
           </SheetHeader>
 
@@ -766,6 +779,65 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
       </Sheet>
 
       {/* Close-as prompt */}
+      <Dialog open={deletePromptOpen} onOpenChange={v => { if (!v) setDeletePromptOpen(false); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Delete this pitch?</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              {target?.name} {sellingName || buyingName ? `· ${[sellingName, buyingName].filter(Boolean).join(' → ')}` : ''}
+            </p>
+
+            {hasHistory ? (
+              <>
+                {/* A negotiation that happened is a record of what a club would
+                    pay and what they said. That is worth more later than a tidy
+                    board is now. */}
+                <p className="text-xs text-foreground">
+                  This deal has {negotiations.length} logged {negotiations.length === 1 ? 'entry' : 'entries'}
+                  {notes.length > 0 && ` and ${notes.length} ${notes.length === 1 ? 'note' : 'notes'}`}.
+                  Deleting loses what each club said and what they offered.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Closing it instead keeps the record and takes it off the board.
+                </p>
+              </>
+            ) : (
+              <p className="text-xs text-muted-foreground">Nothing has been logged on it yet.</p>
+            )}
+
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="ghost" onClick={() => setDeletePromptOpen(false)} className="h-8 text-xs">Cancel</Button>
+              {hasHistory && (
+                <Button
+                  variant="outline"
+                  className="h-8 text-xs"
+                  onClick={() => { setDeletePromptOpen(false); handleStageChange('Collapsed'); }}
+                >
+                  Close instead
+                </Button>
+              )}
+              <Button
+                variant="destructive"
+                className="h-8 text-xs"
+                disabled={deletePitch.isPending}
+                onClick={async () => {
+                  try {
+                    await deletePitch.mutateAsync(pitchId);
+                    toast.success(`Deleted the pitch for ${target?.name ?? 'this player'}`);
+                    setDeletePromptOpen(false);
+                    onClose();
+                  } catch (e: any) {
+                    toast.error(e.message);
+                  }
+                }}
+              >
+                {deletePitch.isPending ? 'Deleting…' : 'Delete'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={closePromptOpen} onOpenChange={v => { if (!v) setClosePromptOpen(false); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Close pitch as…</DialogTitle></DialogHeader>

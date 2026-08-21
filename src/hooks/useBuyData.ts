@@ -466,14 +466,56 @@ export function useUpdateBuyPitch() {
   });
 }
 
+/**
+ * Delete a pitch and everything that only existed because of it.
+ *
+ * Notes, negotiation entries and documents cascade in the database. Two things
+ * do not, and both would outlive the deal:
+ *
+ *  - `follow_up_links` is polymorphic — `link_id` is text with no foreign key —
+ *    so a reminder set on this pitch would survive it and show up on Pending
+ *    Actions pointing at a deal that no longer exists.
+ *  - Files attached to notes live in storage, which knows nothing about rows.
+ *
+ * Both are cleaned up before the row goes, so a failure part-way leaves the
+ * pitch intact rather than stranded without its history.
+ */
 export function useDeleteBuyPitch() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      // Storage first: read the paths while the notes still exist.
+      const { data: notes } = await supabase
+        .from('buy_pitch_notes' as any)
+        .select('attachments')
+        .eq('buy_pitch_id', id);
+
+      const paths = (notes ?? [])
+        .flatMap((n: any) => (Array.isArray(n.attachments) ? n.attachments : []))
+        .map((a: any) => a?.path)
+        .filter((path: unknown): path is string => typeof path === 'string' && path.length > 0);
+
+      if (paths.length > 0) {
+        // A file we cannot remove is litter, not a reason to keep the deal.
+        const { error: storageErr } = await supabase.storage.from('pitch-attachments').remove(paths);
+        if (storageErr) console.warn('Left attachments behind:', storageErr.message);
+      }
+
+      const { error: linkErr } = await supabase
+        .from('follow_up_links' as any)
+        .delete()
+        .eq('link_type', 'buy_pitch')
+        .eq('link_id', id);
+      if (linkErr) throw linkErr;
+
       const { error } = await supabase.from('buy_pitches' as any).delete().eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['buy_pitches'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['buy_pitches'] });
+      // A reminder that lost its only link should stop showing as outstanding.
+      qc.invalidateQueries({ queryKey: ['follow_ups'] });
+    },
   });
 }
 
