@@ -6,8 +6,7 @@
 # is how a page that crashed on a missing field reached a user.
 #
 # Everything gated here is green as of the commit that adds it, so a red check
-# means something actually broke. Lint is the exception and is advisory — see
-# the note on that job.
+# means something actually broke.
 
 name: CI
 
@@ -24,7 +23,7 @@ concurrency:
 
 jobs:
   verify:
-    name: Typecheck, schema, tests, build
+    name: Typecheck, lint, schema, tests, build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,6 +41,11 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      # Zero errors. The 131 remaining `any`s are warnings under a --max-warnings
+      # ratchet, so the count can fall but a new one fails the build.
+      - name: Lint
+        run: npm run lint
+
       # Catches a migration that adds a column the generated types never learned
       # about. Reads the DDL, so it needs no database credentials.
       - name: Schema drift
@@ -53,18 +57,3 @@ jobs:
       - name: Build
         run: npm run build
 
-  lint:
-    name: Lint (advisory)
-    runs-on: ubuntu-latest
-    # ~180 pre-existing violations, and no-unused-vars is switched off in the
-    # config. Gating on a check that is red on day one just teaches people to
-    # ignore red. Make this required once the backlog is cleared.
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci --no-audit --no-fund
-      - run: npm run lint

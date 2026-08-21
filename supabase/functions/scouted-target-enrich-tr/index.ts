@@ -62,7 +62,7 @@ async function callProxy(path: string, token: string) {
     signal: AbortSignal.timeout(30000),
   });
   let json: any = null;
-  try { json = await r.json(); } catch (_) {}
+  try { json = await r.json(); } catch { /* non-JSON body — caller checks `ok` */ }
   return { ok: r.ok, status: r.status, json };
 }
 
@@ -164,7 +164,7 @@ Deno.serve(async (req) => {
     name?: string; dob?: string | null; club?: string | null;
     league?: string | null; trPlayerId?: number;
   } = {};
-  try { body = await req.json(); } catch (_) {}
+  try { body = await req.json(); } catch { /* no body — validated below */ }
   const name = (body.name || '').trim();
   const dob = body.dob ? String(body.dob).slice(0, 10) : null;
   const club = (body.club || '').trim();

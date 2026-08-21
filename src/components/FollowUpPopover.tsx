@@ -37,16 +37,16 @@ const FollowUpPopover = ({ target, contactId, contactName, contactClub, open, on
   const createFollowUp = useCreateFollowUp();
 
   // Resolve target — explicit prop wins, otherwise build from legacy contact props.
-  const resolvedTarget: FollowUpTarget | null = target
-    ? target
-    : contactId
-      ? {
-          type: 'contact',
-          id: contactId,
-          label: contactName || contactClub || 'Contact',
-          sublabel: contactClub,
-        }
-      : null;
+  const resolvedTarget: FollowUpTarget | null = useMemo(() => {
+    if (target) return target;
+    if (!contactId) return null;
+    return {
+      type: 'contact',
+      id: contactId,
+      label: contactName || contactClub || 'Contact',
+      sublabel: contactClub,
+    };
+  }, [target, contactId, contactName, contactClub]);
 
   const excludeKeys = useMemo(() => {
     const s = new Set<string>();

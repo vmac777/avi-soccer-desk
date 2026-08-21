@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   useBuyPitches, useAddBuyPitch, useUpdateBuyPitch, useScoutedTargets,
   useSetLossReason,
@@ -248,6 +248,9 @@ function CloseReasonDialog({ open, onCancel, onConfirm }: {
   );
 }
 
+const activeStrings = BUY_ACTIVE_STAGES as readonly string[];
+const closedStrings = BUY_CLOSED_STAGES as readonly string[];
+
 export default function BuyPitchesPage() {
   const { data: pitches = [], isLoading } = useBuyPitches();
   const { data: targets = [] } = useScoutedTargets();
@@ -319,7 +322,7 @@ export default function BuyPitchesPage() {
     };
   };
 
-  const matchesSearch = (p: BuyPitch) => {
+  const matchesSearch = useCallback((p: BuyPitch) => {
     if (!search) return true;
     const s = search.toLowerCase();
     const t = targetMap[p.scouted_target_id];
@@ -331,10 +334,7 @@ export default function BuyPitchesPage() {
       .filter(Boolean);
     return (t?.name || '').toLowerCase().includes(s)
       || sides.some((c) => (c.name || '').toLowerCase().includes(s) || (c.club || '').toLowerCase().includes(s));
-  };
-
-  const activeStrings = BUY_ACTIVE_STAGES as readonly string[];
-  const closedStrings = BUY_CLOSED_STAGES as readonly string[];
+  }, [search, targetMap, contactMap]);
 
   const activePitches = useMemo(() => {
     return pitches.filter(p => {
@@ -353,7 +353,7 @@ export default function BuyPitchesPage() {
       }
       return true;
     });
-  }, [pitches, search, targetMap, contactMap, bicFilter, posFilter]);
+  }, [pitches, matchesSearch, targetMap, bicFilter, posFilter]);
   const closedPitches = useMemo(() => pitches.filter(p => {
     if (!closedStrings.includes(p.stage)) return false;
     if (!matchesSearch(p)) return false;
@@ -362,7 +362,7 @@ export default function BuyPitchesPage() {
       if (!t || getPositionGroup(t.position) !== posFilter) return false;
     }
     return true;
-  }), [pitches, search, targetMap, contactMap, posFilter]);
+  }), [pitches, matchesSearch, targetMap, posFilter]);
 
   const signedPitches = useMemo(() => closedPitches.filter(p => p.stage === 'Signed'), [closedPitches]);
   const unsuccessfulClosed = useMemo(() => closedPitches.filter(p => p.stage !== 'Signed'), [closedPitches]);

@@ -165,6 +165,16 @@ const Dashboard = () => {
     );
   }, [allContacts, search]);
 
+  /**
+   * League → its clubs, from the clubs table rather than from who we know.
+   *
+   * Must stay above the `isLoading` early return. A hook after a conditional
+   * return runs on some renders and not others, and React throws "rendered
+   * more hooks than during the previous render" the moment loading finishes —
+   * which is every single page load.
+   */
+  const clubsByLeague = useMemo(() => clubsByLeagueFrom(allClubs), [allClubs]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -202,9 +212,6 @@ const Dashboard = () => {
     { label: 'Offered', value: offeredCount, color: 'text-status-pipeline' },
     { label: 'Negotiating', value: negotiatingCount, color: 'text-status-warm' },
   ];
-
-  /** League → its clubs, from the clubs table rather than from who we know. */
-  const clubsByLeague = useMemo(() => clubsByLeagueFrom(allClubs), [allClubs]);
 
   const markets = getMarketStats(contacts);
   // A league we hold no contacts in still exists, and an empty tile is the

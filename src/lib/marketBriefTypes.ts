@@ -96,7 +96,7 @@ export function defaultComparablePositions(position: string | null | undefined):
   if (!raw) return [];
 
   // Split composite positions like "DM/CM", "RB-CB", "LB, LWB" into individual codes.
-  const parts = raw.split(/[\/,\-|&+\s]+/).map(s => s.trim()).filter(Boolean);
+  const parts = raw.split(/[/,\-|&+\s]+/).map(s => s.trim()).filter(Boolean);
 
   const oneCode = (p: string): string[] => {
     switch (p) {

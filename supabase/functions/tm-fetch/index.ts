@@ -140,7 +140,7 @@ Deno.serve(async (req) => {
   if (!gate.ok) return gate.response;
 
   let body: { tmUrl?: string } = {};
-  try { body = await req.json(); } catch (_) {}
+  try { body = await req.json(); } catch { /* no body — handled by the checks below */ }
   const tmUrl = (body.tmUrl || '').trim();
   const m = tmUrl.match(TM_URL_RE);
   if (!m) {

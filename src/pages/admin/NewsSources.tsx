@@ -87,14 +87,14 @@ export default function NewsSources() {
   const toggleLeague = (k: string) => {
     setOpenLeagues((p) => {
       const n = new Set(p);
-      n.has(k) ? n.delete(k) : n.add(k);
+      if (n.has(k)) n.delete(k); else n.add(k);
       return n;
     });
   };
   const toggleClub = (id: string) => {
     setOpenClubs((p) => {
       const n = new Set(p);
-      n.has(id) ? n.delete(id) : n.add(id);
+      if (n.has(id)) n.delete(id); else n.add(id);
       return n;
     });
   };

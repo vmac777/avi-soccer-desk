@@ -89,7 +89,7 @@ const CrossLinkPicker = ({ followUpId, excludeKeys, onSelect, onClose }: CrossLi
     });
 
     return opts;
-  }, [contacts, scoutedTargets, , buyPitches]);
+  }, [contacts, scoutedTargets, buyPitches]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
