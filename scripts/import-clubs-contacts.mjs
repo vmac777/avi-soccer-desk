@@ -211,8 +211,12 @@ const { data: existing, error: readErr } = await supabase
   .from('contacts').select('club, contact_person');
 if (readErr) { console.error(`Could not read existing contacts: ${readErr.message}`); process.exit(1); }
 
-const seen = new Set((existing ?? []).map((c) => `${c.club}::${c.contact_person}`));
-const fresh = namedContacts.filter((c) => !seen.has(`${c.club}::${c.contact_person}`));
+// Compare on the same normalised form we write. Matching raw strings is how a
+// row already stored as "Joaquim Pinto " failed to match the trimmed "Joaquim
+// Pinto" this run produces, and the whole directory landed a second time.
+const dedupeKey = (club, person) => `${String(club).trim()}::${String(person ?? '').trim().toLowerCase()}`;
+const seen = new Set((existing ?? []).map((c) => dedupeKey(c.club, c.contact_person)));
+const fresh = namedContacts.filter((c) => !seen.has(dedupeKey(c.club, c.contact_person)));
 console.log(`contacts: ${fresh.length} new, ${namedContacts.length - fresh.length} already present`);
 
 let contactsOk = 0;
