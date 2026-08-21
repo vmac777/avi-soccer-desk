@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 import { CLIENT } from '@/config/client';
+import BrandMark from '@/components/BrandMark';
 
 const LoginPage = () => {
   const { signIn, session, profile, loading } = useAuthContext();
@@ -49,12 +50,10 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="w-full max-w-sm p-8 bg-card rounded-lg border border-border">
-        <div className="text-center mb-8">
-          <p className="text-[11px] tracking-[0.2em] font-bold text-primary uppercase mb-2">
-            {CLIENT.brandName}
-          </p>
+        <div className="flex flex-col items-center text-center mb-8">
+          <BrandMark height={56} className="mb-4" />
           <h1 className="text-xl font-medium text-foreground tracking-tight">
-            Player Trading Desk
+            {CLIENT.deskName}
           </h1>
         </div>
 

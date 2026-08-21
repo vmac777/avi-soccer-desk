@@ -12,13 +12,19 @@
 export interface ClientConfig {
   /** Stable slug. Used for ids and filenames, never displayed. */
   id: string;
-  /** Wordmark shown in the sidebar, app header, and login screen. */
-  brandName: string;
+  // The sidebar, header and login screen render the logo itself now, so there
+  // is no wordmark string. `pdfBrandMark` below is separate and still used: a
+  // document sets the name in type beside the mark.
   /** Short name used in records and defaults. */
   shortName: string;
   /** Full legal entity name. */
   legalName: string;
-  /** Desk label shown under the brand. */
+  /**
+   * Desk label shown beside the logo and on the login screen.
+   *
+   * Whose desk this is, not what kind of desk it is — an agency's book belongs
+   * to the agent who runs it.
+   */
   deskName: string;
   /** Logo path, relative to the public/ root. */
   logoPath: string;
@@ -36,10 +42,9 @@ export interface ClientConfig {
 
 const aviSoccer: ClientConfig = {
   id: 'avi-soccer',
-  brandName: 'AVI SOCCER',
   shortName: 'AVI Soccer',
   legalName: 'AVI Soccer',
-  deskName: 'Representation Desk',
+  deskName: 'Julio Taran',
   logoPath: '/brand/avi-soccer-primary-horizontal.png',
   logoPathReversed: '/brand/avi-soccer-primary-horizontal-white.png',
   pdfBrandMark: 'AVI SOCCER',

@@ -320,10 +320,16 @@ export default function ExportPdfDialog({ player, open, onClose }: ExportPdfDial
         {/* Page header with client logo */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #2a2118', paddingBottom: 16, marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {/* The reversed mark, not the colour one. This page is filled
+                near-black (setFillColor(13, 10, 6) above) and the colour logo's
+                letterform is Ink Navy — it was invisible against it, leaving
+                only the gold stripes on every document a club received.
+                Height drives the size so the 2:1 lockup is not letterboxed
+                inside a portrait box. */}
             <img
-              src={CLIENT.logoPath}
+              src={CLIENT.logoPathReversed}
               alt={CLIENT.shortName}
-              style={{ width: 43, height: 48, objectFit: 'contain', display: 'block', flexShrink: 0 }}
+              style={{ height: 34, width: 'auto', display: 'block', flexShrink: 0 }}
             />
 
             <div>

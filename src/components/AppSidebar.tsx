@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
 import { useFollowUpBadgeCount } from '@/hooks/useFollowUps';
-import { CLIENT } from '@/config/client';
+import BrandMark from '@/components/BrandMark';
 
 interface NavItem {
   to: string;
@@ -72,9 +72,7 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
     <>
       {/* Brand */}
       <div className="h-14 flex items-center px-5 border-b border-border">
-        <span className="text-[11px] tracking-[0.2em] font-bold text-primary uppercase">
-          {CLIENT.brandName}
-        </span>
+        <BrandMark height={26} />
       </div>
 
       {/* Navigation */}
