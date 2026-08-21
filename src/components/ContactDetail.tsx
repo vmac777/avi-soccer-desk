@@ -16,7 +16,6 @@ import FollowUpPopover from '@/components/FollowUpPopover';
 import FollowUpBanner from '@/components/FollowUpBanner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
 import { todayKey } from '@/lib/dateKeys';
 
 const STAGES = ['', 'Contacted - No Answer', 'Contacted', 'Offered', 'Negotiating', 'Closed Won', 'Closed Lost', 'Dormant'];
@@ -42,10 +41,17 @@ const PrimaryContactToggle = ({ contact }: { contact: any }) => {
   );
 };
 
-const panelVariants = {
-  hidden: { x: '100%', transition: { type: 'spring' as const, damping: 30, stiffness: 300 } },
-  visible: { x: 0, transition: { type: 'spring' as const, damping: 30, stiffness: 300 } },
-};
+/**
+ * The slide-in, in CSS.
+ *
+ * This was a framer-motion spring, which cost about 60 kB gzipped on the two
+ * most-used pages to animate one element. The exit half never ran at all:
+ * `AnimatePresence` can only animate an unmount it controls, and every caller
+ * renders this as `{selectedId && <ContactDetail/>}`, so the parent tears it
+ * down before any exit could play. FollowUpDetailPanel already slides with a
+ * plain transition and looks the same.
+ */
+const PANEL_ENTER = 'animate-in slide-in-from-right duration-300 ease-out';
 
 const ContactDetail = ({ contactId, onClose }: ContactDetailProps) => {
   const { data: contact, isLoading } = useContact(contactId);
@@ -78,21 +84,15 @@ const ContactDetail = ({ contactId, onClose }: ContactDetailProps) => {
 
   if (isLoading || !contact) {
     return (
-      <AnimatePresence>
-        <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
-          <div className="absolute inset-0 bg-background/60" />
-          <motion.div
-            variants={panelVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            className={cn(DETAIL_PANEL_WIDTH, 'relative h-full bg-card border-l border-border p-6 flex items-center justify-center')}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <span className="text-muted-foreground font-mono text-sm">Loading...</span>
-          </motion.div>
+      <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
+        <div className="absolute inset-0 bg-background/60" />
+        <div
+          className={cn(DETAIL_PANEL_WIDTH, PANEL_ENTER, 'relative h-full bg-card border-l border-border p-6 flex items-center justify-center')}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <span className="text-muted-foreground font-mono text-sm">Loading...</span>
         </div>
-      </AnimatePresence>
+      </div>
     );
   }
 
@@ -156,15 +156,10 @@ const ContactDetail = ({ contactId, onClose }: ContactDetailProps) => {
   };
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
         <div className="absolute inset-0 bg-background/60" />
-        <motion.div
-          variants={panelVariants}
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          className={cn(DETAIL_PANEL_WIDTH, 'relative h-full bg-card border-l border-border overflow-y-auto')}
+        <div
+          className={cn(DETAIL_PANEL_WIDTH, PANEL_ENTER, 'relative h-full bg-card border-l border-border overflow-y-auto')}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -517,9 +512,8 @@ const ContactDetail = ({ contactId, onClose }: ContactDetailProps) => {
               />
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
-    </AnimatePresence>
   );
 };
 

@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
 
 interface MoveContactDialogProps {
   contactId: string;
@@ -81,10 +80,8 @@ const MoveContactDialog = ({ contactId, currentMarket, currentClub, onClose }: M
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-background/60" />
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="relative w-full max-w-[380px] mx-4 bg-card border border-border rounded-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto"
+      <div
+        className="animate-in fade-in-0 zoom-in-95 duration-200 relative w-full max-w-[380px] mx-4 bg-card border border-border rounded-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
@@ -205,7 +202,7 @@ const MoveContactDialog = ({ contactId, currentMarket, currentClub, onClose }: M
             </div>
           </div>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 };

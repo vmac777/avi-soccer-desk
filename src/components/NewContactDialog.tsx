@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
 
 const STAGES = ['', 'Contacted - No Answer', 'Contacted', 'Offered', 'Negotiating', 'Closed Won', 'Closed Lost', 'Dormant'];
 
@@ -94,10 +93,8 @@ const NewContactDialog = ({ onClose }: NewContactDialogProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-background/60" />
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="relative w-full max-w-[400px] mx-4 bg-card border border-border rounded-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto"
+      <div
+        className="animate-in fade-in-0 zoom-in-95 duration-200 relative w-full max-w-[400px] mx-4 bg-card border border-border rounded-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
@@ -219,7 +216,7 @@ const NewContactDialog = ({ onClose }: NewContactDialogProps) => {
           <Button onClick={onClose} variant="outline" className="h-8 text-xs border-border">Cancel</Button>
           <Button onClick={handleSubmit} className="h-8 text-xs bg-primary text-primary-foreground">Create</Button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
