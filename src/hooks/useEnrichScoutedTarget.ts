@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { ScoutedTarget } from './useBuyData';
+import type { FieldProvenance } from '@/lib/rosterData';
 
 interface EnrichArgs {
   targetId: string;
@@ -93,9 +94,86 @@ async function runTr(args: TrArgs) {
 
 const BIO_KEYS = ['position', 'date_of_birth', 'age', 'nationality', 'height', 'foot', 'contract_end', 'market_value', 'photo_url'] as const;
 
+/**
+ * Database column -> the `data_provenance` key for the same fact.
+ *
+ * Provenance is keyed by the camelCase field the dossier and the PDF read, so
+ * writing a column without translating the name here leaves the value looking
+ * unsourced and keeps it off client documents.
+ */
+const PROVENANCE_KEY: Record<string, string> = {
+  position: 'position',
+  age: 'age',
+  date_of_birth: 'dob',
+  nationality: 'nationality',
+  height: 'height',
+  foot: 'foot',
+  photo_url: 'photoUrl',
+  contract_end: 'contractEndDate',
+  market_value: 'marketValue',
+  current_club: 'currentClub',
+  league: 'league',
+};
+
 async function applyPatch(id: string, patch: Patch) {
   if (Object.keys(patch).length === 0) return;
   await supabase.from('scouted_targets' as any).update(patch as any).eq('id', id);
+}
+
+/**
+ * Write an enrichment patch without trampling what the agency already knows.
+ *
+ * Two rules, both there for the same reason: a contract date is the field an
+ * agent acts on, and a wrong one sends them to a club in the wrong window.
+ *
+ *  1. A field the agency marked `verified` is theirs. A public source does not
+ *     get to silently replace it. Where the two disagree the incoming value is
+ *     dropped and the disagreement is written into enrichment_notes, so a human
+ *     decides rather than the last writer winning.
+ *  2. Every field this does write is stamped with the source that produced it,
+ *     so the dossier can badge it and the PDF can print it.
+ */
+async function applyEnrichment(id: string, patch: Patch, source: FieldProvenance) {
+  const values = Object.entries(patch).filter(([k]) => !k.startsWith('__tr_'));
+  if (values.length === 0) return;
+
+  const { data: row } = await supabase
+    .from('scouted_targets' as any)
+    .select('data_provenance, enrichment_notes, ' + Object.keys(PROVENANCE_KEY).join(','))
+    .eq('id', id)
+    .maybeSingle();
+
+  const provenance: Record<string, string> = { ...((row as any)?.data_provenance ?? {}) };
+  const conflicts: string[] = [];
+  const write: Record<string, unknown> = {};
+
+  for (const [column, value] of values) {
+    const pKey = PROVENANCE_KEY[column];
+    if (!pKey) {
+      // Not a fact the documents gate on (statuses, tr_data, ids).
+      write[column] = value;
+      continue;
+    }
+    const current = (row as any)?.[column];
+    const held = provenance[pKey];
+    const differs = current != null && current !== '' && String(current) !== String(value);
+
+    if (held === 'verified' && differs) {
+      conflicts.push(`${column}: we hold ${current}, ${source} says ${value}`);
+      continue;
+    }
+    write[column] = value;
+    provenance[pKey] = source;
+  }
+
+  write.data_provenance = provenance;
+  if (conflicts.length > 0) {
+    const prior = (row as any)?.enrichment_notes;
+    const note = `Conflicts with our record — ${conflicts.join('; ')}.`;
+    write.enrichment_notes = prior && !prior.includes(note) ? `${prior} ${note}` : note;
+  }
+
+  await applyPatch(id, write as Patch);
 }
 
 async function applyTrWithBackfill(id: string, trPatch: Patch, tmKeys: Set<string>) {
@@ -105,7 +183,7 @@ async function applyTrWithBackfill(id: string, trPatch: Patch, tmKeys: Set<strin
     if (k.startsWith('__tr_')) bio[k.replace('__tr_', '')] = v;
     else main[k] = v;
   }
-  await applyPatch(id, main as Patch);
+  await applyEnrichment(id, main as Patch, 'transferroom');
   if (Object.keys(bio).length === 0) return;
   // Skip bio fields TM already filled in this run; backfill the rest only when empty
   const candidates: Record<string, any> = {};
@@ -124,7 +202,57 @@ async function applyTrWithBackfill(id: string, trPatch: Patch, tmKeys: Set<strin
     const cur = (row as any)?.[k];
     if (cur == null || cur === '' || cur === 0) fill[k] = v;
   }
-  if (Object.keys(fill).length > 0) await applyPatch(id, fill as Patch);
+  if (Object.keys(fill).length > 0) await applyEnrichment(id, fill as Patch, 'transferroom');
+}
+
+/**
+ * Enrich one existing row from the sources named.
+ *
+ * The single entry point for enriching a player already in the roster, used by
+ * the per-player retry, the dossier's enrich action, and the bulk run over a
+ * whole roster. Resolves to what each source did, so a caller running through
+ * ninety-five players can report which ones came back empty.
+ */
+export async function enrichTarget(
+  target: ScoutedTarget,
+  sources: ('tm' | 'tr')[] = ['tm', 'tr'],
+): Promise<{ tm: 'ok' | 'failed' | 'skipped'; tr: 'ok' | 'failed' | 'skipped' }> {
+  const result = { tm: 'skipped' as const, tr: 'skipped' as const } as {
+    tm: 'ok' | 'failed' | 'skipped';
+    tr: 'ok' | 'failed' | 'skipped';
+  };
+
+  let tmKeys = new Set<string>();
+  let tmDob: string | undefined;
+
+  if (sources.includes('tm') && target.tm_link) {
+    const tmRes = await runTm({ id: target.id, tmUrl: target.tm_link, current_club: target.current_club });
+    await applyEnrichment(target.id, tmRes, 'transfermarkt');
+    tmKeys = new Set(Object.keys(tmRes));
+    tmDob = (tmRes as any)?.date_of_birth;
+    result.tm = (tmRes as any)?.tm_status === 'ok' ? 'ok' : 'failed';
+  }
+
+  if (sources.includes('tr')) {
+    // A date of birth is what separates two players of the same name, so if TM
+    // just found one, use it before giving up on the TransferRoom match.
+    let trRes = await runTr({
+      name: target.name,
+      club: target.current_club,
+      league: target.league,
+      dob: target.date_of_birth ?? tmDob ?? null,
+      trPlayerId: target.tr_player_id ?? null,
+    });
+    if ((trRes as any)?.tr_status === 'failed' && tmDob && !target.date_of_birth) {
+      trRes = await runTr({
+        name: target.name, club: target.current_club, league: target.league, dob: tmDob,
+      });
+    }
+    await applyTrWithBackfill(target.id, trRes, tmKeys);
+    result.tr = (trRes as any)?.tr_status === 'ok' ? 'ok' : 'failed';
+  }
+
+  return result;
 }
 
 export function useEnrichScoutedTarget() {
@@ -136,7 +264,7 @@ export function useEnrichScoutedTarget() {
     const trPromise = runTr({ name: args.name, club: args.current_club, league: args.league });
 
     const tmRes = await tmPromise;
-    await applyPatch(args.targetId, tmRes);
+    await applyEnrichment(args.targetId, tmRes, 'transfermarkt');
     const tmKeys = new Set(Object.keys(tmRes));
 
     let trRes = await trPromise;
@@ -158,23 +286,7 @@ export function useEnrichScoutedTarget() {
       if (sources.includes('tr')) pendingPatch.tr_status = 'pending';
       await applyPatch(target.id, pendingPatch);
       qc.invalidateQueries({ queryKey: ['scouted_targets'] });
-
-      let tmKeys = new Set<string>();
-      if (sources.includes('tm') && target.tm_link) {
-        const tmRes = await runTm({ id: target.id, tmUrl: target.tm_link, current_club: target.current_club });
-        await applyPatch(target.id, tmRes);
-        tmKeys = new Set(Object.keys(tmRes));
-      }
-      if (sources.includes('tr')) {
-        const trRes = await runTr({
-          name: target.name,
-          club: target.current_club,
-          league: target.league,
-          dob: target.date_of_birth ?? null,
-          trPlayerId: target.tr_player_id ?? null,
-        });
-        await applyTrWithBackfill(target.id, trRes, tmKeys);
-      }
+      await enrichTarget(target, sources);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['scouted_targets'] }),
   });

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ScoutedTarget } from '@/hooks/useBuyData';
 
 /**
@@ -30,12 +31,15 @@ vi.mock('@/components/SetReminderButton', () => ({
 import RosterPlayerPage from './RosterPlayerPage';
 
 function mount(id: string) {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
-    <MemoryRouter initialEntries={[`/roster/${id}`]}>
-      <Routes>
-        <Route path="/roster/:id" element={<RosterPlayerPage />} />
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={qc}>
+      <MemoryRouter initialEntries={[`/roster/${id}`]}>
+        <Routes>
+          <Route path="/roster/:id" element={<RosterPlayerPage />} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 

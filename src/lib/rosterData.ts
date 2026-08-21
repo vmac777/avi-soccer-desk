@@ -37,7 +37,18 @@ export interface TransferHistoryEntry {
  * `placeholder` fields are badged in the UI, excluded from client-facing PDFs,
  * and ignored by the matching engine.
  */
-export type FieldProvenance = 'verified' | 'transfermarkt' | 'placeholder';
+/**
+ * Where a value came from, which decides whether it may be printed on a
+ * document going to a club.
+ *
+ *   verified      the agency's own knowledge — their list, their conversation
+ *   transfermarkt | transferroom   a public or third-party source
+ *   placeholder   nobody's knowledge; a value we put there to fill the shape
+ *
+ * `verified` is the only one that outranks an automated source, and enrichment
+ * will not overwrite it — see applyEnrichment in useEnrichScoutedTarget.
+ */
+export type FieldProvenance = 'verified' | 'transfermarkt' | 'transferroom' | 'placeholder';
 
 /** Keyed by RosterPlayer field name. Absent key means unknown, treated as placeholder. */
 export type DataProvenance = Partial<Record<keyof RosterPlayer, FieldProvenance>>;

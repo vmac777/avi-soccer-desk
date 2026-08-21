@@ -4,13 +4,14 @@ import { useScoutedTargets, useAddScoutedTarget, useUpdateScoutedTarget, useDele
 import { useContacts, useCreateContact } from '@/hooks/useData';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnrichScoutedTarget } from '@/hooks/useEnrichScoutedTarget';
+import { useBulkEnrich, needsEnrichment } from '@/hooks/useBulkEnrich';
 import { AddScoutedTargetSheet } from '@/components/AddScoutedTargetSheet';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Plus, LayoutGrid, List, Trash2, Pencil, X, Link as LinkIcon, SendHorizonal, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Search, Plus, LayoutGrid, List, Trash2, Pencil, X, Link as LinkIcon, SendHorizonal, RefreshCw, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 
@@ -465,9 +466,60 @@ function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, 
   );
 }
 
+/**
+ * Runs the whole roster through enrichment.
+ *
+ * An imported roster is names and links; everything a club document needs is
+ * still to be fetched. The count is the point of the label — it says how much
+ * of the roster is still only a name.
+ */
+function BulkEnrichButton({ targets, bulk }: {
+  targets: ScoutedTarget[];
+  bulk: ReturnType<typeof useBulkEnrich>;
+}) {
+  const pending = useMemo(() => targets.filter(needsEnrichment).length, [targets]);
+  const { running, done, total, failed, current } = bulk.progress;
+
+  if (running) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] text-muted-foreground font-mono">
+          {done}/{total}
+          {current && <span className="ml-1.5 text-muted-foreground/70">{current}</span>}
+          {failed > 0 && <span className="ml-1.5 text-amber-400">{failed} failed</span>}
+        </span>
+        <Button variant="outline" onClick={bulk.cancel} className="h-8 text-xs">
+          Stop
+        </Button>
+      </div>
+    );
+  }
+
+  if (pending === 0) return null;
+
+  return (
+    <Button
+      variant="outline"
+      className="h-8 text-xs"
+      onClick={async () => {
+        const r = await bulk.run(targets);
+        if (r.failed > 0) {
+          toast.warning(`Enriched ${r.done - r.failed} of ${r.total}. ${r.failed} could not be read.`);
+        } else {
+          toast.success(`Enriched ${r.done} ${r.done === 1 ? 'player' : 'players'}.`);
+        }
+      }}
+      title="Fetch photo, date of birth, height, foot, contract and valuation from each player's Transfermarkt link"
+    >
+      <Sparkles className="h-3.5 w-3.5 mr-1" /> Enrich {pending}
+    </Button>
+  );
+}
+
 export default function ScoutedTargetsPage() {
   const navigate = useNavigate();
   const { data: targets = [], isLoading } = useScoutedTargets();
+  const bulk = useBulkEnrich();
   const { data: contacts = [] } = useContacts();
   const addMutation = useAddScoutedTarget();
   const updateMutation = useUpdateScoutedTarget();
@@ -606,6 +658,7 @@ export default function ScoutedTargetsPage() {
               <List className="h-3.5 w-3.5" />
             </button>
           </div>
+          <BulkEnrichButton targets={targets} bulk={bulk} />
           <Button onClick={() => setShowCreate(true)} className="h-8 text-xs bg-primary text-primary-foreground">
             <Plus className="h-3.5 w-3.5 mr-1" /> Add Player
           </Button>

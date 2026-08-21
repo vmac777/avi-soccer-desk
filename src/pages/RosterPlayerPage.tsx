@@ -1,8 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, FileDown, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, FileDown, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useScoutedTargets } from '@/hooks/useBuyData';
+import { enrichTarget } from '@/hooks/useEnrichScoutedTarget';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { toRosterPlayer } from '@/lib/rosterMapping';
 import {
   getAge,
@@ -80,11 +83,27 @@ export default function RosterPlayerPage() {
   const navigate = useNavigate();
   const { data: targets = [], isLoading } = useScoutedTargets();
   const [showPdf, setShowPdf] = useState(false);
+  const [enriching, setEnriching] = useState(false);
+  const qc = useQueryClient();
 
-  const player = useMemo(() => {
-    const row = targets.find((t) => t.id === id || t.slug === id);
-    return row ? toRosterPlayer(row) : undefined;
-  }, [targets, id]);
+  const row = useMemo(() => targets.find((t) => t.id === id || t.slug === id), [targets, id]);
+
+  const enrich = async () => {
+    if (!row) return;
+    setEnriching(true);
+    try {
+      const r = await enrichTarget(row);
+      qc.invalidateQueries({ queryKey: ['scouted_targets'] });
+      if (r.tm === 'failed' && r.tr !== 'ok') toast.error('Could not read either source.');
+      else if (r.tm === 'failed') toast.warning('Transfermarkt could not be read; TransferRoom data updated.');
+      else if (r.tr === 'failed') toast.warning('Updated from Transfermarkt. No TransferRoom match.');
+      else toast.success('Updated.');
+    } finally {
+      setEnriching(false);
+    }
+  };
+
+  const player = useMemo(() => (row ? toRosterPlayer(row) : undefined), [row]);
 
   if (isLoading) {
     return <div className="p-6 text-xs font-mono text-muted-foreground">Loading…</div>;
@@ -118,6 +137,20 @@ export default function RosterPlayerPage() {
           <SetReminderButton
             target={{ type: 'scouted_target', id: player.id, label: player.name, sublabel: player.currentClub }}
           />
+          <Button
+            variant="outline"
+            onClick={enrich}
+            disabled={enriching || !player.tmLink}
+            className="h-7 text-[11px]"
+            title={player.tmLink
+              ? 'Refetch from Transfermarkt and TransferRoom'
+              : 'No Transfermarkt link on this player'}
+          >
+            {enriching
+              ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+              : <Sparkles className="h-3.5 w-3.5 mr-1" />}
+            {enriching ? 'Fetching…' : 'Enrich'}
+          </Button>
           <Button
             onClick={() => setShowPdf(true)}
             className="h-7 text-[11px] bg-primary text-primary-foreground hover:bg-primary/90"
