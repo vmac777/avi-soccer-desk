@@ -3,28 +3,26 @@ import { supabase } from '@/integrations/supabase/client';
 import type { ContactEnriched, Interaction, Player, PlayerClubLink } from '@/lib/supabase';
 import type { TablesInsert } from '@/integrations/supabase/types';
 import { todayKey } from '@/lib/dateKeys';
+import { fetchAllRows } from '@/lib/fetchAllRows';
 
 // Contacts
 export function useContacts() {
   return useQuery({
     queryKey: ['contacts_enriched'],
     queryFn: async () => {
-      const allData: ContactEnriched[] = [];
-      let from = 0;
-      const pageSize = 1000;
-      while (true) {
-        const { data, error } = await supabase
+      const rows = await fetchAllRows((from, to) =>
+        supabase
           .from('contacts_enriched')
           .select('*')
           .order('market', { ascending: true })
           .order('club', { ascending: true })
-          .range(from, from + pageSize - 1);
-        if (error) throw error;
-        allData.push(...(data as ContactEnriched[]));
-        if (data.length < pageSize) break;
-        from += pageSize;
-      }
-      return allData;
+          .range(from, to),
+      );
+      // Every column of a view types as nullable — Postgres cannot carry a NOT
+      // NULL guarantee through one — but each row here is a contacts row with
+      // its primary key. One assertion at the boundary rather than a cast on
+      // the query itself, which would have hidden the column names too.
+      return rows as ContactEnriched[];
     },
   });
 }

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { todayKey } from '@/lib/dateKeys';
+import { fetchAllRows } from '@/lib/fetchAllRows';
 
 export type FollowUpTargetType =
   | 'contact'
@@ -46,12 +47,16 @@ export function useFollowUps() {
   return useQuery({
     queryKey: ['follow_ups'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('follow_ups')
-        .select('*')
-        .order('due_date', { ascending: true });
-      if (error) throw error;
-      return data as unknown as FollowUp[];
+      const rows = await fetchAllRows((from, to) =>
+        supabase
+          .from('follow_ups')
+          .select('*')
+          .order('due_date', { ascending: true })
+          .range(from, to),
+      );
+      // `target_type` is a CHECK-constrained text column, so it arrives as
+      // `string`; FollowUp narrows it to the three values the check allows.
+      return rows as FollowUp[];
     },
   });
 }
