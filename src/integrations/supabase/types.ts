@@ -234,6 +234,48 @@ export type Database = {
           },
         ]
       }
+      client_errors: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          component_stack: string | null
+          id: string
+          kind: string
+          message: string
+          occurred_at: string
+          route: string | null
+          stack: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          component_stack?: string | null
+          id?: string
+          kind: string
+          message: string
+          occurred_at?: string
+          route?: string | null
+          stack?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          component_stack?: string | null
+          id?: string
+          kind?: string
+          message?: string
+          occurred_at?: string
+          route?: string | null
+          stack?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       club_briefs: {
         Row: {
           angle: string
@@ -305,6 +347,74 @@ export type Database = {
             columns: ["generated_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_requirements: {
+        Row: {
+          age_max: number | null
+          age_min: number | null
+          budget_max: number | null
+          budget_min: number | null
+          contact_id: string
+          created_at: string
+          created_by: string | null
+          foot: string | null
+          id: string
+          league_experience: string[]
+          needs_eu_passport: boolean
+          notes: string | null
+          position: string
+          salary_max: number | null
+          status: string
+          updated_at: string
+          window_target: string | null
+        }
+        Insert: {
+          age_max?: number | null
+          age_min?: number | null
+          budget_max?: number | null
+          budget_min?: number | null
+          contact_id: string
+          created_at?: string
+          created_by?: string | null
+          foot?: string | null
+          id?: string
+          league_experience?: string[]
+          needs_eu_passport?: boolean
+          notes?: string | null
+          position: string
+          salary_max?: number | null
+          status?: string
+          updated_at?: string
+          window_target?: string | null
+        }
+        Update: {
+          age_max?: number | null
+          age_min?: number | null
+          budget_max?: number | null
+          budget_min?: number | null
+          contact_id?: string
+          created_at?: string
+          created_by?: string | null
+          foot?: string | null
+          id?: string
+          league_experience?: string[]
+          needs_eu_passport?: boolean
+          notes?: string | null
+          position?: string
+          salary_max?: number | null
+          status?: string
+          updated_at?: string
+          window_target?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_requirements_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
         ]

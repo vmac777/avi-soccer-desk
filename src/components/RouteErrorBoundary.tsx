@@ -1,15 +1,17 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { reportError } from '@/lib/reportError';
 
 /**
  * Keeps a crash inside one page from taking the app down.
  *
- * `strictNullChecks` is off in this project, so a component reading a field the
- * database has not filled in yet type-checks fine and throws at render. React
- * unmounts the whole tree on an unhandled render error — the desk goes blank,
- * navigation included, with nothing on screen to say why. On a desk somebody is
- * working live deals on, that is the difference between "this section is broken"
- * and "the tool is gone".
+ * React unmounts the whole tree on an unhandled render error — the desk goes
+ * blank, navigation included, with nothing on screen to say why. On a desk
+ * somebody is working live deals on, that is the difference between "this
+ * section is broken" and "the tool is gone".
+ *
+ * The crash is also filed to `client_errors`, so finding out no longer depends
+ * on the person who hit it thinking to mention it.
  */
 interface State {
   error: Error | null;
@@ -24,6 +26,7 @@ export default class RouteErrorBoundary extends Component<{ children: ReactNode 
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('Route crashed:', error, info.componentStack);
+    void reportError(error, 'render', info.componentStack);
   }
 
   render() {

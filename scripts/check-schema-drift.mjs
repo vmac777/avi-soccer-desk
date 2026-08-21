@@ -59,6 +59,25 @@ const dropped = new Set();
 
 for (const file of readdirSync(MIGRATIONS).filter(f => f.endsWith('.sql')).sort()) {
   const sql = readFileSync(join(MIGRATIONS, file), 'utf8');
+
+  // CREATE TABLE, not just ALTER. The first version of this check only read
+  // ALTER TABLE, so a brand new table was invisible to it — `client_errors`
+  // went in and only the compiler objected.
+  const creates = sql.matchAll(
+    /CREATE TABLE\s+(?:IF NOT EXISTS\s+)?(?:public\.)?(\w+)\s*\(([\s\S]*?)\n\s*\);/gi,
+  );
+  for (const [, table, body] of creates) {
+    for (const line of body.split('\n')) {
+      // Column definitions only: skip constraints, and skip anything indented
+      // past the first level, which is a continuation of the line above.
+      const m = /^\s{2}(\w+)\s+[a-zA-Z]/.exec(line);
+      if (!m) continue;
+      const col = m[1];
+      if (/^(primary|foreign|unique|check|constraint|exclude)$/i.test(col)) continue;
+      added.set(`${table}.${col}`, file);
+    }
+  }
+
   const alters = sql.matchAll(/ALTER TABLE\s+(?:public\.)?(\w+)([\s\S]*?);/gi);
   for (const [, table, body] of alters) {
     for (const [, col] of body.matchAll(/ADD COLUMN\s+(?:IF NOT EXISTS\s+)?(\w+)/gi)) {
@@ -70,6 +89,12 @@ for (const file of readdirSync(MIGRATIONS).filter(f => f.endsWith('.sql')).sort(
     }
     for (const [, col] of body.matchAll(/DROP COLUMN\s+(?:IF EXISTS\s+)?(\w+)/gi)) {
       dropped.add(`${table}.${col}`);
+    }
+  }
+
+  for (const [, table] of sql.matchAll(/DROP TABLE\s+(?:IF EXISTS\s+)?(?:public\.)?(\w+)/gi)) {
+    for (const key of [...added.keys()]) {
+      if (key.startsWith(`${table}.`)) added.delete(key);
     }
   }
 }
