@@ -4,7 +4,7 @@ import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useAuth } from '@/hooks/useAuth';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { X, Plus } from 'lucide-react';
+import { X } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 

@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import {
   useBuyPitches, useAddBuyPitch, useUpdateBuyPitch, useScoutedTargets,
   useSetLossReason,
-  BUY_ACTIVE_STAGES, BUY_CLOSED_STAGES, BUY_ALL_STAGES,
+  BUY_ACTIVE_STAGES, BUY_CLOSED_STAGES,
   CLOSED_STAGE_TO_LOSS_REASON,
   type BuyPitch, type BuyPitchStage, type ScoutedTarget, type BallInCourt,
 } from '@/hooks/useBuyData';
@@ -400,12 +400,6 @@ export default function BuyPitchesPage() {
       toast.error(e.message);
     }
   };
-
-  const closedCounts = useMemo(() => {
-    const m: Record<string, number> = {};
-    closedPitches.forEach(p => { m[p.stage] = (m[p.stage] || 0) + 1; });
-    return m;
-  }, [closedPitches]);
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-64"><span className="text-muted-foreground font-mono text-sm">Loading...</span></div>;

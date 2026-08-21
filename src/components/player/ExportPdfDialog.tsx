@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { RosterPlayer as Player, eurToM, formatHeight, getAge, getPositionGroup, parsePlayerDob, hasCommercialData, hasTrData, getLatestXtvM, getXtvChange6mPct, getXtvChange12mPct, isPrintable } from '@/lib/rosterData';
+import { RosterPlayer as Player, eurToM, formatHeight, getAge, parsePlayerDob, hasCommercialData, hasTrData, getLatestXtvM, getXtvChange6mPct, getXtvChange12mPct, isPrintable } from '@/lib/rosterData';
 import { formatCurrency } from '@/lib/currency';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { Download, Loader2, FileDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { t, tr, formatPdfDate, Lang } from '@/lib/pdfTranslations';
+import { tr, formatPdfDate, Lang } from '@/lib/pdfTranslations';
 import { useTrTeamHistory, findTrFee } from '@/hooks/useTrTeamHistory';
 import { CLIENT } from '@/config/client';
 

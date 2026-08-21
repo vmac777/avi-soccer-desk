@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useScoutedTargets, useAddScoutedTarget, useUpdateScoutedTarget, useDeleteScoutedTarget, useAddBuyPitch, type ScoutedTarget } from '@/hooks/useBuyData';
+import { useScoutedTargets, useUpdateScoutedTarget, useDeleteScoutedTarget, useAddBuyPitch, type ScoutedTarget } from '@/hooks/useBuyData';
 import { useContacts, useCreateContact } from '@/hooks/useData';
 import { useClubs } from '@/hooks/useClubsAndSources';
 import ClubContactPicker from '@/components/ClubContactPicker';
@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Plus, LayoutGrid, List, Trash2, Pencil, X, Link as LinkIcon, SendHorizonal, RefreshCw, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
+import { Search, Plus, LayoutGrid, List, Trash2, Pencil, Link as LinkIcon, SendHorizonal, RefreshCw, AlertTriangle, Sparkles } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 
@@ -67,7 +67,7 @@ function contractEndDisplay(dateStr?: string | null) {
   return { text, className: '' };
 }
 
-const tenureBadge = (tenure: string | null) => {
+const tenureBadge = (tenure: string | null | undefined) => {
   switch (tenure) {
     case 'loan':       return { label: 'LOAN',      className: 'bg-amber-500/15 text-amber-300 border-amber-500/30' };
     case 'free_agent': return { label: 'FREE',      className: 'bg-rose-500/15 text-rose-300 border-rose-500/30' };
@@ -107,13 +107,6 @@ interface TargetFormData {
   has_valuation: string;
   valuation_url: string;
 }
-
-const emptyForm: TargetFormData = {
-  name: '', position: '', age: '', date_of_birth: '', nationality: '', league: '', current_club: '',
-  contract_end: '', market_value: '', height: '', foot: '', photo_url: '',
-  salary_estimate: '', agent_name: '', agent_contact: '', priority_ranking: 'Medium', notes: '',
-  tm_link: '', has_valuation: 'No', valuation_url: '',
-};
 
 function TargetFormDialog({ open, onClose, initial, onSubmit, title, leagueClubMap }: {
   open: boolean; onClose: () => void; initial: TargetFormData; onSubmit: (d: TargetFormData) => void; title: string;
@@ -587,7 +580,6 @@ export default function ScoutedTargetsPage() {
   const bulk = useBulkEnrich();
   const { data: contacts = [] } = useContacts();
   const { data: allClubs = [] } = useClubs();
-  const addMutation = useAddScoutedTarget();
   const updateMutation = useUpdateScoutedTarget();
   const deleteMutation = useDeleteScoutedTarget();
   const addPitch = useAddBuyPitch();
@@ -646,37 +638,6 @@ export default function ScoutedTargetsPage() {
 
     return list;
   }, [targets, posFilter, search, sortBy]);
-
-  const handleCreate = async (form: TargetFormData) => {
-    try {
-      await addMutation.mutateAsync({
-        name: form.name,
-        position: form.position,
-        age: form.age ? Number(form.age) : null,
-        date_of_birth: form.date_of_birth || null,
-        nationality: form.nationality,
-        league: form.league,
-        current_club: form.current_club,
-        contract_end: form.contract_end || null,
-        market_value: form.market_value ? Number(form.market_value) : null,
-        height: form.height,
-        foot: form.foot,
-        photo_url: form.photo_url,
-        salary_estimate: form.salary_estimate ? Number(form.salary_estimate) : null,
-        agent_name: form.agent_name,
-        agent_contact: form.agent_contact,
-        priority_ranking: form.priority_ranking,
-        notes: form.notes,
-        tm_link: form.tm_link,
-        has_valuation: form.has_valuation === 'Yes',
-        valuation_url: form.valuation_url,
-      });
-      toast.success(`Added ${form.name}`);
-      setShowCreate(false);
-    } catch (e: any) {
-      toast.error(e.message);
-    }
-  };
 
   const handleUpdate = async (form: TargetFormData) => {
     if (!editTarget) return;

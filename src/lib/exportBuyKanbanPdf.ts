@@ -28,12 +28,6 @@ function esc(s: string): string {
   return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
 
-function fmt(d?: string | null): string {
-  if (!d) return '';
-  const dt = new Date(d);
-  return `${String(dt.getDate()).padStart(2, '0')}/${String(dt.getMonth() + 1).padStart(2, '0')}/${dt.getFullYear()}`;
-}
-
 function renderCard(c: CardData, mode: 'detailed' | 'short'): string {
   const eff: BallInCourt | null = c.pitch.ball_in_court ?? c.columnDefaultGlow;
   // Only "us" is a queue we control; the three counterparties all read as

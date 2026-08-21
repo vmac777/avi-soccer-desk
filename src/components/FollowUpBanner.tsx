@@ -1,4 +1,4 @@
-import { useContactFollowUps, useDeleteFollowUp, type FollowUp } from '@/hooks/useFollowUps';
+import { useContactFollowUps, useDeleteFollowUp } from '@/hooks/useFollowUps';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';

@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useContacts, useUpdateContact } from '@/hooks/useData';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { X, ArrowRightLeft } from 'lucide-react';
+import { X } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 

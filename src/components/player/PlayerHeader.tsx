@@ -1,4 +1,4 @@
-import { RosterPlayer as Player, formatHeight, getPositionGroup, getAge, parsePlayerDob, hasTrData, getLatestXtvM, getXtvChange6mPct } from '@/lib/rosterData';
+import { RosterPlayer as Player, formatHeight, getPositionGroup, getAge, hasTrData, getLatestXtvM, getXtvChange6mPct } from '@/lib/rosterData';
 import { cn } from '@/lib/utils';
 import { ExternalLink } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';

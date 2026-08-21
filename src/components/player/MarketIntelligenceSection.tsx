@@ -1,5 +1,4 @@
 import { RosterPlayer as Player, hasTrData, getLatestXtvM, getXtvChange6mPct, getXtvChange12mPct, eurToM } from '@/lib/rosterData';
-import { cn } from '@/lib/utils';
 import SectionWrapper from './SectionWrapper';
 import InfoField from './InfoField';
 

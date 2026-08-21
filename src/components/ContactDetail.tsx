@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useContact, useUpdateContact, useDeleteContact, useLogTouch, useInteractions, useCreateInteraction, useDeleteInteraction, usePlayerClubLinks, useSetPrimaryContact } from '@/hooks/useData';
+import { useContact, useUpdateContact, useDeleteContact, useInteractions, useCreateInteraction, useDeleteInteraction, usePlayerClubLinks, useSetPrimaryContact } from '@/hooks/useData';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useAuth } from '@/hooks/useAuth';
 import { useBuyPitches, useScoutedTargets } from '@/hooks/useBuyData';
 import { cn } from '@/lib/utils';
 import { DETAIL_PANEL_WIDTH } from '@/lib/panelWidth';
-import { healthColor, healthBg, stagePill, formatDaysAgo, UNCONTACTED_LABEL } from '@/lib/contactUtils';
+import { healthColor, healthBg, formatDaysAgo, UNCONTACTED_LABEL } from '@/lib/contactUtils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X, Phone, MessageCircle, Mail, Smartphone, Trash2, Linkedin, ArrowRightLeft, Plus, Star, Pencil, Check } from 'lucide-react';
@@ -53,7 +53,6 @@ const ContactDetail = ({ contactId, onClose }: ContactDetailProps) => {
   const { data: playerLinks = [] } = usePlayerClubLinks(null, contactId);
   const updateContact = useUpdateContact();
   const deleteContact = useDeleteContact();
-  const logTouch = useLogTouch();
   const createInteraction = useCreateInteraction();
   const deleteInteraction = useDeleteInteraction();
   const { displayName } = useAuth();

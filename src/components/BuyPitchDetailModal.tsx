@@ -322,7 +322,11 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
                       };
                       return (
                         <select
-                          value={newAgentName !== null ? '__new_agent__' : pitch.contact_id}
+                          // `contact_id` is null on a free-agent pitch — there is
+                          // no selling club. Passing null to a <select> makes it
+                          // uncontrolled, so it would stop tracking state
+                          // entirely on exactly those pitches.
+                          value={newAgentName !== null ? '__new_agent__' : pitch.contact_id ?? ''}
                           onChange={e => handleSelect(e.target.value)}
                           className="w-full h-8 text-xs bg-background border border-border rounded-md px-2"
                         >

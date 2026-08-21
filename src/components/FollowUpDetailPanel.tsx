@@ -33,7 +33,7 @@ const TYPE_BADGE: Record<FollowUpTargetType, string> = {
 };
 
 /** Returns a navigation route for a given target. Returns null if the target has no first-class page. */
-function routeForTarget(type: FollowUpTargetType, id: string): string | null {
+function routeForTarget(type: FollowUpTargetType): string | null {
   switch (type) {
     case 'scouted_target':
       return `/scouted-targets`;
@@ -64,7 +64,7 @@ const FollowUpDetailPanel = ({ followUp, onClose, onOpenContact }: FollowUpDetai
       onOpenContact(id);
       return;
     }
-    const route = routeForTarget(type, id);
+    const route = routeForTarget(type);
     if (route) {
       onClose();
       navigate(route);
@@ -120,7 +120,6 @@ const FollowUpDetailPanel = ({ followUp, onClose, onOpenContact }: FollowUpDetai
             </p>
             <TargetRow
               type={followUp.target_type}
-              id={followUp.target_id}
               label={followUp.target_label}
               sublabel={followUp.target_sublabel || undefined}
               onOpen={() => handleNavigate(followUp.target_type, followUp.target_id)}
@@ -149,7 +148,6 @@ const FollowUpDetailPanel = ({ followUp, onClose, onOpenContact }: FollowUpDetai
                   <TargetRow
                     key={link.id}
                     type={link.link_type}
-                    id={link.link_id}
                     label={link.link_label}
                     sublabel={link.link_sublabel || undefined}
                     onOpen={() => handleNavigate(link.link_type, link.link_id)}
@@ -199,10 +197,9 @@ const FollowUpDetailPanel = ({ followUp, onClose, onOpenContact }: FollowUpDetai
 };
 
 function TargetRow({
-  type, id, label, sublabel, onOpen, onRemove,
+  type, label, sublabel, onOpen, onRemove,
 }: {
   type: FollowUpTargetType;
-  id: string;
   label: string;
   sublabel?: string;
   onOpen: () => void;

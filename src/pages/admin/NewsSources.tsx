@@ -24,8 +24,8 @@ const norm = (s: string) =>
   s.normalize('NFKD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 
 export default function NewsSources() {
-  const { data: clubs = [], isLoading: clubsLoading } = useClubs();
-  const { data: sources = [], isLoading: srcLoading } = useClubSources();
+  const { data: clubs = [] } = useClubs();
+  const { data: sources = [] } = useClubSources();
   const qc = useQueryClient();
 
   const [importOpen, setImportOpen] = useState(false);
