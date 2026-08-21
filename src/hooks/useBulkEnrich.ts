@@ -31,9 +31,27 @@ export interface BulkEnrichProgress {
 
 const IDLE: BulkEnrichProgress = { running: false, done: 0, total: 0, failed: 0 };
 
-/** Worth a pass: there is a link to follow, and we have not followed it yet. */
+/** Never read at all: there is a link to follow and we have not followed it. */
 export function needsEnrichment(t: ScoutedTarget): boolean {
   return !!t.tm_link && t.tm_status !== 'ok';
+}
+
+/**
+ * Read from Transfermarkt but not from TransferRoom.
+ *
+ * This is most of a roster after the first pass, and it used to be invisible:
+ * the sweep only looked at tm_status, so once Transfermarkt had succeeded for
+ * everyone the button had nothing to do — even with TransferRoom failing on
+ * ninety players. Resolving their clubs afterwards did not change that, which is
+ * exactly when you most need to run it again.
+ */
+export function needsTrRetry(t: ScoutedTarget): boolean {
+  return !!t.tm_link && t.tm_status === 'ok' && t.tr_status !== 'ok';
+}
+
+/** Anything the sweep would touch by default. */
+export function isPending(t: ScoutedTarget): boolean {
+  return needsEnrichment(t) || needsTrRetry(t);
 }
 
 export function useBulkEnrich() {
@@ -42,8 +60,10 @@ export function useBulkEnrich() {
   const cancelled = useRef(false);
 
   const run = useCallback(
-    async (targets: ScoutedTarget[]) => {
-      const queue = targets.filter(needsEnrichment);
+    async (targets: ScoutedTarget[], { all = false }: { all?: boolean } = {}) => {
+      const queue = all
+        ? targets.filter((t) => t.tm_link)
+        : targets.filter(isPending);
       if (queue.length === 0) return { ...IDLE };
 
       cancelled.current = false;
@@ -55,11 +75,16 @@ export function useBulkEnrich() {
         setProgress({ running: true, done, total: queue.length, failed, current: target.name });
 
         try {
-          const r = await enrichTarget(target);
+          // Don't re-read Transfermarkt for a player it already answered on —
+          // that is the slow half and the half that rate-limits. Unless this is
+          // an explicit refresh, in which case the point is to re-read both.
+          const sources: ('tm' | 'tr')[] =
+            !all && target.tm_status === 'ok' ? ['tr'] : ['tm', 'tr'];
+          const r = await enrichTarget(target, sources);
           // TransferRoom not matching a player is ordinary — plenty of them are
           // not in it. Failing to read Transfermarkt is the one worth counting,
           // since that is where the link pointed.
-          if (r.tm === 'failed') failed++;
+          if (r.tm === 'failed' || (r.tm === 'skipped' && r.tr === 'failed')) failed++;
         } catch {
           failed++;
         }

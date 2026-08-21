@@ -175,8 +175,38 @@ export function getAge(dob?: string | null): number | undefined {
   return age;
 }
 
+/**
+ * Is there anything from TransferRoom worth showing?
+ *
+ * This used to ask only whether we held their player id. TransferRoom does not
+ * always return one — a squad row can carry a valuation, a GBE score and a
+ * transfer history with no id attached — and gating on it hid every one of
+ * those sections on a player we had real data for.
+ */
 export function hasTrData(player: RosterPlayer): boolean {
-  return player.trId != null;
+  return (
+    player.trId != null ||
+    player.trXtv != null ||
+    player.trGbeScore != null ||
+    player.trAskingPrice != null ||
+    !!player.trAvailableForSale ||
+    !!player.trPlayingStyle ||
+    (player.xtvHistory?.length ?? 0) > 0 ||
+    (player.transferHistory?.length ?? 0) > 0
+  );
+}
+
+/**
+ * Height arrives as "172cm" from one source and "1.72" from another, so a bare
+ * `${height}m` produces "172cmm".
+ */
+export function formatHeight(height?: string): string | undefined {
+  if (!height) return undefined;
+  const h = String(height).trim();
+  if (/[a-z]/i.test(h)) return h;              // already carries its unit
+  const n = Number(h.replace(',', '.'));
+  if (!Number.isFinite(n)) return h;
+  return n > 3 ? `${Math.round(n)}cm` : `${n.toFixed(2)}m`;
 }
 
 /**

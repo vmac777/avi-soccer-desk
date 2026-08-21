@@ -1,4 +1,4 @@
-import { RosterPlayer as Player, getPositionGroup, getAge, parsePlayerDob, getLatestXtvM, getXtvChange6mPct } from '@/lib/rosterData';
+import { RosterPlayer as Player, formatHeight, getPositionGroup, getAge, parsePlayerDob, hasTrData, getLatestXtvM, getXtvChange6mPct } from '@/lib/rosterData';
 import { cn } from '@/lib/utils';
 import { ExternalLink } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -34,7 +34,7 @@ export default function PlayerHeader({ player }: { player: Player }) {
   const group = getPositionGroup(player.position);
   // A real date of birth if we have one, otherwise the age the list came with.
   const age = getAge(player.dob) ?? player.age;
-  const hasTr = player.trId != null;
+  const hasTr = hasTrData(player);
   const latestXtv = getLatestXtvM(player);
   const change6m = getXtvChange6mPct(player);
 
@@ -78,7 +78,7 @@ export default function PlayerHeader({ player }: { player: Player }) {
             <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">{player.nationality}</span>
           )}
           {player.height && (
-            <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">{player.height}m</span>
+            <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">{formatHeight(player.height)}</span>
           )}
           {player.currentClub && (
             <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">{player.currentClub}</span>

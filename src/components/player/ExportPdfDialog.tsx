@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { RosterPlayer as Player, getAge, getPositionGroup, parsePlayerDob, hasCommercialData, hasTrData, getLatestXtvM, getXtvChange6mPct, getXtvChange12mPct, isPrintable } from '@/lib/rosterData';
+import { RosterPlayer as Player, formatHeight, getAge, getPositionGroup, parsePlayerDob, hasCommercialData, hasTrData, getLatestXtvM, getXtvChange6mPct, getXtvChange12mPct, isPrintable } from '@/lib/rosterData';
 import { formatCurrency } from '@/lib/currency';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -364,7 +364,7 @@ export default function ExportPdfDialog({ player, open, onClose }: ExportPdfDial
                 <span style={{ padding: '4px 10px', borderRadius: 6, background: '#1a1410', border: '1px solid #2a2118', fontSize: 12 }}>{player.nationality}</span>
               )}
               {player.height && (
-                <span style={{ padding: '4px 10px', borderRadius: 6, background: '#1a1410', border: '1px solid #2a2118', fontSize: 12 }}>{player.height}m</span>
+                <span style={{ padding: '4px 10px', borderRadius: 6, background: '#1a1410', border: '1px solid #2a2118', fontSize: 12 }}>{formatHeight(player.height)}</span>
               )}
               {player.currentClub && (
                 <span style={{ padding: '4px 10px', borderRadius: 6, background: '#1a1410', border: '1px solid #2a2118', fontSize: 12 }}>{player.currentClub}</span>
@@ -412,7 +412,7 @@ export default function ExportPdfDialog({ player, open, onClose }: ExportPdfDial
               value={age == null ? '—' : dob ? `${age} (${dob.getFullYear()})` : String(age)}
             />
             <PdfField label={tr('nationality', lang)} value={player.nationality || '—'} />
-            <PdfField label={tr('height', lang)} value={player.height ? `${player.height}m` : '—'} />
+            <PdfField label={tr('height', lang)} value={formatHeight(player.height) ?? '—'} />
             <PdfField label={tr('previousClub', lang)} value={player.previousClub} />
             <PdfField label={tr('currentClub', lang)} value={player.currentClub} />
             {player.trPreferredFoot && <PdfField label={tr('preferredFoot', lang)} value={player.trPreferredFoot} />}

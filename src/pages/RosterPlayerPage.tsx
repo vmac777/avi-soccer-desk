@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { toRosterPlayer } from '@/lib/rosterMapping';
 import {
+  formatHeight,
   getAge,
   getPositionGroup,
   hasMandateData,
@@ -167,7 +168,7 @@ export default function RosterPlayerPage() {
           <Field label="Position" value={`${player.position || '—'} (${group})`} player={player} field="position" />
           <Field label="Age" value={age != null ? String(age) : '—'} player={player} field="age" />
           <Field label="Nationality" value={player.nationality ?? '—'} player={player} field="nationality" />
-          <Field label="Height" value={player.height ? `${player.height}m` : '—'} player={player} field="height" />
+          <Field label="Height" value={formatHeight(player.height) ?? '—'} player={player} field="height" />
           <Field label="Preferred foot" value={player.trPreferredFoot ?? player.foot ?? '—'} player={player} field="foot" />
           <Field label="Current club" value={player.currentClub ?? '—'} player={player} field="currentClub" />
           <Field label="League" value={player.league ?? '—'} player={player} field="league" />
