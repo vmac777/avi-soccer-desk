@@ -294,3 +294,29 @@ describe('rosterCoverage', () => {
     ])).toEqual({ total: 4, enriched: 2, missing: 2 });
   });
 });
+
+describe('one card per club', () => {
+  it('does not stack the same club twice', () => {
+    // Two needs at one club is one conversation. Repeating the name reads as
+    // repetition rather than as demand.
+    const board = buildBoard(input({
+      requirements: [
+        need({ id: 'r1', position: 'CF' }),
+        need({ id: 'r2', position: 'RB' }),
+      ],
+      roster: [player({ id: 'a', position: 'CF' }), player({ id: 'b', position: 'RB' })],
+    }));
+    const unworked = board.filter((o) => o.kind === 'unworked_match');
+    expect(unworked).toHaveLength(1);
+    expect(unworked[0].detail).toContain('1 more open need there');
+  });
+
+  it('still shows two different clubs separately', () => {
+    const board = buildBoard(input({
+      requirements: [need({ id: 'r1' }), need({ id: 'r2', club_id: 'club-2' })],
+      roster: [player()],
+      clubNames: { 'club-1': 'Palmeiras', 'club-2': 'Bahia' },
+    }));
+    expect(board.filter((o) => o.kind === 'unworked_match')).toHaveLength(2);
+  });
+});

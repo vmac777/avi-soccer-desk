@@ -174,14 +174,24 @@ function unworkedMatches(input: BoardInput): Opportunity[] {
     }))
     .filter(({ fits }) => fits.length > 0)
     .sort((a, b) => b.fits.length - a.fits.length)
+    // One card per club. Two needs at the same club is one conversation, and
+    // stacking "Bahia want…" twice reads as repetition rather than as demand.
+    .filter((x, _i, all) => all.findIndex(
+      (y) => clubOf(y.r, input) === clubOf(x.r, input)) === all.indexOf(x))
     .slice(0, 3)
     .map(({ r, fits }) => {
       const club = clubOf(r, input);
+      const alsoAtClub = input.requirements.filter((o) =>
+        o.id !== r.id && o.status === 'open' && !listed.has(o.id)
+        && clubOf(o, input) === club && club !== '').length;
       return {
         kind: 'unworked_match' as const,
         id: `unworked:${r.id}`,
         headline: `${club || 'A club'} want ${requirementSummary(r)}.`,
-        detail: `${fits.length} of yours ${plural(fits.length, 'fits', 'fit')} and nobody has been put forward.`,
+        detail: [
+          `${fits.length} of yours ${plural(fits.length, 'fits', 'fit')} and nobody has been put forward.`,
+          alsoAtClub > 0 ? `${alsoAtClub} more open ${plural(alsoAtClub, 'need')} there.` : null,
+        ].filter(Boolean).join(' '),
         urgency: 80 + Math.min(fits.length, 10),
         href: `/needs/${r.id}`,
       };

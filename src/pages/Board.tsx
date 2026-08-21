@@ -45,20 +45,34 @@ const edgeFor = (urgency: number) =>
   : urgency >= 70 ? 'border-l-primary'
   : 'border-l-border';
 
-function OpportunityCard({ item, onOpen }: { item: Opportunity; onOpen: () => void }) {
+/**
+ * The first card is bigger.
+ *
+ * Six identical cards read as a list to work through. Something has to tell the
+ * eye where to start, and the ranking already knows — so the top of it looks
+ * like the top of it.
+ */
+function OpportunityCard({ item, onOpen, hero = false }: {
+  item: Opportunity; onOpen: () => void; hero?: boolean;
+}) {
   const Icon = KIND_ICON[item.kind];
   return (
     <button
       onClick={onOpen}
       className={cn(
-        'group flex w-full items-start gap-3 rounded-lg border border-l-[3px] border-border bg-card p-4 text-left transition-colors hover:border-primary/40',
+        'group flex w-full items-start gap-3 rounded-lg border border-l-[3px] border-border bg-card text-left transition-colors hover:border-primary/40',
+        hero ? 'p-5' : 'px-4 py-3',
         edgeFor(item.urgency),
       )}
     >
-      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+      <Icon className={cn('shrink-0 text-muted-foreground', hero ? 'mt-0.5 h-5 w-5' : 'mt-0.5 h-4 w-4')} />
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-foreground">{item.headline}</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">{item.detail}</p>
+        <p className={cn('font-medium text-foreground', hero ? 'text-base' : 'text-sm')}>
+          {item.headline}
+        </p>
+        <p className={cn('mt-0.5 text-muted-foreground', hero ? 'text-xs' : 'text-[11px]')}>
+          {item.detail}
+        </p>
       </div>
       <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
     </button>
@@ -67,7 +81,7 @@ function OpportunityCard({ item, onOpen }: { item: Opportunity; onOpen: () => vo
 
 export default function BoardPage() {
   const navigate = useNavigate();
-  const { displayName } = useAuth();
+  const { profile } = useAuth();
 
   const { data: requirements = [], isLoading: reqLoading } = useAllRequirements();
   const { data: shortlistEntries = [] } = useShortlistEntries();
@@ -93,6 +107,20 @@ export default function BoardPage() {
 
   const coverage = useMemo(() => rosterCoverage(targets), [targets]);
 
+  /** Reminders actually due, not a count of them. */
+  const dueToday = useMemo(
+    () => followUps
+      .filter((f) => !f.completed && f.due_date <= today)
+      .sort((a, b) => a.due_date.localeCompare(b.due_date))
+      .slice(0, 5),
+    [followUps, today],
+  );
+
+  const recentPitches = useMemo(
+    () => [...pitches].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 4),
+    [pitches],
+  );
+
   /** The two sentences at the top. Numbers only where a number is the point. */
   const line = useMemo(() => {
     const due = followUps.filter((f) => !f.completed && f.due_date <= today).length;
@@ -115,10 +143,17 @@ export default function BoardPage() {
     );
   }
 
-  const firstName = (displayName || '').trim().split(/\s+/)[0];
+  /**
+   * Greet by name, or not at all.
+   *
+   * `displayName` falls back to the email local-part when a profile has no
+   * full name, so this page opened with "Morning, vmachado194." An email handle
+   * is never the right way to address anybody — better to say nothing.
+   */
+  const firstName = (profile?.full_name ?? '').trim().split(/\s+/)[0];
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       {/* ── The line ── */}
       <div>
         <h1 className="text-lg font-medium tracking-tight text-foreground">
@@ -149,8 +184,9 @@ export default function BoardPage() {
         </p>
       </div>
 
+      <div className="grid gap-6 lg:grid-cols-3">
       {/* ── Opportunities ── */}
-      <div>
+      <div className="lg:col-span-2">
         <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
           WHERE TO SPEND TODAY
         </h2>
@@ -189,8 +225,13 @@ export default function BoardPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {board.map((item) => (
-              <OpportunityCard key={item.id} item={item} onOpen={() => navigate(item.href)} />
+            {board.map((item, i) => (
+              <OpportunityCard
+                key={item.id}
+                item={item}
+                hero={i === 0}
+                onOpen={() => navigate(item.href)}
+              />
             ))}
           </div>
         )}
@@ -204,36 +245,56 @@ export default function BoardPage() {
         )}
       </div>
 
-      {/* ── Jump back in ── */}
-      {pitches.length > 0 && (
+
+      {/* ── The rail: what is due, and what you were last in ── */}
+      <div className="space-y-6">
         <div>
           <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
-            PICK UP WHERE YOU LEFT OFF
+            DUE
           </h2>
-          <div className="grid gap-2 sm:grid-cols-3">
-            {[...pitches]
-              .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
-              .slice(0, 3)
-              .map((p) => {
-                const name = roster.find((r) => r.id === p.scouted_target_id)?.name;
-                return (
-                  <button
-                    key={p.id}
-                    onClick={() => navigate('/pitches')}
-                    className="rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-primary/40"
-                  >
-                    <p className="truncate text-xs font-medium text-foreground">
-                      {name ?? 'Placement'}
-                    </p>
-                    <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                      {p.stage}
-                    </p>
-                  </button>
-                );
-              })}
-          </div>
+          {dueToday.length === 0 ? (
+            <p className="font-mono text-xs text-muted-foreground">Nothing due.</p>
+          ) : (
+            <div className="space-y-1.5">
+              {dueToday.map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => navigate('/pending-actions')}
+                  className="w-full rounded-md border border-border bg-card px-3 py-2 text-left transition-colors hover:border-primary/40"
+                >
+                  <p className="truncate text-xs font-medium text-foreground">{f.target_label}</p>
+                  <p className="truncate text-[11px] text-muted-foreground">{f.action_text}</p>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+
+        {recentPitches.length > 0 && (
+          <div>
+            <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
+              LAST WORKED
+            </h2>
+            <div className="space-y-1.5">
+              {recentPitches.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => navigate('/pitches')}
+                  className="flex w-full items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-left transition-colors hover:border-primary/40"
+                >
+                  <span className="truncate text-xs font-medium text-foreground">
+                    {roster.find((r) => r.id === p.scouted_target_id)?.name ?? 'Placement'}
+                  </span>
+                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                    {p.stage}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      </div>
     </div>
   );
 }
