@@ -23,6 +23,7 @@ import XtvHistoryChart from '@/components/player/XtvHistoryChart';
 import GbeSection from '@/components/player/GbeSection';
 import TransferHistorySection from '@/components/player/TransferHistorySection';
 import ExportPdfDialog from '@/components/player/ExportPdfDialog';
+import WhoWantsThisSection from '@/components/player/WhoWantsThisSection';
 import SetReminderButton from '@/components/SetReminderButton';
 
 const fmtDate = (d?: string) => {
@@ -242,6 +243,9 @@ export default function RosterPlayerPage() {
           <TransferHistorySection player={player} />
         </>
       )}
+
+      {/* The needs engine read backwards: who is in the market for him. */}
+      <WhoWantsThisSection player={player} />
 
       {player.notes && (
         <SectionWrapper title="Notes">

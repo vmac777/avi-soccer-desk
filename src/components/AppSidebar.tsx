@@ -1,7 +1,7 @@
 import { NavLink as RouterNavLink, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { BarChart3, Users, LogOut, Menu, Shield, ArrowLeftRight, ClipboardCheck, FileSearch, Activity } from 'lucide-react';
+import { BarChart3, Users, LogOut, Menu, Shield, ArrowLeftRight, ClipboardCheck, FileSearch, Activity, Target } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -27,6 +27,7 @@ const adminSections: NavSection[] = [
     items: [
       { to: '/', icon: BarChart3, label: 'Dashboard' },
       { to: '/contacts', icon: Users, label: 'Contacts' },
+      { to: '/needs', icon: Target, label: 'Club Needs' },
       { to: '/pending-actions', icon: ClipboardCheck, label: 'Pending Actions', hasBadge: true },
     ],
   },

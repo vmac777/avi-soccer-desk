@@ -24,6 +24,8 @@ import LoginPage from "@/pages/Login";
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const ContactsPage = lazy(() => import("@/pages/Contacts"));
 const PendingActionsPage = lazy(() => import("@/pages/PendingActions"));
+const ClubNeedsPage = lazy(() => import("@/pages/ClubNeeds"));
+const RequirementDetailPage = lazy(() => import("@/pages/RequirementDetail"));
 const RosterPage = lazy(() => import("@/pages/Roster"));
 const RosterPlayerPage = lazy(() => import("@/pages/RosterPlayerPage"));
 const PitchesPage = lazy(() => import("@/pages/BuyPitches"));
@@ -103,6 +105,8 @@ const App = () => (
             <Route path="/" element={adminRoute(<Dashboard />)} />
             <Route path="/contacts" element={adminRoute(<ContactsPage />)} />
             <Route path="/pending-actions" element={adminRoute(<PendingActionsPage />)} />
+            <Route path="/needs" element={adminRoute(<ClubNeedsPage />)} />
+            <Route path="/needs/:id" element={adminRoute(<RequirementDetailPage />)} />
             <Route path="/roster" element={adminRoute(<RosterPage />)} />
             <Route path="/roster/:id" element={adminRoute(<RosterPlayerPage />)} />
             <Route path="/pitches" element={adminRoute(<PitchesPage />)} />

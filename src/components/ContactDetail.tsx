@@ -14,6 +14,7 @@ import MoveContactDialog from '@/components/MoveContactDialog';
 import ClubTmLinks from '@/components/ClubTmLinks';
 import FollowUpPopover from '@/components/FollowUpPopover';
 import FollowUpBanner from '@/components/FollowUpBanner';
+import ClubRequirementsSection from '@/components/ClubRequirementsSection';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
 import { todayKey } from '@/lib/dateKeys';
@@ -398,6 +399,10 @@ const ContactDetail = ({ contactId, onClose }: ContactDetailProps) => {
               open={showFollowUp}
               onClose={() => setShowFollowUp(false)}
             />
+
+            {/* What the club is looking for — structured, alongside the free
+                text `Needs` field above rather than replacing it. */}
+            <ClubRequirementsSection clubName={contact.club} contactId={contactId} />
 
             {/* Player Pitches */}
             <div>
