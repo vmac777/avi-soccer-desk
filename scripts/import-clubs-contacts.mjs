@@ -74,12 +74,21 @@ if (!dryRun && (!URL || !KEY || !EMAIL || !PASSWORD)) {
 const clubs = JSON.parse(readFileSync(clubsPath, 'utf8'));
 const contacts = JSON.parse(readFileSync(contactsPath, 'utf8'));
 
-/** Reference data: carried over as-is. */
+/**
+ * Reference data: carried over as-is.
+ *
+ * tr_team_id and tr_competition_id come too. They are public TransferRoom
+ * identifiers, not anyone's private information, and without them TransferRoom
+ * enrichment cannot run at all: it resolves a player's club through this table
+ * and gives up with club_not_mapped_to_tr when the mapping is absent.
+ */
 const clubRows = clubs.map((c) => ({
   name: c.name,
   country: c.country ?? null,
   league: c.league ?? null,
   tier: c.tier ?? null,
+  tr_team_id: c.tr_team_id ?? null,
+  tr_competition_id: c.tr_competition_id ?? null,
 }));
 
 /** The directory half only. Everything else is reset, not copied. */
@@ -121,6 +130,7 @@ console.log(`from ${backupDir}`);
 console.log(`  clubs:    ${clubRows.length}`);
 console.log(`  contacts: ${contactRows.length}  (names and roles only)`);
 console.log(`  leagues:  ${new Set(clubRows.map((c) => c.league).filter(Boolean)).size}`);
+console.log(`  TR-mapped: ${clubRows.filter((c) => c.tr_team_id && c.tr_competition_id).length}  (needed for TransferRoom enrichment)`);
 console.log(`\n  leaving behind, from ${carriedNonEmpty} rows that carried something:`);
 console.log(`    ${DROPPED.join(', ')}`);
 console.log(`    ${sourcePhones} phone numbers and ${sourceLinkedin} LinkedIn URLs are NOT copied`);

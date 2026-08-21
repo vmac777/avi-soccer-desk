@@ -40,6 +40,8 @@ export interface ScoutedTarget {
   tr_data?: Record<string, unknown> | null;
   tm_status?: 'pending' | 'ok' | 'failed' | null;
   tr_status?: 'pending' | 'ok' | 'failed' | null;
+  /** Why TransferRoom gave up, when tr_status is 'failed'. Cleared on success. */
+  tr_fail_reason?: string | null;
   enrichment_notes?: string | null;
 
   // Roster tenure. A player out on loan has two clubs and two live contracts:

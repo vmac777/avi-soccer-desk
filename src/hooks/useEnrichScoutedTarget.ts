@@ -65,9 +65,14 @@ async function runTr(args: TrArgs) {
         trPlayerId: args.trPlayerId ?? undefined,
       },
     });
-    if (error || !data?.ok) return { tr_status: 'failed' as const };
+    if (error || !data?.ok) {
+      // The function says why it gave up — an unmapped club is a very different
+      // problem to a bad password, and both look identical without this.
+      const reason = (data as any)?.reason ?? error?.message;
+      return { tr_status: 'failed' as const, tr_fail_reason: reason ?? 'unknown' };
+    }
     const d = data.data as Record<string, any>;
-    const patch: Patch = { tr_status: 'ok', tr_data: data.raw ?? null };
+    const patch: Patch = { tr_status: 'ok', tr_data: data.raw ?? null, tr_fail_reason: null };
     // TR-only metrics
     if (d.tr_player_id) patch.tr_player_id = d.tr_player_id;
     if (d.xtv != null) patch.xtv = d.xtv;

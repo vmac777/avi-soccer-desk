@@ -285,6 +285,29 @@ function fmtDDMMYYYY(iso: string | null | undefined): string {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 }
 
+/**
+ * Plain-English version of the reason TransferRoom enrichment gave up.
+ *
+ * These need genuinely different fixes — an unmapped club is a data-import job,
+ * a proxy 401 is a credentials job, no_match is a per-player judgement call — so
+ * saying which one it is saves a trip to the function logs.
+ */
+function trFailMessage(reason?: string | null): string {
+  switch (reason) {
+    case 'club_not_in_clubs_table':   return "TR: this club isn't in the clubs table yet";
+    case 'club_not_mapped_to_tr':     return 'TR: club has no TransferRoom mapping';
+    case 'team_not_in_competition_pool': return "TR: team not in that competition's squad list";
+    case 'no_match':                  return 'TR: no player matched this name';
+    case 'proxy_not_configured':      return 'TR: proxy token not set';
+    case 'proxy_401':
+    case 'proxy_403':                 return 'TR: TransferRoom rejected our credentials';
+    case undefined:
+    case null:
+    case 'unknown':                   return "Couldn't fetch from TR";
+    default:                          return `TR: ${reason}`;
+  }
+}
+
 function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, isRetrying }: {
   target: ScoutedTarget; onOpen: () => void; onEdit: () => void; onDelete: () => void; onCreatePitch: () => void;
   onRetry: (sources: ('tm' | 'tr')[]) => void; isRetrying: boolean;
@@ -320,9 +343,12 @@ function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, 
           <Trash2 className="h-3 w-3 text-muted-foreground" />
         </button>
       </div>
+      {/* Transfermarkt portraits are 3:4 head-and-shoulders; a square card crops
+          a quarter of the height. Take it off the bottom, not the top, or the
+          hairline gets clipped and every player looks cut off. */}
       <div className="aspect-square relative overflow-hidden bg-muted">
         {target.photo_url ? (
-          <img src={target.photo_url} alt={target.name} className="w-full h-full object-cover" style={{ objectPosition: 'center 15%' }} />
+          <img src={target.photo_url} alt={target.name} className="w-full h-full object-cover" style={{ objectPosition: 'center top' }} />
         ) : tmPending ? (
           <Skeleton className="w-full h-full" />
         ) : (
@@ -401,7 +427,7 @@ function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, 
             <span>
               {tmFailed && trFailed ? "Couldn't fetch TM or TR"
                 : tmFailed ? "Couldn't fetch from TM"
-                : "Couldn't fetch from TR"}
+                : trFailMessage(target.tr_fail_reason)}
             </span>
             <button
               onClick={(e) => { e.stopPropagation(); onRetry(failedSources); }}
