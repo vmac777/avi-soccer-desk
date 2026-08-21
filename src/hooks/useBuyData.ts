@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import type { SellingTrack, BuyingTrack, PlayerTrack } from '@/lib/placementStage';
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -59,18 +60,36 @@ export interface ScoutedTarget {
   data_provenance?: Record<string, 'verified' | 'transfermarkt' | 'transferroom' | 'placeholder'> | null;
 }
 
-export type BallInCourt = 'us' | 'them';
-export type ClubTrack = 'none' | 'enquiring' | 'bid_in' | 'fee_agreed';
-export type PlayerTrack = 'none' | 'talking' | 'agreed';
+/**
+ * Who the deal is waiting on. Was `us | them` under the buying-desk model,
+ * where there was only ever one counterparty for "them" to mean.
+ */
+export type BallInCourt = 'us' | 'selling' | 'buying' | 'player';
+
+// The three ladders live in placementStage.ts, next to the logic that reads
+// them. Re-exported here so callers of this hook get them in one import.
+export type { SellingTrack, BuyingTrack, PlayerTrack, Tracks } from '@/lib/placementStage';
+
 export type LossReason = 'walked' | 'rejected' | 'lost' | 'collapsed';
 
+/**
+ * The gates a transfer passes through, in order.
+ *
+ * The last three are new. A deal both clubs and the player have agreed still
+ * dies at a failed medical, a work permit the player does not qualify for, or
+ * an international clearance that misses the registration deadline — and each
+ * is a different phone call.
+ */
 export type MilestoneKey =
   | 'enquiry_sent'
   | 'bid_submitted'
   | 'fee_agreed'
   | 'terms_agreed'
   | 'medical'
-  | 'registered';
+  | 'work_permit'
+  | 'itc'
+  | 'registered'
+  | 'announced';
 
 export type MilestoneEntry = { at?: string; amount?: number | null; in_progress?: boolean };
 export type Milestones = Partial<Record<MilestoneKey, MilestoneEntry>>;
@@ -110,8 +129,20 @@ export interface BuyPitch {
   created_at: string;
   updated_at: string;
   ball_in_court: BallInCourt | null;
-  club_track: ClubTrack;
+  /** Will the current club let him go, and for what. */
+  selling_track: SellingTrack;
+  /** Does the club being approached want him, and on what terms. */
+  buying_track: BuyingTrack;
+  /** Does he want the move — project, minutes, city, family. */
   player_track: PlayerTrack;
+
+  // Personal terms sit on the buying side: the fee is between the clubs, the
+  // wage is between the club and the player.
+  salary_offer?: number | null;
+  contract_years?: number | null;
+  signing_bonus?: number | null;
+  /** Window close, or the club's own cutoff. */
+  deadline?: string | null;
   loss_reason: LossReason | null;
   mwp: number | null;
   milestones: Milestones;
@@ -143,7 +174,28 @@ export interface BuyNegotiationEntry {
   note: string;
   logged_by: string;
   created_at: string;
+  /**
+   * Which conversation this belongs to. Rows written before the three-sided
+   * model default to 'selling', which is what they were.
+   */
+  side?: NegotiationSide | null;
 }
+
+export type NegotiationSide = 'selling' | 'buying' | 'player' | 'internal';
+
+/**
+ * What can be said on each side.
+ *
+ * Kept apart because the same word means different things across the table: a
+ * "counter" from the selling club is about the fee, from the buying club it is
+ * about the wage.
+ */
+export const ENTRY_TYPES_BY_SIDE: Record<NegotiationSide, string[]> = {
+  selling: ['Ask', 'Bid', 'Counter', 'Fee agreed', 'Refused', 'Note'],
+  buying: ['Interest', 'Offer', 'Counter', 'Terms offered', 'Terms agreed', 'Passed', 'Note'],
+  player: ['Conversation', 'Willing', 'Concern', 'Declined', 'Note'],
+  internal: ['Note'],
+};
 
 // ─── Stage model ─────────────────────────────────────────
 
@@ -327,7 +379,8 @@ export function useAddBuyPitch() {
             stage: 'Enquiry',
             loss_reason: null,
             ball_in_court: null,
-            club_track: 'none',
+            selling_track: 'none',
+            buying_track: 'none',
             player_track: 'none',
             milestones: {},
             updated_at: new Date().toISOString(),
@@ -360,7 +413,8 @@ export function useAddBuyPitch() {
             final_price: null,
             notes,
             ball_in_court: null,
-            club_track: 'none',
+            selling_track: 'none',
+            buying_track: 'none',
             player_track: 'none',
             loss_reason: null,
             mwp: null,
@@ -459,19 +513,26 @@ export function useSetBallInCourt() {
 export function useSetTracks() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, club_track, player_track }: { id: string; club_track?: ClubTrack; player_track?: PlayerTrack }) => {
-      const patch: any = {};
-      if (club_track !== undefined) patch.club_track = club_track;
+    mutationFn: async ({ id, selling_track, buying_track, player_track }: {
+      id: string;
+      selling_track?: SellingTrack;
+      buying_track?: BuyingTrack;
+      player_track?: PlayerTrack;
+    }) => {
+      const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+      if (selling_track !== undefined) patch.selling_track = selling_track;
+      if (buying_track !== undefined) patch.buying_track = buying_track;
       if (player_track !== undefined) patch.player_track = player_track;
-      const { error } = await supabase.from('buy_pitches' as any).update(patch).eq('id', id);
+      const { error } = await supabase.from('buy_pitches' as any).update(patch as any).eq('id', id);
       if (error) throw error;
     },
-    onMutate: async ({ id, club_track, player_track }) => {
+    onMutate: async ({ id, selling_track, buying_track, player_track }) => {
       await qc.cancelQueries({ queryKey: ['buy_pitches'] });
-      const patch: Partial<BuyPitch> = {};
-      if (club_track !== undefined) patch.club_track = club_track;
+      const patch: Record<string, unknown> = {};
+      if (selling_track !== undefined) patch.selling_track = selling_track;
+      if (buying_track !== undefined) patch.buying_track = buying_track;
       if (player_track !== undefined) patch.player_track = player_track;
-      return { prev: optimisticPitchPatch(qc, id, patch) };
+      return { prev: optimisticPitchPatch(qc, id, patch as Partial<BuyPitch>) };
     },
     onError: (_e, _v, ctx) => ctx?.prev && qc.setQueryData(['buy_pitches'], ctx.prev),
     onSettled: () => qc.invalidateQueries({ queryKey: ['buy_pitches'] }),

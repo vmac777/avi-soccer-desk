@@ -7,9 +7,15 @@ import {
   BUY_ACTIVE_STAGES, BUY_CLOSED_STAGES,
   CLOSED_STAGE_TO_LOSS_REASON,
   NEGOTIATION_TYPES, LOAN_TYPES_WITH_TRIGGER,
-  type BuyPitchStage, type BallInCourt, type ClubTrack, type PlayerTrack,
+  ENTRY_TYPES_BY_SIDE,
+  type BuyPitchStage, type BallInCourt, type NegotiationSide,
   type MilestoneKey, type MilestoneEntry, type NegotiationType, type BuyPitchAttachment,
 } from '@/hooks/useBuyData';
+import {
+  SELLING_TRACK, BUYING_TRACK, PLAYER_TRACK, TRACK_LABELS,
+  deadSide, suggestedStage, suggestionReason,
+  type SellingTrack, type BuyingTrack, type PlayerTrack, type Tracks,
+} from '@/lib/placementStage';
 import { useContacts, useCreateContact } from '@/hooks/useData';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,19 +30,32 @@ import { toast } from 'sonner';
 import { Trash2, Paperclip, X, Download } from 'lucide-react';
 import SetReminderButton from '@/components/SetReminderButton';
 
-const ENTRY_TYPES = ['Our Offer', 'Their Counter', 'Their Ask', 'Agreement', 'Note'] as const;
+/**
+ * Who the deal is waiting on, and what that looks like.
+ *
+ * "Us" is the only one an agent can clear on their own, so it reads as an
+ * action and the rest read as waiting.
+ */
+const BALL_OPTIONS: { v: BallInCourt; label: string; action: boolean }[] = [
+  { v: 'us', label: 'Us', action: true },
+  { v: 'selling', label: 'Selling club', action: false },
+  { v: 'buying', label: 'Buying club', action: false },
+  { v: 'player', label: 'Player', action: false },
+];
 
-const CLUB_TRACKS: { v: ClubTrack; label: string }[] = [
-  { v: 'none', label: '—' },
-  { v: 'enquiring', label: 'Enquiring' },
-  { v: 'bid_in', label: 'Bid in' },
-  { v: 'fee_agreed', label: 'Fee agreed' },
-];
-const PLAYER_TRACKS: { v: PlayerTrack; label: string }[] = [
-  { v: 'none', label: '—' },
-  { v: 'talking', label: 'Talking' },
-  { v: 'agreed', label: 'Agreed' },
-];
+/** How long until the deal cannot be done at all. */
+function deadlineLabel(iso?: string | null): { text: string; className: string } | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  const days = Math.ceil((d.getTime() - Date.now()) / 86_400_000);
+  if (days < 0) return { text: 'deadline passed', className: 'text-red-400' };
+  if (days === 0) return { text: 'closes today', className: 'text-red-400' };
+  // Same thresholds the roster uses for a contract running down, so urgency
+  // reads the same wherever it appears.
+  const className = days <= 7 ? 'text-red-400' : days <= 30 ? 'text-amber-400' : 'text-muted-foreground';
+  return { text: `closes in ${days}d`, className };
+}
 
 const MILESTONES: { key: MilestoneKey; label: string; withAmount?: boolean; withInProgress?: boolean }[] = [
   { key: 'enquiry_sent', label: 'Enquiry sent' },
@@ -44,7 +63,10 @@ const MILESTONES: { key: MilestoneKey; label: string; withAmount?: boolean; with
   { key: 'fee_agreed', label: 'Fee agreed' },
   { key: 'terms_agreed', label: 'Terms agreed' },
   { key: 'medical', label: 'Medical', withInProgress: true },
+  { key: 'work_permit', label: 'Work permit / GBE', withInProgress: true },
+  { key: 'itc', label: 'International clearance', withInProgress: true },
   { key: 'registered', label: 'Registered' },
+  { key: 'announced', label: 'Announced' },
 ];
 
 const CLOSED_STAGES_UI: { value: BuyPitchStage; label: string }[] = [
@@ -59,6 +81,49 @@ function fmtDate(iso?: string): string {
   if (!iso) return '';
   const d = new Date(iso);
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+}
+
+
+/**
+ * One conversation's ladder.
+ *
+ * Where a side has no club yet, the chips stay but the header says so. A
+ * selling-only pitch is real work — establishing what a club would take before
+ * anyone is shopping him — so an empty buying side should read as deliberate
+ * rather than broken.
+ */
+function TrackRow({ label, who, emptyHint, values, current, dead, onPick }: {
+  label: string;
+  who?: string;
+  emptyHint?: string;
+  values: readonly string[];
+  current: string;
+  dead: boolean;
+  onPick: (v: string) => void;
+}) {
+  return (
+    <div className={cn('rounded-md border p-2.5', dead ? 'border-red-500/40 bg-red-500/5' : 'border-border')}>
+      <div className="flex items-baseline gap-2 mb-1.5">
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</span>
+        <span className={cn('text-[11px]', who ? 'text-foreground' : 'text-muted-foreground/60 italic')}>
+          {who ?? emptyHint ?? '—'}
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {values.map(v => (
+          <button key={v} onClick={() => onPick(v)}
+            className={cn('font-mono px-1.5 py-0.5 text-[10px] rounded border transition-colors',
+              current === v
+                ? dead
+                  ? 'border-red-500 bg-red-500/15 text-red-400'
+                  : 'border-[hsl(var(--gold))] bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]'
+                : 'border-border text-muted-foreground hover:text-foreground')}>
+            {TRACK_LABELS[v] ?? v}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: string; onClose: () => void }) {
@@ -87,7 +152,9 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [editingField, setEditingField] = useState<'mwp' | 'asking' | 'offer' | 'final' | null>(null);
   const [fieldInput, setFieldInput] = useState('');
-  const [negType, setNegType] = useState<string>('Our Offer');
+  const [negSide, setNegSide] = useState<NegotiationSide>('selling');
+  const [negType, setNegType] = useState<string>(ENTRY_TYPES_BY_SIDE.selling[0]);
+  const [logFilter, setLogFilter] = useState<'all' | NegotiationSide>('all');
   const [negAmount, setNegAmount] = useState('');
   const [negNote, setNegNote] = useState('');
   const [closePromptOpen, setClosePromptOpen] = useState(false);
@@ -100,6 +167,24 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
 
   const target = targets.find(t => t.id === pitch.scouted_target_id);
   const contact = contacts.find(c => c.id === pitch.contact_id);
+  const buyingContact = contacts.find(c => c.id === pitch.buying_contact_id);
+  const sellingName = contact ? (contact.club || contact.contact_person) : undefined;
+  const buyingName = buyingContact ? (buyingContact.club || buyingContact.contact_person) : undefined;
+
+  const tracks: Tracks = {
+    selling: pitch.selling_track ?? 'none',
+    buying: pitch.buying_track ?? 'none',
+    player: pitch.player_track ?? 'none',
+  };
+  const dead = deadSide(tracks);
+  const stageSuggestion = suggestedStage(tracks, pitch.stage);
+  const deadline = deadlineLabel(pitch.deadline);
+
+  // Entries written before the three-sided model carry no side; they were all
+  // selling-side, so read them as such rather than hiding them behind a filter.
+  const visibleEntries = logFilter === 'all'
+    ? negotiations
+    : negotiations.filter(e => (e.side ?? 'selling') === logFilter);
 
   const handleAddNote = async () => {
     if (!noteText.trim() && pendingFiles.length === 0) return;
@@ -136,11 +221,23 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
         amount: negAmount ? Number(negAmount) : null,
         note: negNote.trim(),
         logged_by: displayName,
+        side: negSide,
       });
-      // Auto-sync price fields (skip Note).
-      if (negType === 'Our Offer' && negAmount) updatePitch.mutate({ id: pitchId, current_offer: Number(negAmount) });
-      else if ((negType === 'Their Ask' || negType === 'Their Counter') && negAmount) updatePitch.mutate({ id: pitchId, asking_price: Number(negAmount) });
-      else if (negType === 'Agreement' && negAmount) updatePitch.mutate({ id: pitchId, final_price: Number(negAmount) });
+
+      // Keep the headline numbers in step with the log — but route by side.
+      // The two sides put different numbers on the table, and a buying club's
+      // offer overwriting the selling club's ask would erase the gap the whole
+      // negotiation is about.
+      const amount = negAmount ? Number(negAmount) : null;
+      if (amount != null) {
+        if (negSide === 'selling') {
+          if (negType === 'Ask' || negType === 'Counter') updatePitch.mutate({ id: pitchId, asking_price: amount });
+          else if (negType === 'Fee agreed') updatePitch.mutate({ id: pitchId, final_price: amount });
+        } else if (negSide === 'buying') {
+          if (negType === 'Offer' || negType === 'Counter') updatePitch.mutate({ id: pitchId, current_offer: amount });
+          else if (negType === 'Terms offered' || negType === 'Terms agreed') updatePitch.mutate({ id: pitchId, salary_offer: amount });
+        }
+      }
       setNegAmount(''); setNegNote('');
     } catch (e: any) { toast.error(e.message); }
   };
@@ -176,7 +273,15 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
               <div className="min-w-0 flex-1">
                 <SheetTitle className="text-base text-foreground truncate">{target?.name || 'Unknown Target'}</SheetTitle>
                 <div className="flex items-center gap-2 flex-wrap mt-0.5">
-                  <p className="text-xs text-muted-foreground truncate">from {contact?.contact_person || contact?.club || 'Unknown'} at {contact?.club || '—'}</p>
+                  {/* The shape of the deal in one line: who to whom, on what
+                      basis, and how long there is to do it. */}
+                  <p className="text-xs text-muted-foreground truncate">
+                    <span className={sellingName ? 'text-foreground' : 'italic'}>{sellingName ?? 'free agent'}</span>
+                    {' → '}
+                    <span className={buyingName ? 'text-foreground' : 'italic'}>{buyingName ?? 'no buyer yet'}</span>
+                    {pitch.negotiation_type && <span className="ml-2">· {pitch.negotiation_type}</span>}
+                  </p>
+                  {deadline && <span className={cn('text-[11px] font-mono', deadline.className)}>{deadline.text}</span>}
                   <button
                     onClick={() => { setShowCounterpartyEdit(s => !s); setNewAgentName(null); }}
                     className="text-[10px] underline text-muted-foreground hover:text-foreground"
@@ -292,67 +397,81 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
             )}
           </div>
 
-          {/* Ball in court */}
-          <div className="mt-4 flex items-center gap-2">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Ball in court:</span>
-            <button onClick={() => flipBic('us')}
-              className={cn('px-2 py-1 rounded text-[10px] font-mono border transition-colors',
-                pitch.ball_in_court === 'us'
-                  ? 'border-[hsl(var(--glow-action-us))] bg-[hsl(var(--glow-action-us)/0.15)] text-[hsl(var(--glow-action-us))]'
-                  : 'border-border text-muted-foreground')}>
-              US (action)
-            </button>
-            <button onClick={() => flipBic('them')}
-              className={cn('px-2 py-1 rounded text-[10px] font-mono border transition-colors',
-                pitch.ball_in_court === 'them'
-                  ? 'border-[hsl(var(--glow-action-them))] bg-[hsl(var(--glow-action-them)/0.15)] text-[hsl(var(--glow-action-them))]'
-                  : 'border-border text-muted-foreground')}>
-              THEM (waiting)
-            </button>
+          {/* Ball in court — with three counterparties, "them" says nothing. */}
+          <div className="mt-4 flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Waiting on:</span>
+            {BALL_OPTIONS.map(o => (
+              <button key={o.v} onClick={() => flipBic(o.v)}
+                className={cn('px-2 py-1 rounded text-[10px] font-mono border transition-colors',
+                  pitch.ball_in_court === o.v
+                    ? o.action
+                      ? 'border-[hsl(var(--glow-action-us))] bg-[hsl(var(--glow-action-us)/0.15)] text-[hsl(var(--glow-action-us))]'
+                      : 'border-[hsl(var(--glow-action-them))] bg-[hsl(var(--glow-action-them)/0.15)] text-[hsl(var(--glow-action-them))]'
+                    : 'border-border text-muted-foreground hover:text-foreground')}>
+                {o.label}
+              </button>
+            ))}
             {pitch.ball_in_court && (
               <button onClick={() => setBic.mutate({ id: pitchId, value: null })} className="text-[10px] text-muted-foreground hover:text-foreground">clear</button>
             )}
           </div>
 
-          {/* Tracks */}
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">Club track</p>
-              <div className="flex flex-wrap gap-1">
-                {CLUB_TRACKS.map(t => (
-                  <button key={t.v} onClick={() => setTracks.mutate({ id: pitchId, club_track: t.v })}
-                    className={cn('font-mono px-1.5 py-0.5 text-[10px] rounded border transition-colors',
-                      pitch.club_track === t.v
-                        ? 'border-[hsl(var(--gold))] bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]'
-                        : 'border-border text-muted-foreground hover:text-foreground')}>
-                    {t.label}
-                  </button>
-                ))}
-              </div>
+          {/* The stage the tracks imply, offered rather than applied. An agent
+              often knows a deal is dead before any track says so. */}
+          {stageSuggestion && (
+            <div className="mt-3 flex items-center gap-2 rounded-md border border-[hsl(var(--gold)/0.4)] bg-[hsl(var(--gold)/0.08)] px-3 py-2">
+              <span className="text-[11px] text-muted-foreground">
+                {suggestionReason(tracks)} — move to <span className="text-[hsl(var(--gold))] font-medium">{stageSuggestion}</span>?
+              </span>
+              <button
+                onClick={() => handleStageChange(stageSuggestion)}
+                className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded border border-[hsl(var(--gold))] text-[hsl(var(--gold))] hover:bg-[hsl(var(--gold)/0.15)]"
+              >
+                Move
+              </button>
             </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">Player track</p>
-              <div className="flex flex-wrap gap-1">
-                {PLAYER_TRACKS.map(t => (
-                  <button key={t.v} onClick={() => setTracks.mutate({ id: pitchId, player_track: t.v })}
-                    className={cn('font-mono px-1.5 py-0.5 text-[10px] rounded border transition-colors',
-                      pitch.player_track === t.v
-                        ? 'border-[hsl(var(--gold))] bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]'
-                        : 'border-border text-muted-foreground hover:text-foreground')}>
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+          )}
+
+          {/* Three conversations, each with its own ladder. */}
+          <div className="mt-4 space-y-3">
+            <TrackRow
+              label="Selling club"
+              who={sellingName}
+              emptyHint="No selling club — free agent"
+              values={SELLING_TRACK}
+              current={pitch.selling_track}
+              dead={dead === 'selling'}
+              onPick={(v) => setTracks.mutate({ id: pitchId, selling_track: v as SellingTrack })}
+            />
+            <TrackRow
+              label="Buying club"
+              who={buyingName}
+              emptyHint="No buying club yet"
+              values={BUYING_TRACK}
+              current={pitch.buying_track}
+              dead={dead === 'buying'}
+              onPick={(v) => setTracks.mutate({ id: pitchId, buying_track: v as BuyingTrack })}
+            />
+            <TrackRow
+              label="Player"
+              who={target?.name}
+              values={PLAYER_TRACK}
+              current={pitch.player_track}
+              dead={dead === 'player'}
+              onPick={(v) => setTracks.mutate({ id: pitchId, player_track: v as PlayerTrack })}
+            />
           </div>
 
           {/* MWP / Ask / Offer / Final */}
           <div className="mt-4 grid grid-cols-4 gap-2">
             {([
-              { key: 'mwp' as const, dbKey: 'mwp' as const, label: 'MWP', value: pitch.mwp, edit: 'mwp' as const, accent: 'text-foreground' },
-              { key: 'asking_price' as const, dbKey: 'asking_price' as const, label: 'ASK', value: pitch.asking_price, edit: 'asking' as const, accent: 'text-foreground' },
-              { key: 'current_offer' as const, dbKey: 'current_offer' as const, label: 'OFFER', value: pitch.current_offer, edit: 'offer' as const, accent: 'text-[hsl(var(--gold))]' },
-              { key: 'final_price' as const, dbKey: 'final_price' as const, label: 'FINAL', value: pitch.final_price, edit: 'final' as const, accent: 'text-foreground' },
+              // Same columns, read from the agency's seat: the ask belongs to
+              // the selling club, the offer to the buying club, and MWP — a
+              // buyer's walk-away price — becomes our read on where it lands.
+              { key: 'asking_price' as const, dbKey: 'asking_price' as const, label: 'THEIR ASK', value: pitch.asking_price, edit: 'asking' as const, accent: 'text-foreground' },
+              { key: 'current_offer' as const, dbKey: 'current_offer' as const, label: 'THEIR OFFER', value: pitch.current_offer, edit: 'offer' as const, accent: 'text-[hsl(var(--gold))]' },
+              { key: 'mwp' as const, dbKey: 'mwp' as const, label: 'TARGET', value: pitch.mwp, edit: 'mwp' as const, accent: 'text-foreground' },
+              { key: 'final_price' as const, dbKey: 'final_price' as const, label: 'FEE AGREED', value: pitch.final_price, edit: 'final' as const, accent: 'text-foreground' },
             ]).map(({ key, dbKey, label, value, edit, accent }) => (
               <div key={key} className="bg-muted/30 rounded-md p-2">
                 <p className="text-[9px] uppercase tracking-wider text-muted-foreground mb-1">{label}</p>
@@ -467,12 +586,69 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
             </div>
           </div>
 
+          {/* Personal terms — the buying club's side of the table. The fee is
+              between the clubs; the wage is between the club and the player, and
+              a deal stalls on either. */}
+          <div className="mt-4 border-t border-border pt-3">
+            <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Personal terms &amp; deadline</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {([
+                { key: 'salary_offer', label: 'Salary / yr', value: pitch.salary_offer, type: 'number' },
+                { key: 'contract_years', label: 'Years', value: pitch.contract_years, type: 'number' },
+                { key: 'signing_bonus', label: 'Signing bonus', value: pitch.signing_bonus, type: 'number' },
+                { key: 'deadline', label: 'Deadline', value: pitch.deadline, type: 'date' },
+              ] as const).map(f => (
+                <div key={f.key} className="bg-muted/30 rounded-md p-2">
+                  <p className="text-[9px] uppercase tracking-wider text-muted-foreground mb-1">{f.label}</p>
+                  <Input
+                    type={f.type}
+                    defaultValue={f.value ?? ''}
+                    onBlur={e => {
+                      const raw = e.target.value.trim();
+                      const next = raw === '' ? null : f.type === 'number' ? Number(raw) : raw;
+                      if (String(next ?? '') === String(f.value ?? '')) return;
+                      updatePitch.mutate({ id: pitchId, [f.key]: next } as any);
+                    }}
+                    className="h-7 text-[11px] bg-transparent border-0 px-0 font-mono"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Negotiation History */}
           <div className="mt-4 border-t border-border pt-3">
-            <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Negotiation History</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground">Negotiation history</h3>
+              {/* Reading one conversation end to end is how you work out where
+                  a stalled deal actually stopped. */}
+              <div className="flex gap-1">
+                {(['all', 'selling', 'buying', 'player'] as const).map(f => (
+                  <button key={f} onClick={() => setLogFilter(f)}
+                    className={cn('px-1.5 py-0.5 rounded text-[10px] transition-colors',
+                      logFilter === f ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground')}>
+                    {f}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Which conversation this belongs to. Picking a side re-labels the
+                entry types, because "counter" means a fee from one club and a
+                wage from the other. */}
+            <div className="flex gap-1 mb-2">
+              {(['selling', 'buying', 'player', 'internal'] as NegotiationSide[]).map(sd => (
+                <button key={sd} onClick={() => { setNegSide(sd); setNegType(ENTRY_TYPES_BY_SIDE[sd][0]); }}
+                  className={cn('px-2 py-0.5 rounded text-[10px] uppercase tracking-wider border transition-colors',
+                    negSide === sd
+                      ? 'border-[hsl(var(--gold))] bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]'
+                      : 'border-border text-muted-foreground hover:text-foreground')}>
+                  {sd}
+                </button>
+              ))}
+            </div>
             <div className="flex gap-1.5 mb-2 flex-wrap">
               <select value={negType} onChange={e => setNegType(e.target.value)} className="h-7 text-[11px] bg-background border border-border rounded-md px-2">
-                {ENTRY_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                {ENTRY_TYPES_BY_SIDE[negSide].map(t => <option key={t} value={t}>{t}</option>)}
               </select>
               <Input value={negAmount} onChange={e => setNegAmount(e.target.value)} type="number" placeholder="€" autoComplete="off" className="h-7 text-[11px] w-24" />
               <Input value={negNote} onChange={e => setNegNote(e.target.value)} placeholder="Note" autoComplete="off" className="h-7 text-[11px] flex-1 min-w-[100px]"
@@ -480,12 +656,15 @@ export default function BuyPitchDetailModal({ pitchId, onClose }: { pitchId: str
               <Button onClick={handleAddNegEntry} className="h-7 text-[11px] px-2">Add</Button>
             </div>
             <div className="space-y-1 max-h-40 overflow-y-auto">
-              {negotiations.length === 0 ? (
-                <p className="text-[11px] text-muted-foreground">No entries yet</p>
+              {visibleEntries.length === 0 ? (
+                <p className="text-[11px] text-muted-foreground">
+                  {logFilter === 'all' ? 'No entries yet' : `Nothing logged on the ${logFilter} side`}
+                </p>
               ) : (
-                negotiations.map(entry => (
+                visibleEntries.map(entry => (
                   <div key={entry.id} className="flex items-center gap-2 text-[11px] px-2 py-1.5 rounded hover:bg-muted/20">
                     <span className="font-mono text-[10px] text-muted-foreground w-14 shrink-0">{fmtDate(entry.created_at)}</span>
+                    <span className="text-[9px] uppercase tracking-wider text-muted-foreground/70 w-12 shrink-0">{entry.side ?? 'selling'}</span>
                     <span className="text-[10px] text-muted-foreground w-20 shrink-0 truncate">{entry.entry_type}</span>
                     {entry.amount != null && <span className="font-mono text-foreground">{formatCompactEur(entry.amount)}</span>}
                     {entry.note && <span className="text-muted-foreground flex-1 truncate">{entry.note}</span>}

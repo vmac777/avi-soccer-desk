@@ -1,4 +1,5 @@
 import type { BuyPitch, BallInCourt } from '@/hooks/useBuyData';
+import { TRACK_LABELS as trackLabel } from '@/lib/placementStage';
 import { formatCompactEur } from '@/lib/currency';
 
 type CardData = {
@@ -13,15 +14,6 @@ type CardData = {
 type Column = {
   title: string;
   pitches: CardData[];
-};
-
-const trackLabel: Record<string, string> = {
-  none: '—',
-  enquiring: 'Enquiring',
-  bid_in: 'Bid in',
-  fee_agreed: 'Fee agreed',
-  talking: 'Talking',
-  agreed: 'Agreed',
 };
 
 const negShort: Record<string, string> = {
@@ -44,8 +36,11 @@ function fmt(d?: string | null): string {
 
 function renderCard(c: CardData, mode: 'detailed' | 'short'): string {
   const eff: BallInCourt | null = c.pitch.ball_in_court ?? c.columnDefaultGlow;
-  const bicColor = eff === 'us' ? '#ef4444' : eff === 'them' ? '#22c55e' : '#3a342a';
-  const bicLabel = eff === 'us' ? 'US' : eff === 'them' ? 'THEM' : '—';
+  // Only "us" is a queue we control; the three counterparties all read as
+  // waiting, but the label says which one so the sheet is actionable on paper.
+  const waiting = eff === 'selling' || eff === 'buying' || eff === 'player';
+  const bicColor = eff === 'us' ? '#ef4444' : waiting ? '#22c55e' : '#3a342a';
+  const bicLabel = eff === 'us' ? 'US' : waiting ? eff!.toUpperCase() : '—';
   const club = c.targetClub || (c.contactClub && c.contactClub !== c.contactName ? c.contactClub : '');
 
   const header = `
@@ -61,7 +56,8 @@ function renderCard(c: CardData, mode: 'detailed' | 'short'): string {
 
   const tracks = `
     <div class="badges">
-      <span class="badge"><span class="badge-key">CLUB</span><b>${esc(trackLabel[c.pitch.club_track] ?? '—')}</b></span>
+      <span class="badge"><span class="badge-key">SELL</span><b>${esc(trackLabel[c.pitch.selling_track] ?? '—')}</b></span>
+      <span class="badge"><span class="badge-key">BUY</span><b>${esc(trackLabel[c.pitch.buying_track] ?? '—')}</b></span>
       <span class="badge"><span class="badge-key">PLAYER</span><b>${esc(trackLabel[c.pitch.player_track] ?? '—')}</b></span>
     </div>`;
 

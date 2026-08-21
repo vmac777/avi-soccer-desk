@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useContacts, useRecentInteractions } from '@/hooks/useData';
+import { useBuyPitches, BUY_ACTIVE_STAGES } from '@/hooks/useBuyData';
 import { healthColor, healthBg, getMarketStats, stagePill } from '@/lib/contactUtils';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -158,6 +159,7 @@ function MarketGrid({
 
 const Dashboard = () => {
   const { data: allContacts = [], isLoading } = useContacts();
+  const { data: pitches = [] } = useBuyPitches();
   const { data: recentActivity = [] } = useRecentInteractions(20);
   const { isAdmin } = useAuth();
   const { data: leagueNewsCounts = {} } = useLeagueNewsCounts(isAdmin);
@@ -192,7 +194,18 @@ const Dashboard = () => {
   const offeredCount = contacts.filter((c) => c.stage === 'Offered').length;
   const negotiatingCount = contacts.filter((c) => c.stage === 'Negotiating').length;
 
+  /**
+   * Deals waiting on us.
+   *
+   * The only queue an agent controls outright — everything else is waiting on a
+   * club or a player to come back. It goes first because it is the one number
+   * on this page that is directly actionable.
+   */
+  const onUs = pitches.filter(p =>
+    p.ball_in_court === 'us' && (BUY_ACTIVE_STAGES as readonly string[]).includes(p.stage)).length;
+
   const kpis = [
+    { label: 'Ball in our court', value: onUs, color: onUs > 0 ? 'text-status-hot' : 'text-muted-foreground' },
     { label: 'Total Contacts', value: total, color: 'text-foreground' },
     { label: 'Avg Staleness', value: `${avgStaleness}d`, color: 'text-status-warm' },
     { label: 'Active in window', value: activeCount, color: 'text-status-hot' },
@@ -240,7 +253,7 @@ const Dashboard = () => {
       </div>
 
       {/* KPI Row */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
         {kpis.map((kpi) => (
           <div key={kpi.label} className="bg-card border border-border rounded-md p-4">
             <p className="text-[10px] tracking-wider text-muted-foreground uppercase mb-1">{kpi.label}</p>

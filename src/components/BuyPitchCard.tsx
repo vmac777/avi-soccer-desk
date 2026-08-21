@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { type BuyPitch, type BallInCourt, useSetBallInCourt } from '@/hooks/useBuyData';
 import { formatCompactEur } from '@/lib/currency';
+import { TRACK_LABELS } from '@/lib/placementStage';
 
 type Props = {
   pitch: BuyPitch;
@@ -9,10 +10,12 @@ type Props = {
   targetClub?: string;
   contactName: string;
   contactClub: string;
-  /** What the column would glow as if the card had no override. 'us' | 'them' | null */
+  /** What the column would glow as if the card had no override. */
   columnDefaultGlow: BallInCourt | null;
   onOpen: () => void;
   viewMode?: 'detailed' | 'short';
+  /** How many clubs are live on this player right now. More than one is leverage. */
+  clubsInPlay?: number;
 };
 
 function fmt(d?: string): string {
@@ -21,45 +24,45 @@ function fmt(d?: string): string {
   return `${String(dt.getDate()).padStart(2, '0')}/${String(dt.getMonth() + 1).padStart(2, '0')}/${dt.getFullYear()}`;
 }
 
-const trackLabel: Record<string, string> = {
-  none: '—',
-  enquiring: 'Enquiring',
-  bid_in: 'Bid in',
-  fee_agreed: 'Fee agreed',
-  talking: 'Talking',
-  agreed: 'Agreed',
-};
-
+// The gates between agreement and a registered player. Each of the last three
+// is a way a deal everyone agreed on still fails.
 const milestoneOrder: { key: string; short: string }[] = [
   { key: 'enquiry_sent', short: 'Enquiry' },
   { key: 'bid_submitted', short: 'Bid' },
   { key: 'fee_agreed', short: 'Fee' },
   { key: 'terms_agreed', short: 'Terms' },
   { key: 'medical', short: 'Medical' },
+  { key: 'work_permit', short: 'Permit' },
+  { key: 'itc', short: 'ITC' },
   { key: 'registered', short: 'Registered' },
+  { key: 'announced', short: 'Announced' },
 ];
 
-export default function BuyPitchCard({ pitch, targetName, targetClub, contactName, contactClub, columnDefaultGlow, onOpen, viewMode = 'detailed' }: Props) {
+export default function BuyPitchCard({ pitch, targetName, targetClub, contactName, contactClub, columnDefaultGlow, onOpen, viewMode = 'detailed', clubsInPlay = 1 }: Props) {
   const setBic = useSetBallInCourt();
   const [expanded, setExpanded] = useState(false);
   const effective: BallInCourt | null = pitch.ball_in_court ?? columnDefaultGlow;
 
+  // Only "us" is a queue an agent can clear on their own. Every other party
+  // reads the same way — waiting — so they share one treatment.
+  const waitingOnThem = effective === 'selling' || effective === 'buying' || effective === 'player';
+
   const glowClass =
     effective === 'us' ? 'shadow-glow-us ring-glow-us'
-    : effective === 'them' ? 'shadow-glow-them ring-glow-them'
+    : waitingOnThem ? 'shadow-glow-them ring-glow-them'
     : '';
 
+  // The square cycles through the parties rather than toggling, because with
+  // three counterparties "not us" is not an answer.
+  const BALL_CYCLE: (BallInCourt | null)[] = ['us', 'selling', 'buying', 'player', null];
   const cycle = () => {
-    const next: BallInCourt | null =
-      pitch.ball_in_court === 'us' ? 'them'
-      : pitch.ball_in_court === 'them' ? null
-      : 'us';
-    setBic.mutate({ id: pitch.id, value: next });
+    const at = BALL_CYCLE.indexOf(pitch.ball_in_court ?? null);
+    setBic.mutate({ id: pitch.id, value: BALL_CYCLE[(at + 1) % BALL_CYCLE.length] });
   };
 
   const blockStyle = effective === 'us'
     ? { backgroundColor: 'hsl(var(--glow-action-us))' }
-    : effective === 'them'
+    : waitingOnThem
       ? { backgroundColor: 'hsl(var(--glow-action-them))' }
       : undefined;
 
@@ -88,7 +91,20 @@ export default function BuyPitchCard({ pitch, targetName, targetClub, contactNam
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-foreground truncate">{targetName}</p>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <p className="text-xs font-semibold text-foreground truncate">{targetName}</p>
+            {/* Several clubs live on the same player is a competitive situation,
+                and by stage it otherwise scatters across columns as unrelated
+                rows. */}
+            {clubsInPlay > 1 && (
+              <span
+                title={`${clubsInPlay} clubs in play for this player`}
+                className="shrink-0 font-mono text-[9px] px-1 py-0.5 rounded border border-[hsl(var(--gold)/0.5)] text-[hsl(var(--gold))]"
+              >
+                {clubsInPlay} clubs
+              </span>
+            )}
+          </div>
           {(() => {
             // Show player's current club; agent counterparties duplicate contactName==club, so prefer targetClub.
             const clubToShow = targetClub || (contactClub && contactClub !== contactName ? contactClub : '');
@@ -101,7 +117,9 @@ export default function BuyPitchCard({ pitch, targetName, targetClub, contactNam
         </div>
         <button
           onClick={e => { e.stopPropagation(); cycle(); }}
-          title={effective === 'us' ? 'Action on us — click to flip' : effective === 'them' ? 'Waiting on them — click to clear' : 'No action — click to set'}
+          title={effective === 'us' ? 'On us — click to cycle'
+            : waitingOnThem ? `Waiting on the ${effective} — click to cycle`
+            : 'Nobody assigned — click to set'}
           className={cn(
             'h-4 w-4 rounded-sm border shrink-0 transition-colors',
             effective ? 'border-transparent' : 'border-border hover:border-foreground/40'
@@ -115,10 +133,13 @@ export default function BuyPitchCard({ pitch, targetName, targetClub, contactNam
           {/* Track badges */}
           <div className="flex gap-1 flex-wrap">
             <span className="font-mono text-[9px] px-1.5 py-0.5 rounded border border-border text-muted-foreground">
-              Club: <span className="text-foreground">{trackLabel[pitch.club_track] ?? '—'}</span>
+              Sell: <span className="text-foreground">{TRACK_LABELS[pitch.selling_track] ?? '—'}</span>
             </span>
             <span className="font-mono text-[9px] px-1.5 py-0.5 rounded border border-border text-muted-foreground">
-              Player: <span className="text-foreground">{trackLabel[pitch.player_track] ?? '—'}</span>
+              Buy: <span className="text-foreground">{TRACK_LABELS[pitch.buying_track] ?? '—'}</span>
+            </span>
+            <span className="font-mono text-[9px] px-1.5 py-0.5 rounded border border-border text-muted-foreground">
+              Player: <span className="text-foreground">{TRACK_LABELS[pitch.player_track] ?? '—'}</span>
             </span>
           </div>
 

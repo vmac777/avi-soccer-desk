@@ -18,10 +18,17 @@ import BuyPitchDetailModal from '@/components/BuyPitchDetailModal';
 import BuyPitchCard from '@/components/BuyPitchCard';
 import { exportBuyKanbanPdf } from '@/lib/exportBuyKanbanPdf';
 
+/**
+ * What a column implies when a card has not said who it is waiting on.
+ *
+ * An enquiry sits with whoever was asked, and a closing deal sits with the
+ * buying club and the paperwork. Mid-negotiation the ball genuinely moves back
+ * and forth, so that column asserts nothing.
+ */
 const COLUMN_DEFAULT_GLOW: Record<typeof BUY_ACTIVE_STAGES[number], BallInCourt | null> = {
-  Enquiry: 'them',
-  Negotiation: null,   // ball ping-pongs; per-card only
-  Closing: 'them',
+  Enquiry: 'selling',
+  Negotiation: null,
+  Closing: 'buying',
 };
 
 const POSITION_FILTERS = ['All', 'GK', 'DEF', 'MID', 'FWD'] as const;
@@ -193,7 +200,9 @@ export default function BuyPitchesPage() {
   const [selectedPitchId, setSelectedPitchId] = useState<string | null>(null);
 
   // Ball-in-court filter chips (replaces closed-stage chips)
-  const [bicFilter, setBicFilter] = useState<'all' | 'us' | 'them'>('all');
+  // 'waiting' is any of the three counterparties. An agent filters for "what
+  // can I move" far more than for which specific party is sitting on it.
+  const [bicFilter, setBicFilter] = useState<'all' | 'us' | 'waiting' | 'selling' | 'buying' | 'player'>('all');
   const [posFilter, setPosFilter] = useState<PosFilter>('All');
   const [showClosed, setShowClosed] = useState(false);
   const [viewMode, setViewMode] = useState<'detailed' | 'short'>('detailed');
@@ -221,6 +230,21 @@ export default function BuyPitchesPage() {
    * buying club leads — that is the conversation being worked, and the selling
    * club is context for it.
    */
+  /**
+   * How many clubs are live on the same player.
+   *
+   * One player being worked at three clubs at once is a competitive situation
+   * and the most valuable thing this board can tell an agent — it is leverage,
+   * and by stage it otherwise scatters across three columns as unrelated rows.
+   */
+  const clubsInPlay = useMemo(() => {
+    const n: Record<string, number> = {};
+    pitches
+      .filter(p => (BUY_ACTIVE_STAGES as readonly string[]).includes(p.stage))
+      .forEach(p => { n[p.scouted_target_id] = (n[p.scouted_target_id] ?? 0) + 1; });
+    return n;
+  }, [pitches]);
+
   const counterparty = (p: BuyPitch) => {
     const selling = p.contact_id ? contactMap[p.contact_id] : undefined;
     const buying = p.buying_contact_id ? contactMap[p.buying_contact_id] : undefined;
@@ -261,7 +285,9 @@ export default function BuyPitchesPage() {
       if (bicFilter !== 'all') {
         const colGlow = COLUMN_DEFAULT_GLOW[p.stage as typeof BUY_ACTIVE_STAGES[number]];
         const effective = p.ball_in_court ?? colGlow;
-        if (effective !== bicFilter) return false;
+        if (bicFilter === 'waiting') {
+          if (effective !== 'selling' && effective !== 'buying' && effective !== 'player') return false;
+        } else if (effective !== bicFilter) return false;
       }
       return true;
     });
@@ -399,7 +425,7 @@ export default function BuyPitchesPage() {
 
         {/* Ball-in-court filter */}
         <div className="flex items-center gap-1 bg-card border border-border rounded-md p-0.5">
-          {(['all', 'us', 'them'] as const).map(v => (
+          {(['all', 'us', 'waiting', 'selling', 'buying', 'player'] as const).map(v => (
             <button
               key={v}
               onClick={() => setBicFilter(v)}
@@ -408,7 +434,7 @@ export default function BuyPitchesPage() {
                 bicFilter === v ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              {v === 'all' ? 'All' : v === 'us' ? 'Us' : 'Them'}
+              {v}
             </button>
           ))}
         </div>
@@ -467,11 +493,12 @@ export default function BuyPitchesPage() {
                 {stagePitches.map(pitch => (
                   <div key={pitch.id} draggable onDragStart={e => e.dataTransfer.setData('pitchId', pitch.id)}>
                     <BuyPitchCard
+                      clubsInPlay={clubsInPlay[pitch.scouted_target_id] ?? 1}
                       pitch={pitch}
                       targetName={targetMap[pitch.scouted_target_id]?.name || 'Unknown'}
                       targetClub={targetMap[pitch.scouted_target_id]?.current_club || ''}
-                      contactName={contactMap[pitch.contact_id]?.name || 'Unknown'}
-                      contactClub={contactMap[pitch.contact_id]?.club || ''}
+                      contactName={counterparty(pitch).name}
+                      contactClub={counterparty(pitch).club}
                       columnDefaultGlow={colGlow}
                       onOpen={() => setSelectedPitchId(pitch.id)}
                       viewMode={viewMode}
@@ -499,12 +526,13 @@ export default function BuyPitchesPage() {
           <div className="space-y-2">
             {signedPitches.map(pitch => (
               <BuyPitchCard
+                clubsInPlay={clubsInPlay[pitch.scouted_target_id] ?? 1}
                 key={pitch.id}
                 pitch={pitch}
                 targetName={targetMap[pitch.scouted_target_id]?.name || 'Unknown'}
                 targetClub={targetMap[pitch.scouted_target_id]?.current_club || ''}
-                contactName={contactMap[pitch.contact_id]?.name || 'Unknown'}
-                contactClub={contactMap[pitch.contact_id]?.club || ''}
+                contactName={counterparty(pitch).name}
+                contactClub={counterparty(pitch).club}
                 columnDefaultGlow={null}
                 onOpen={() => setSelectedPitchId(pitch.id)}
                 viewMode={viewMode}
@@ -527,11 +555,12 @@ export default function BuyPitchesPage() {
               {visibleClosed.map(pitch => (
                 <div key={pitch.id} className="relative">
                   <BuyPitchCard
+                clubsInPlay={clubsInPlay[pitch.scouted_target_id] ?? 1}
                     pitch={pitch}
                     targetName={targetMap[pitch.scouted_target_id]?.name || 'Unknown'}
                     targetClub={targetMap[pitch.scouted_target_id]?.current_club || ''}
-                    contactName={contactMap[pitch.contact_id]?.name || 'Unknown'}
-                    contactClub={contactMap[pitch.contact_id]?.club || ''}
+                    contactName={counterparty(pitch).name}
+                    contactClub={counterparty(pitch).club}
                     columnDefaultGlow={null}
                     onOpen={() => setSelectedPitchId(pitch.id)}
                     viewMode={viewMode}

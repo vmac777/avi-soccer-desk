@@ -132,7 +132,8 @@ export type Database = {
         Row: {
           asking_price: number | null
           ball_in_court: string | null
-          club_track: string
+          selling_track: string
+          buying_track: string
           contact_id: string
           created_at: string
           current_offer: number | null
@@ -152,7 +153,8 @@ export type Database = {
         Insert: {
           asking_price?: number | null
           ball_in_court?: string | null
-          club_track?: string
+          selling_track?: string
+          buying_track?: string
           contact_id: string
           created_at?: string
           current_offer?: number | null
@@ -172,7 +174,8 @@ export type Database = {
         Update: {
           asking_price?: number | null
           ball_in_court?: string | null
-          club_track?: string
+          selling_track?: string
+          buying_track?: string
           contact_id?: string
           created_at?: string
           current_offer?: number | null
