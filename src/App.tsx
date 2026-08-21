@@ -21,6 +21,7 @@ import LoginPage from "@/pages/Login";
  * Login stays eager because it is the first paint for anyone signed out, and a
  * spinner in front of a password field is a worse trade than a few kilobytes.
  */
+const BoardPage = lazy(() => import("@/pages/Board"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const ContactsPage = lazy(() => import("@/pages/Contacts"));
 const PendingActionsPage = lazy(() => import("@/pages/PendingActions"));
@@ -102,7 +103,8 @@ const App = () => (
           <Routes>
             <Route path="/login" element={<LoginPage />} />
 
-            <Route path="/" element={adminRoute(<Dashboard />)} />
+            <Route path="/" element={adminRoute(<BoardPage />)} />
+            <Route path="/network" element={adminRoute(<Dashboard />)} />
             <Route path="/contacts" element={adminRoute(<ContactsPage />)} />
             <Route path="/pending-actions" element={adminRoute(<PendingActionsPage />)} />
             <Route path="/needs" element={adminRoute(<ClubNeedsPage />)} />
