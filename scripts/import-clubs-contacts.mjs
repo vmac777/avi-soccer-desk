@@ -26,9 +26,10 @@
  * on. In transfer terms the two desks are counterparties, so that layer stays
  * where it was built.
  *
- * Direct phone numbers and LinkedIn URLs are also left behind. Those are
- * personal contact details that identifiable people gave to one desk, not
- * consent to be reachable from another. The agency can gather its own.
+ * Direct phone numbers are also left behind. A mobile number is something an
+ * identifiable person handed to that desk, not consent to be called from this
+ * one. LinkedIn URLs do come across: a public professional profile is the same
+ * thing a search for that person's name would return.
  *
  * Those fields are written as the schema's neutral values rather than copied.
  * `stage` becomes '' — no relationship yet — rather than the column default of
@@ -95,8 +96,8 @@ const clubRows = clubs.map((c) => ({
 const DROPPED = [
   // one desk's private read on the relationship
   'who_spoke', 'last_contact', 'stage', 'needs', 'club_interest', 'players_offered', 'priority',
-  // personal contact details, given to that desk and not to this one
-  'phone1', 'phone2', 'phone3', 'linkedin',
+  // direct lines, given to that desk and not to this one
+  'phone1', 'phone2', 'phone3',
 ];
 
 /**
@@ -113,11 +114,14 @@ const contactRows = contacts.map((c) => ({
   role: clean(c.role),
   is_primary: false,
 
+  // A LinkedIn URL is a public professional profile — the same thing a search
+  // would return. It travels; a direct line does not.
+  linkedin: clean(c.linkedin),
+
   // Left behind deliberately — see the header.
   phone1: '',
   phone2: '',
   phone3: '',
-  linkedin: '',
 
   // Deliberately reset — see the header.
   who_spoke: '',
@@ -135,18 +139,19 @@ const nameless = contactRows.filter((c) => !c.contact_person).length;
 const namedContacts = contactRows.filter((c) => c.contact_person);
 
 const sourcePhones = contacts.filter((c) => c.phone1 || c.phone2 || c.phone3).length;
-const sourceLinkedin = contacts.filter((c) => c.linkedin).length;
+const carriedLinkedin = namedContacts.filter((c) => c.linkedin).length;
 const carriedNonEmpty = contacts.filter((c) => DROPPED.some((f) => c[f])).length;
 
 console.log(`from ${backupDir}`);
 console.log(`  clubs:    ${clubRows.length}`);
-console.log(`  contacts: ${namedContacts.length}  (names and roles only)`);
+console.log(`  contacts: ${namedContacts.length}  (names, roles, LinkedIn)`);
 if (nameless > 0) console.log(`            ${nameless} rows have no name and are skipped`);
 console.log(`  leagues:  ${new Set(clubRows.map((c) => c.league).filter(Boolean)).size}`);
 console.log(`  TR-mapped: ${clubRows.filter((c) => c.tr_team_id && c.tr_competition_id).length}  (needed for TransferRoom enrichment)`);
 console.log(`\n  leaving behind, from ${carriedNonEmpty} rows that carried something:`);
 console.log(`    ${DROPPED.join(', ')}`);
-console.log(`    ${sourcePhones} phone numbers and ${sourceLinkedin} LinkedIn URLs are NOT copied`);
+console.log(`    ${sourcePhones} phone numbers are NOT copied`);
+console.log(`  carrying ${carriedLinkedin} LinkedIn URLs`);
 
 if (dryRun) {
   console.log('\n--dry-run: first club and contact as they would be written\n');
@@ -192,5 +197,5 @@ console.log(`contacts: ${contactsOk}/${fresh.length} inserted`);
 contactFails.slice(0, 10).forEach((f) => console.error(`  !! ${f.who}: ${f.error}`));
 
 if (clubFails.length || contactFails.length) process.exit(1);
-console.log('\nNames and roles imported. Relationship history, phone numbers and LinkedIn');
-console.log('URLs were not copied — those start empty here.');
+console.log('\nNames, roles and LinkedIn URLs imported. Relationship history and phone');
+console.log('numbers were not copied — those start empty here.');

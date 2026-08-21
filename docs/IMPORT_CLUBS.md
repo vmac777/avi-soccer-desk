@@ -57,12 +57,14 @@ twice is safe.
 
 **Crosses:** club name, country, league and tier — public reference data, and
 what the Country → League → Club pickers are built on. Plus each stakeholder's
-**name and role**.
+**name, role and LinkedIn URL**.
 
 **Does not cross:**
 
-- **Phone numbers and LinkedIn URLs.** Personal contact details that named
-  people gave to that desk, not consent to be reachable from this one.
+- **Phone numbers.** A mobile number is something an identifiable person handed
+  to that desk, not consent to be called from this one. LinkedIn is different
+  and does come across — a public professional profile is the same thing a
+  search for that person's name would return.
 - **The CRM layer** — `who_spoke`, `last_contact`, `stage`, `needs`,
   `club_interest`, `players_offered`, `priority`. That is not a directory, it is
   one organisation's private read on each relationship: how warm it is, who owns
@@ -72,5 +74,5 @@ what the Country → League → Club pickers are built on. Plus each stakeholder
 `stage` lands as empty rather than the column default of
 `Contacted - No Answer`, which would assert an approach that never happened.
 
-The importer prints how many phone numbers and LinkedIn URLs it left behind, so
-you can see the filter did its job.
+The importer prints how many phone numbers it left behind and how many LinkedIn
+URLs it is carrying, so you can see the filter did its job.
