@@ -137,18 +137,26 @@ export function getPositionGroup(position: string): string {
   return 'MID';
 }
 
-/** Accepts ISO `YYYY-MM-DD` (how the DB stores it) or legacy `DD/MM/YYYY`. */
-export function parsePlayerDob(dob: string): Date {
-  if (dob.includes('-')) {
-    const [year, month, day] = dob.split('-').map(Number);
-    return new Date(year, month - 1, day);
-  }
-  const [day, month, year] = dob.split('/').map(Number);
-  return new Date(year, month - 1, day);
+/**
+ * Accepts ISO `YYYY-MM-DD` (how the DB stores it) or legacy `DD/MM/YYYY`.
+ *
+ * Returns null rather than throwing on a missing or unparseable date. A roster
+ * player has no date of birth until enrichment has run against his Transfermarkt
+ * link, which is most of the roster on the day it is imported — so "no date" is
+ * the normal case here, not an error.
+ */
+export function parsePlayerDob(dob?: string | null): Date | null {
+  if (!dob) return null;
+  const parts = dob.includes('-') ? dob.split('-').map(Number) : dob.split('/').map(Number).reverse();
+  const [year, month, day] = parts;
+  if (!year || !month || !day) return null;
+  const d = new Date(year, month - 1, day);
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
-export function getAge(dob: string): number {
+export function getAge(dob?: string | null): number | undefined {
   const birth = parsePlayerDob(dob);
+  if (!birth) return undefined;
   const today = new Date();
   let age = today.getFullYear() - birth.getFullYear();
   const m = today.getMonth() - birth.getMonth();

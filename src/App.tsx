@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
 import RequireAuth from "@/components/auth/RequireAuth";
+import RouteErrorBoundary from "@/components/RouteErrorBoundary";
 import RequireAdmin from "@/components/auth/RequireAdmin";
 import RequireSuperAdmin from "@/components/auth/RequireSuperAdmin";
 import Dashboard from "@/pages/Dashboard";
@@ -22,19 +23,19 @@ const queryClient = new QueryClient();
 
 const adminRoute = (el: JSX.Element) => (
   <RequireAdmin>
-    <AppLayout>{el}</AppLayout>
+    <AppLayout><RouteErrorBoundary>{el}</RouteErrorBoundary></AppLayout>
   </RequireAdmin>
 );
 
 const superAdminRoute = (el: JSX.Element) => (
   <RequireSuperAdmin>
-    <AppLayout>{el}</AppLayout>
+    <AppLayout><RouteErrorBoundary>{el}</RouteErrorBoundary></AppLayout>
   </RequireSuperAdmin>
 );
 
 const authedRoute = (el: JSX.Element) => (
   <RequireAuth>
-    <AppLayout>{el}</AppLayout>
+    <AppLayout><RouteErrorBoundary>{el}</RouteErrorBoundary></AppLayout>
   </RequireAuth>
 );
 

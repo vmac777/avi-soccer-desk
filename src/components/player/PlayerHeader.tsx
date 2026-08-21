@@ -32,7 +32,8 @@ function getInitials(name: string): string {
 
 export default function PlayerHeader({ player }: { player: Player }) {
   const group = getPositionGroup(player.position);
-  const age = getAge(player.dob);
+  // A real date of birth if we have one, otherwise the age the list came with.
+  const age = getAge(player.dob) ?? player.age;
   const hasTr = player.trId != null;
   const latestXtv = getLatestXtvM(player);
   const change6m = getXtvChange6mPct(player);
@@ -65,11 +66,20 @@ export default function PlayerHeader({ player }: { player: Player }) {
             </span>
           )}
         </div>
-        <p className="text-sm text-muted-foreground mt-0.5">{player.fullName}</p>
+        {player.fullName && <p className="text-sm text-muted-foreground mt-0.5">{player.fullName}</p>}
+        {/* Each pill is a fact we hold. Until enrichment has run against the
+            Transfermarkt link most of these are absent, and an empty pill reads
+            as a fact we have and can't display. Show only what we know. */}
         <div className="flex items-center gap-2 mt-3 flex-wrap">
-          <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">{age} yrs</span>
-          <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">{player.nationality}</span>
-          <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">{player.height}m</span>
+          {age != null && (
+            <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">{age} yrs</span>
+          )}
+          {player.nationality && (
+            <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">{player.nationality}</span>
+          )}
+          {player.height && (
+            <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">{player.height}m</span>
+          )}
           {player.currentClub && (
             <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">{player.currentClub}</span>
           )}

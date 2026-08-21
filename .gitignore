@@ -32,3 +32,8 @@ backups
 
 # Generated spreadsheets / deliverables
 out
+
+# This is not a Lovable project — bun.lock resolves through a private registry
+# that 403s outside Lovable, and Vercel auto-detects it. npm is the only path.
+bun.lock
+bun.lockb

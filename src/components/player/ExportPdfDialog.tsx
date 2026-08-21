@@ -277,7 +277,7 @@ export default function ExportPdfDialog({ player, open, onClose }: ExportPdfDial
 
   // Template data
   const dob = parsePlayerDob(player.dob);
-  const age = getAge(player.dob);
+  const age = getAge(player.dob) ?? player.age;
   const hasFin = hasCommercialData(player);
   const hasTr = hasTrData(player);
   const latestXtv = getLatestXtvM(player);
@@ -357,9 +357,15 @@ export default function ExportPdfDialog({ player, open, onClose }: ExportPdfDial
             <div style={{ fontSize: 13, color: '#998a70', marginBottom: 14 }}>{player.fullName}</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
               <span style={{ padding: '4px 10px', borderRadius: 6, background: '#c8952a', color: '#0d0a06', fontSize: 12, fontWeight: 600 }}>{player.position}</span>
-              <span style={{ padding: '4px 10px', borderRadius: 6, background: '#1a1410', border: '1px solid #2a2118', fontSize: 12 }}>{age} {tr('yrs', lang)}</span>
-              <span style={{ padding: '4px 10px', borderRadius: 6, background: '#1a1410', border: '1px solid #2a2118', fontSize: 12 }}>{player.nationality}</span>
-              <span style={{ padding: '4px 10px', borderRadius: 6, background: '#1a1410', border: '1px solid #2a2118', fontSize: 12 }}>{player.height}m</span>
+              {age != null && (
+                <span style={{ padding: '4px 10px', borderRadius: 6, background: '#1a1410', border: '1px solid #2a2118', fontSize: 12 }}>{age} {tr('yrs', lang)}</span>
+              )}
+              {player.nationality && (
+                <span style={{ padding: '4px 10px', borderRadius: 6, background: '#1a1410', border: '1px solid #2a2118', fontSize: 12 }}>{player.nationality}</span>
+              )}
+              {player.height && (
+                <span style={{ padding: '4px 10px', borderRadius: 6, background: '#1a1410', border: '1px solid #2a2118', fontSize: 12 }}>{player.height}m</span>
+              )}
               {player.currentClub && (
                 <span style={{ padding: '4px 10px', borderRadius: 6, background: '#1a1410', border: '1px solid #2a2118', fontSize: 12 }}>{player.currentClub}</span>
               )}
@@ -401,9 +407,12 @@ export default function ExportPdfDialog({ player, open, onClose }: ExportPdfDial
         <PdfSection title={tr('sporting', lang)}>
           <PdfGrid cols={3}>
             <PdfField label={tr('position', lang)} value={player.position} />
-            <PdfField label={tr('dob', lang)} value={`${age} (${dob.getFullYear()})`} />
-            <PdfField label={tr('nationality', lang)} value={player.nationality} />
-            <PdfField label={tr('height', lang)} value={`${player.height}m`} />
+            <PdfField
+              label={tr('dob', lang)}
+              value={age == null ? '—' : dob ? `${age} (${dob.getFullYear()})` : String(age)}
+            />
+            <PdfField label={tr('nationality', lang)} value={player.nationality || '—'} />
+            <PdfField label={tr('height', lang)} value={player.height ? `${player.height}m` : '—'} />
             <PdfField label={tr('previousClub', lang)} value={player.previousClub} />
             <PdfField label={tr('currentClub', lang)} value={player.currentClub} />
             {player.trPreferredFoot && <PdfField label={tr('preferredFoot', lang)} value={player.trPreferredFoot} />}

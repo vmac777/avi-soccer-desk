@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { toRosterPlayer } from './rosterMapping';
-import { hasCommercialData, hasMandateData, isPrintable, provenanceOf } from './rosterData';
+import { getAge, hasCommercialData, hasMandateData, isPrintable, parsePlayerDob, provenanceOf } from './rosterData';
 import type { ScoutedTarget } from '@/hooks/useBuyData';
 
 /**
@@ -78,6 +78,28 @@ describe('provenance', () => {
       row({ contract_end: '2027-06-30', data_provenance: { contractEndDate: 'verified' } } as unknown as Partial<ScoutedTarget>),
     );
     expect(isPrintable(p, 'contractEndDate')).toBe(true);
+  });
+});
+
+describe('dates of birth', () => {
+  // A missing date of birth is the normal state of a freshly imported roster,
+  // not an error. These used to throw, which blanked the whole page.
+  it('returns nothing rather than throwing when there is no date', () => {
+    expect(parsePlayerDob(undefined)).toBeNull();
+    expect(parsePlayerDob(null)).toBeNull();
+    expect(parsePlayerDob('')).toBeNull();
+    expect(getAge(undefined)).toBeUndefined();
+  });
+
+  it('rejects a date it cannot read instead of inventing one', () => {
+    expect(parsePlayerDob('not a date')).toBeNull();
+    expect(getAge('not a date')).toBeUndefined();
+  });
+
+  it('reads both the stored and the legacy format as the same day', () => {
+    expect(parsePlayerDob('1998-03-14')?.getFullYear()).toBe(1998);
+    expect(parsePlayerDob('1998-03-14')?.getMonth()).toBe(2);
+    expect(parsePlayerDob('14/03/1998')?.getTime()).toBe(parsePlayerDob('1998-03-14')?.getTime());
   });
 });
 
