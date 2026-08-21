@@ -1,7 +1,7 @@
 // Fetches a Transfermarkt player profile and parses key fields.
 // Fails soft: returns { ok: false, reason } when blocked / timeout / parse error.
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { requireAdmin } from '../_shared/requireAdmin.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -134,24 +134,10 @@ function parseTmHtml(html: string) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
-  // Auth: validated JWT
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return new Response(JSON.stringify({ ok: false, reason: 'unauthorized' }), {
-      status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-  const userClient = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_ANON_KEY')!,
-    { global: { headers: { Authorization: authHeader } } },
-  );
-  const { data: { user } } = await userClient.auth.getUser();
-  if (!user) {
-    return new Response(JSON.stringify({ ok: false, reason: 'unauthorized' }), {
-      status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
+  // Auth: signed in AND an admin. This burns metered Transfermarkt requests,
+  // so being any authenticated user is not enough.
+  const gate = await requireAdmin(req, corsHeaders);
+  if (!gate.ok) return gate.response;
 
   let body: { tmUrl?: string } = {};
   try { body = await req.json(); } catch (_) {}

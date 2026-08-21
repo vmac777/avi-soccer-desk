@@ -15,6 +15,7 @@
 // Output: { ok: true, data: {...}, raw: {...} } | { ok: false, reason: string, ... }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { requireAdmin } from '../_shared/requireAdmin.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -144,16 +145,12 @@ function json(body: unknown, status = 200) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
-  // ── Auth: caller must be signed in ──
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) return json({ ok: false, reason: 'unauthorized' }, 401);
-  const userClient = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_ANON_KEY')!,
-    { global: { headers: { Authorization: authHeader } } },
-  );
-  const { data: { user } } = await userClient.auth.getUser();
-  if (!user) return json({ ok: false, reason: 'unauthorized' }, 401);
+  // ── Auth: caller must be signed in AND an admin ──
+  // Below this line the function spends TransferRoom quota and then writes
+  // through a service-role client that bypasses RLS. "Signed in" was never a
+  // sufficient bar for either.
+  const gate = await requireAdmin(req, corsHeaders);
+  if (!gate.ok) return gate.response;
 
   const proxyToken = Deno.env.get('TR_PROXY_BEARER_TOKEN');
   if (!proxyToken) return json({ ok: false, reason: 'proxy_not_configured' }, 500);

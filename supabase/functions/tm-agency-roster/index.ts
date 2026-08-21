@@ -9,7 +9,7 @@
 // Fails soft, like tm-fetch: { ok: false, reason } on block, timeout or parse
 // failure. Never throws at the caller.
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { requireAdmin } from '../_shared/requireAdmin.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -102,17 +102,9 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  // Auth: validated JWT, same gate as tm-fetch.
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) return json({ ok: false, reason: 'unauthorized' }, 401);
-
-  const userClient = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_ANON_KEY')!,
-    { global: { headers: { Authorization: authHeader } } },
-  );
-  const { data: { user } } = await userClient.auth.getUser();
-  if (!user) return json({ ok: false, reason: 'unauthorized' }, 401);
+  // Auth: signed in AND an admin, same gate as tm-fetch.
+  const gate = await requireAdmin(req, corsHeaders);
+  if (!gate.ok) return gate.response;
 
   let body: { agencyUrl?: string } = {};
   try { body = await req.json(); } catch (_) { /* handled below */ }
