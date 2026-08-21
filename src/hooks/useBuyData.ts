@@ -98,7 +98,10 @@ export const LOAN_TYPES_WITH_TRIGGER: NegotiationType[] = [
 export interface BuyPitch {
   id: string;
   scouted_target_id: string;
-  contact_id: string;
+  /** Selling side — the club holding the registration. Null for a free agent. */
+  contact_id: string | null;
+  /** Buying side — the club being approached. Null before anyone is sounded out. */
+  buying_contact_id?: string | null;
   stage: BuyPitchStage;
   asking_price: number | null;
   current_offer: number | null;
@@ -277,18 +280,36 @@ export function useAddBuyPitch() {
   return useMutation({
     mutationFn: async (input: {
       scouted_target_id: string;
-      contact_id: string;
+      /** Selling side — the club holding his registration. Absent for a free agent. */
+      contact_id?: string | null;
+      /** Buying side — the club being approached. */
+      buying_contact_id?: string | null;
       notes?: string;
     }): Promise<{ pitch: BuyPitch; action: 'created' | 'opened' | 'reopened' }> => {
-      const { scouted_target_id, contact_id, notes = '' } = input;
+      const { scouted_target_id, notes = '' } = input;
+      const contact_id = input.contact_id || null;
+      const buying_contact_id = input.buying_contact_id || null;
+
+      if (!contact_id && !buying_contact_id) {
+        throw new Error('A pitch needs a club on at least one side.');
+      }
 
       // 1. Existing?
-      const { data: existing, error: selErr } = await supabase
+      //
+      // Matched on the whole three-way pairing, not the player alone. One
+      // player is offered to many clubs at once — that is the job — so keying
+      // on scouted_target_id would find an unrelated pitch and quietly return
+      // it instead of opening the new one.
+      let q = supabase
         .from('buy_pitches' as any)
         .select('*')
-        .eq('scouted_target_id', scouted_target_id)
-        .maybeSingle();
+        .eq('scouted_target_id', scouted_target_id);
+      q = contact_id ? q.eq('contact_id', contact_id) : q.is('contact_id', null);
+      q = buying_contact_id ? q.eq('buying_contact_id', buying_contact_id) : q.is('buying_contact_id', null);
+
+      const { data: existingRows, error: selErr } = await q.limit(1);
       if (selErr) throw selErr;
+      const existing = existingRows?.[0] ?? null;
 
       const closedStrings = BUY_CLOSED_STAGES as readonly string[];
 
@@ -332,6 +353,7 @@ export function useAddBuyPitch() {
           .insert({
             scouted_target_id,
             contact_id,
+            buying_contact_id,
             stage: 'Enquiry',
             asking_price: null,
             current_offer: null,

@@ -213,12 +213,38 @@ export default function BuyPitchesPage() {
     return m;
   }, [contacts]);
 
+  /**
+   * Who this pitch is with.
+   *
+   * A pitch now has two sides and either can be empty, so a row cannot just
+   * read the selling contact. Show whichever side exists; where both do, the
+   * buying club leads — that is the conversation being worked, and the selling
+   * club is context for it.
+   */
+  const counterparty = (p: BuyPitch) => {
+    const selling = p.contact_id ? contactMap[p.contact_id] : undefined;
+    const buying = p.buying_contact_id ? contactMap[p.buying_contact_id] : undefined;
+    const lead = buying ?? selling;
+    if (!lead) return { name: 'No counterparty', club: '', both: false };
+    return {
+      name: lead.name,
+      club: buying && selling ? `${buying.club} ← ${selling.club}` : lead.club,
+      both: !!(buying && selling),
+    };
+  };
+
   const matchesSearch = (p: BuyPitch) => {
     if (!search) return true;
     const s = search.toLowerCase();
     const t = targetMap[p.scouted_target_id];
-    const c = contactMap[p.contact_id];
-    return (t?.name || '').toLowerCase().includes(s) || (c?.name || '').toLowerCase().includes(s) || (c?.club || '').toLowerCase().includes(s);
+    // Search both sides — an agent looks a deal up by whichever club is on
+    // their mind, and that is as often the buyer as the seller.
+    const sides = [p.contact_id, p.buying_contact_id]
+      .filter((id): id is string => !!id)
+      .map((id) => contactMap[id])
+      .filter(Boolean);
+    return (t?.name || '').toLowerCase().includes(s)
+      || sides.some((c) => (c.name || '').toLowerCase().includes(s) || (c.club || '').toLowerCase().includes(s));
   };
 
   const activeStrings = BUY_ACTIVE_STAGES as readonly string[];
@@ -307,8 +333,8 @@ export default function BuyPitchesPage() {
                   pitch: p,
                   targetName: targetMap[p.scouted_target_id]?.name || 'Unknown',
                   targetClub: targetMap[p.scouted_target_id]?.current_club || '',
-                  contactName: contactMap[p.contact_id]?.name || 'Unknown',
-                  contactClub: contactMap[p.contact_id]?.club || '',
+                  contactName: counterparty(p).name,
+                  contactClub: counterparty(p).club,
                   columnDefaultGlow: COLUMN_DEFAULT_GLOW[stage],
                 })),
               }));
@@ -318,8 +344,8 @@ export default function BuyPitchesPage() {
                   pitch: p,
                   targetName: targetMap[p.scouted_target_id]?.name || 'Unknown',
                   targetClub: targetMap[p.scouted_target_id]?.current_club || '',
-                  contactName: contactMap[p.contact_id]?.name || 'Unknown',
-                  contactClub: contactMap[p.contact_id]?.club || '',
+                  contactName: counterparty(p).name,
+                  contactClub: counterparty(p).club,
                   columnDefaultGlow: null,
                 })),
               });
@@ -330,8 +356,8 @@ export default function BuyPitchesPage() {
                     pitch: p,
                     targetName: targetMap[p.scouted_target_id]?.name || 'Unknown',
                     targetClub: targetMap[p.scouted_target_id]?.current_club || '',
-                    contactName: contactMap[p.contact_id]?.name || 'Unknown',
-                    contactClub: contactMap[p.contact_id]?.club || '',
+                    contactName: counterparty(p).name,
+                    contactClub: counterparty(p).club,
                     columnDefaultGlow: null,
                   })),
                 });

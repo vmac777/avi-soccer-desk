@@ -599,6 +599,7 @@ export default function ScoutedTargetsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [editTarget, setEditTarget] = useState<ScoutedTarget | null>(null);
   const [pitchTarget, setPitchTarget] = useState<ScoutedTarget | null>(null);
+  const [pitchBuyingContactId, setPitchBuyingContactId] = useState('');
   const [pitchContactId, setPitchContactId] = useState('');
   const [newAgentName, setNewAgentName] = useState<string | null>(null);
 
@@ -928,15 +929,48 @@ export default function ScoutedTargetsPage() {
 
       {/* Quick Create Pitch Dialog */}
       {pitchTarget && (() => {
-        const teamContacts = contacts.filter(c => c.club && pitchTarget.current_club && c.club.toLowerCase() === pitchTarget.current_club.toLowerCase());
-        const reset = () => { setPitchTarget(null); setPitchContactId(''); setNewAgentName(null); };
+        /**
+         * A placement has two sides and we sit between them.
+         *
+         * The selling club has to let him go; the buying club has to want him.
+         * Either conversation can start first, so either side alone is enough to
+         * open a pitch — a free agent has no selling club at all, and an
+         * approach usually begins with a buying club before the current club
+         * hears anything about it.
+         */
+        const sellingClub = pitchTarget.owner_club || pitchTarget.current_club;
+        const sellingContacts = contacts.filter(
+          c => c.club && sellingClub && c.club.toLowerCase() === sellingClub.toLowerCase());
+
+        // Anyone but the selling club — the whole directory is a buying side.
+        const buyingContacts = contacts
+          .filter(c => !sellingClub || (c.club ?? '').toLowerCase() !== sellingClub.toLowerCase())
+          .filter(c => c.contact_person || c.club);
+
+        const buyingByLeague = buyingContacts.reduce<Record<string, typeof buyingContacts>>((acc, c) => {
+          const k = c.market || 'Other';
+          (acc[k] ||= []).push(c);
+          return acc;
+        }, {});
+
+        const reset = () => {
+          setPitchTarget(null); setPitchContactId(''); setPitchBuyingContactId(''); setNewAgentName(null);
+        };
+
         return (
         <Dialog open onOpenChange={reset}>
-          <DialogContent className="max-w-sm">
-            <DialogHeader><DialogTitle>Create Pitch for {pitchTarget.name}</DialogTitle></DialogHeader>
+          <DialogContent className="max-w-md">
+            <DialogHeader><DialogTitle>New pitch — {pitchTarget.name}</DialogTitle></DialogHeader>
             <div className="space-y-3">
+              <p className="text-[11px] text-muted-foreground">
+                Fill in whichever side you have. At least one is needed; you can add the other
+                once that conversation starts.
+              </p>
+
               <div>
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Contact (selling club/agent) *</label>
+                <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Selling side {sellingClub ? `— ${sellingClub}` : '— none (free agent)'}
+                </label>
                 <select
                   value={newAgentName !== null ? '__new_agent__' : pitchContactId}
                   onChange={e => {
@@ -945,18 +979,21 @@ export default function ScoutedTargetsPage() {
                   }}
                   className="w-full h-8 text-xs bg-background border border-border rounded-md px-2"
                 >
-                  <option value="">Select contact...</option>
-                  {teamContacts.length > 0 && (
-                    <optgroup label={pitchTarget.current_club}>
-                      {teamContacts.map(c => <option key={c.id} value={c.id}>{c.contact_person || c.club}</option>)}
+                  <option value="">None</option>
+                  {sellingContacts.length > 0 && (
+                    <optgroup label={sellingClub}>
+                      {sellingContacts.map(c => (
+                        <option key={c.id} value={c.id}>{c.contact_person || c.club}{c.role ? ` — ${c.role}` : ''}</option>
+                      ))}
                     </optgroup>
                   )}
-                  <option value="__new_agent__">＋ Create New — Agent</option>
+                  <option value="__new_agent__">＋ Create new — agent</option>
                 </select>
               </div>
+
               {newAgentName !== null && (
                 <div>
-                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Agent Name *</label>
+                  <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Agent name *</label>
                   <Input
                     value={newAgentName}
                     onChange={e => setNewAgentName(e.target.value)}
@@ -966,11 +1003,36 @@ export default function ScoutedTargetsPage() {
                   />
                 </div>
               )}
+
+              <div>
+                <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Buying side — club being approached
+                </label>
+                <select
+                  value={pitchBuyingContactId}
+                  onChange={e => setPitchBuyingContactId(e.target.value)}
+                  className="w-full h-8 text-xs bg-background border border-border rounded-md px-2"
+                >
+                  <option value="">None yet</option>
+                  {Object.keys(buyingByLeague).sort().map(league => (
+                    <optgroup key={league} label={league}>
+                      {buyingByLeague[league]
+                        .sort((a, b) => (a.club ?? '').localeCompare(b.club ?? ''))
+                        .map(c => (
+                          <option key={c.id} value={c.id}>
+                            {c.club} — {c.contact_person || 'unnamed'}
+                          </option>
+                        ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+
               <div className="flex justify-end gap-2">
                 <Button variant="ghost" onClick={reset} className="h-8 text-xs">Cancel</Button>
                 <Button className="h-8 text-xs" onClick={async () => {
                   try {
-                    let contactId = pitchContactId;
+                    let contactId: string | null = pitchContactId || null;
                     if (newAgentName !== null) {
                       const name = newAgentName.trim();
                       if (!name) { toast.error('Agent name required'); return; }
@@ -982,19 +1044,23 @@ export default function ScoutedTargetsPage() {
                       } as any);
                       contactId = created.id;
                     }
-                    if (!contactId) { toast.error('Select a contact'); return; }
+                    if (!contactId && !pitchBuyingContactId) {
+                      toast.error('Pick a club on one side or the other');
+                      return;
+                    }
                     const { action } = await addPitch.mutateAsync({
                       scouted_target_id: pitchTarget.id,
                       contact_id: contactId,
+                      buying_contact_id: pitchBuyingContactId || null,
                     });
                     if (action === 'reopened') toast.success(`Re-opened pitch for ${pitchTarget.name}`);
-                    else if (action === 'opened') toast.info(`Pitch already exists for ${pitchTarget.name}`);
+                    else if (action === 'opened') toast.info(`That pitch already exists for ${pitchTarget.name}`);
                     else toast.success(`Pitch created for ${pitchTarget.name}`);
                     reset();
                   } catch (e: any) {
                     toast.error(e.message);
                   }
-                }}>Create Pitch</Button>
+                }}>Create pitch</Button>
               </div>
             </div>
           </DialogContent>
