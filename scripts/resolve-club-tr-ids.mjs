@@ -7,6 +7,7 @@
  *     node scripts/resolve-club-tr-ids.mjs --apply               # write them
  *     node scripts/resolve-club-tr-ids.mjs --list-competitions   # dump the TR list
  *     node scripts/resolve-club-tr-ids.mjs --list-teams --competition=1526
+ *     node scripts/resolve-club-tr-ids.mjs --only="X" --competition=1 --team=2 --rename --apply
  *     node scripts/resolve-club-tr-ids.mjs --only="Shakhtar"     # one club
  *
  * TransferRoom enrichment needs a club's tr_team_id and tr_competition_id. Ours
@@ -35,6 +36,7 @@ const args = process.argv.slice(2);
 const apply = args.includes('--apply');
 const listCompetitions = args.includes('--list-competitions');
 const listTeams = args.includes('--list-teams');
+const rename = args.includes('--rename');
 const onlyArg = args.find((a) => a.startsWith('--only='));
 const only = onlyArg ? onlyArg.slice('--only='.length).toLowerCase() : null;
 
@@ -125,55 +127,6 @@ const supabase = createClient(URL, KEY, { auth: { persistSession: false, autoRef
 const { error: authErr } = await supabase.auth.signInWithPassword({ email: EMAIL, password: PASSWORD });
 if (authErr) { console.error(`Sign-in failed: ${authErr.message}`); process.exit(1); }
 
-// ── Direct mapping, decided by a human ──
-if (forceTeam != null) {
-  // The club may not be in the table at all — that is the usual reason it needs
-  // a mapping written by hand. So match on the roster first: that is where the
-  // name came from, and it carries the league to file the new club under.
-  const { data: onRoster } = await supabase
-    .from('scouted_targets')
-    .select('current_club, league, owner_club, owner_league, loan_club, loan_league');
-
-  const found = new Map();
-  for (const r of onRoster ?? []) {
-    for (const [club, league] of [
-      [r.current_club, r.league], [r.owner_club, r.owner_league], [r.loan_club, r.loan_league],
-    ]) {
-      if (club && club.toLowerCase().includes(only)) found.set(club, league || '');
-    }
-  }
-
-  if (found.size === 0) {
-    console.error(`No club on the roster matching "${only}".`);
-    process.exit(1);
-  }
-  if (found.size > 1) {
-    console.error(`"${only}" matches more than one club: ${[...found.keys()].join(', ')}`);
-    process.exit(1);
-  }
-
-  const [name, league] = [...found.entries()][0];
-  const { data: existing } = await supabase
-    .from('clubs').select('id, name, league, country, tier').eq('name', name).maybeSingle();
-
-  console.log(`${name}  ->  team ${forceTeam}, competition ${forceCompetition}`);
-  console.log(existing ? '  (updating the existing clubs row)' : `  (creating a clubs row, league "${league || '—'}")`);
-  if (!apply) { console.log('\nRead-only. Add --apply to write it.'); process.exit(0); }
-
-  const { error } = await supabase.from('clubs').upsert({
-    name,
-    league: existing?.league || league || null,
-    country: existing?.country ?? null,
-    tier: existing?.tier ?? null,
-    tr_team_id: forceTeam,
-    tr_competition_id: forceCompetition,
-  }, { onConflict: 'name' });
-
-  if (error) { console.error(`Failed: ${error.message}`); process.exit(1); }
-  console.log('Written. Re-run enrichment from the roster to pick it up.');
-  process.exit(0);
-}
-
 // ── The competition list, once ──
 const competitions = await proxy('/competitions');
 if (!Array.isArray(competitions)) {
@@ -231,7 +184,7 @@ for (const p of players) {
   note(p.loan_club, p.loan_league);
 }
 
-if (wanted.size === 0) {
+if (wanted.size === 0 && forceTeam == null && !listTeams) {
   console.log('Every club the roster references already has TransferRoom identifiers.');
   process.exit(0);
 }
@@ -300,6 +253,91 @@ async function teamsIn(competitionId) {
   }
   rosterCache.set(competitionId, teams);
   return teams;
+}
+
+// ── Direct mapping, decided by a human ──
+if (forceTeam != null) {
+  // The club may not be in the table at all — that is the usual reason it needs
+  // a mapping written by hand. So match on the roster first: that is where the
+  // name came from, and it carries the league to file the new club under.
+  const { data: onRoster } = await supabase
+    .from('scouted_targets')
+    .select('current_club, league, owner_club, owner_league, loan_club, loan_league');
+
+  const found = new Map();
+  for (const r of onRoster ?? []) {
+    for (const [club, league] of [
+      [r.current_club, r.league], [r.owner_club, r.owner_league], [r.loan_club, r.loan_league],
+    ]) {
+      if (club && club.toLowerCase().includes(only)) found.set(club, league || '');
+    }
+  }
+
+  if (found.size === 0) {
+    console.error(`No club on the roster matching "${only}".`);
+    process.exit(1);
+  }
+  if (found.size > 1) {
+    console.error(`"${only}" matches more than one club: ${[...found.keys()].join(', ')}`);
+    process.exit(1);
+  }
+
+  const [rosterName, league] = [...found.entries()][0];
+
+  // What TransferRoom calls this team. Worth knowing even when we keep our own
+  // name, because a mismatch here is usually a sign the wrong id was picked.
+  let trName = null;
+  try {
+    trName = (await teamsIn(forceCompetition)).get(forceTeam) ?? null;
+  } catch (e) {
+    console.warn(`  (could not read competition ${forceCompetition}: ${e.message})`);
+  }
+
+  // The clubs row has to be named exactly as the roster names the club —
+  // enrichment looks it up by that string. So renaming the club means renaming
+  // it on the players too, or the lookup stops finding anything.
+  const name = rename && trName ? trName : rosterName;
+  if (rename && !trName) {
+    console.error('--rename needs the team name from TransferRoom, which could not be read.');
+    process.exit(1);
+  }
+
+  console.log(`${rosterName}  ->  team ${forceTeam}, competition ${forceCompetition}`);
+  if (trName) console.log(`  TransferRoom calls it: ${trName}`);
+  if (rename) console.log(`  --rename: the roster's "${rosterName}" becomes "${trName}" too`);
+
+  const { data: existing } = await supabase
+    .from('clubs').select('id, name, league, country, tier').eq('name', name).maybeSingle();
+  console.log(existing ? '  (updating the existing clubs row)' : `  (creating a clubs row, league "${league || '—'}")`);
+
+  if (!apply) { console.log('\nRead-only. Add --apply to write it.'); process.exit(0); }
+
+  const { error } = await supabase.from('clubs').upsert({
+    name,
+    league: existing?.league || league || null,
+    country: existing?.country ?? null,
+    tier: existing?.tier ?? null,
+    tr_team_id: forceTeam,
+    tr_competition_id: forceCompetition,
+  }, { onConflict: 'name' });
+
+  if (error) { console.error(`Failed: ${error.message}`); process.exit(1); }
+
+  if (rename && name !== rosterName) {
+    let moved = 0;
+    for (const col of ['current_club', 'owner_club', 'loan_club']) {
+      const { count, error: e } = await supabase
+        .from('scouted_targets')
+        .update({ [col]: name }, { count: 'exact' })
+        .eq(col, rosterName);
+      if (e) { console.error(`Failed renaming ${col}: ${e.message}`); process.exit(1); }
+      moved += count ?? 0;
+    }
+    console.log(`  renamed ${moved} roster reference${moved === 1 ? '' : 's'} to "${name}"`);
+  }
+
+  console.log('Written. Re-run enrichment from the roster to pick it up.');
+  process.exit(0);
 }
 
 // ── Every team in one competition, for when no string match can get there ──
