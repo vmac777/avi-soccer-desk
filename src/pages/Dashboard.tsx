@@ -11,6 +11,8 @@ import type { ContactEnriched } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { useLeagueNewsCounts, urgencyClasses, type LeagueNewsCount } from '@/hooks/useNewsCounts';
 import NewsFlagBadge from '@/components/NewsFlagBadge';
+import { useClubs } from '@/hooks/useClubsAndSources';
+import { getTeamFreshness, clubsByLeagueFrom } from '@/lib/marketHeatmap';
 
 function buildDonutData(contacts: ContactEnriched[]) {
   const counts = {
@@ -78,35 +80,21 @@ function StalenessDonut({ title, data }: { title: string; data: { name: string; 
   );
 }
 
-function getTeamFreshness(contacts: ContactEnriched[]): { club: string; health: string }[] {
-  const clubMap: Record<string, ContactEnriched[]> = {};
-  contacts.forEach((c) => {
-    if (!clubMap[c.club]) clubMap[c.club] = [];
-    clubMap[c.club].push(c);
-  });
-  return Object.entries(clubMap).map(([club, members]) => {
-    const best = members.reduce((a, b) => {
-      const da = a.days_since_contact ?? 9999;
-      const db = b.days_since_contact ?? 9999;
-      return da < db ? a : b;
-    });
-    return { club, health: best.health_status };
-  }).sort((a, b) => a.club.localeCompare(b.club));
-}
-
 function MarketGrid({
   markets,
   navigate,
   newsCounts,
+  clubsByLeague,
 }: {
   markets: [string, { contacts: ContactEnriched[]; avgStaleness: number }][];
   navigate: (path: string) => void;
   newsCounts: Record<string, LeagueNewsCount>;
+  clubsByLeague: Record<string, string[]>;
 }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
       {markets.map(([market, data]) => {
-        const teams = getTeamFreshness(data.contacts);
+        const teams = getTeamFreshness(data.contacts, clubsByLeague[market] ?? []);
         const news = newsCounts[market];
         const urgency = news?.unread_count ? news.max_urgency : null;
         const { border } = urgencyClasses(urgency);
@@ -161,6 +149,7 @@ const Dashboard = () => {
   const { data: allContacts = [], isLoading } = useContacts();
   const { data: pitches = [] } = useBuyPitches();
   const { data: recentActivity = [] } = useRecentInteractions(20);
+  const { data: allClubs = [] } = useClubs();
   const { isAdmin } = useAuth();
   const { data: leagueNewsCounts = {} } = useLeagueNewsCounts(isAdmin);
   const navigate = useNavigate();
@@ -214,7 +203,18 @@ const Dashboard = () => {
     { label: 'Negotiating', value: negotiatingCount, color: 'text-status-warm' },
   ];
 
+  /** League → its clubs, from the clubs table rather than from who we know. */
+  const clubsByLeague = useMemo(() => clubsByLeagueFrom(allClubs), [allClubs]);
+
   const markets = getMarketStats(contacts);
+  // A league we hold no contacts in still exists, and an empty tile is the
+  // point of the heatmap. Only while searching do we let the contact book
+  // narrow the list, since that is what the search box is filtering.
+  if (!search) {
+    Object.keys(clubsByLeague).forEach((league) => {
+      if (!markets[league]) markets[league] = { contacts: [], avgStaleness: -1 };
+    });
+  }
   const allMarkets = Object.entries(markets);
   const tier1Markets = allMarkets.filter(([m]) => TIER_1_LEAGUES.includes(m)).sort((a, b) => a[0].localeCompare(b[0]));
   const tier2Markets = allMarkets.filter(([m]) => TIER_2_LEAGUES.includes(m)).sort((a, b) => a[0].localeCompare(b[0]));
@@ -270,15 +270,15 @@ const Dashboard = () => {
 
           {/* Tier 1 */}
           <h3 className="text-[10px] tracking-[0.12em] font-semibold text-status-hot uppercase mt-1">TIER 1</h3>
-          <MarketGrid markets={tier1Markets} navigate={navigate} newsCounts={leagueNewsCounts} />
+          <MarketGrid markets={tier1Markets} navigate={navigate} newsCounts={leagueNewsCounts} clubsByLeague={clubsByLeague} />
 
           {/* Tier 2 */}
           <h3 className="text-[10px] tracking-[0.12em] font-semibold text-status-warm uppercase mt-4">TIER 2</h3>
-          <MarketGrid markets={tier2Markets} navigate={navigate} newsCounts={leagueNewsCounts} />
+          <MarketGrid markets={tier2Markets} navigate={navigate} newsCounts={leagueNewsCounts} clubsByLeague={clubsByLeague} />
 
           {/* Tier 3 */}
           <h3 className="text-[10px] tracking-[0.12em] font-semibold text-muted-foreground uppercase mt-4">TIER 3</h3>
-          <MarketGrid markets={tier3Markets} navigate={navigate} newsCounts={leagueNewsCounts} />
+          <MarketGrid markets={tier3Markets} navigate={navigate} newsCounts={leagueNewsCounts} clubsByLeague={clubsByLeague} />
         </div>
 
         {/* Right: Donuts + Alerts */}

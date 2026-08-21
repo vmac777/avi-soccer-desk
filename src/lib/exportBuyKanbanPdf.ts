@@ -72,7 +72,7 @@ function renderCard(c: CardData, mode: 'detailed' | 'short'): string {
   return `<div class="card" style="border-left:3px solid ${bicColor}">${header}${tracks}${neg}</div>`;
 }
 
-export function exportBuyKanbanPdf(columns: Column[], mode: 'detailed' | 'short', title = 'Buy-Side Pipeline') {
+export function exportBuyKanbanPdf(columns: Column[], mode: 'detailed' | 'short', title = 'Our Dealflow') {
   const today = new Date();
   const stamp = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
   const totalPitches = columns.reduce((s, c) => s + c.pitches.length, 0);

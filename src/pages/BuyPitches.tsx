@@ -409,7 +409,7 @@ export default function BuyPitchesPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-[11px] tracking-[0.15em] font-bold text-primary uppercase">BUY-SIDE PITCHES</h1>
+        <h1 className="text-[11px] tracking-[0.15em] font-bold text-primary uppercase">OUR DEALFLOW</h1>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
