@@ -239,20 +239,42 @@ export async function enrichTarget(
   }
 
   if (sources.includes('tr')) {
-    // A date of birth is what separates two players of the same name, so if TM
-    // just found one, use it before giving up on the TransferRoom match.
-    let trRes = await runTr({
-      name: target.name,
-      club: target.current_club,
-      league: target.league,
-      dob: target.date_of_birth ?? tmDob ?? null,
-      trPlayerId: target.tr_player_id ?? null,
-    });
-    if ((trRes as any)?.tr_status === 'failed' && tmDob && !target.date_of_birth) {
+    const dob = target.date_of_birth ?? tmDob ?? null;
+
+    /**
+     * Which club to look him up under.
+     *
+     * TransferRoom resolves a player through a club's squad list, and for a
+     * loaned player the two desks disagree about which club that is: he turns
+     * out for the loan club but is often still registered — and listed — with
+     * the parent. Alerrandro plays for CSKA Moscow and sits in Internacional's
+     * TransferRoom squad.
+     *
+     * So try both, in the order the roster suggests, rather than picking one and
+     * being wrong half the time. Nothing is written until a search succeeds, so
+     * a failed first attempt costs a request and nothing else.
+     */
+    const clubsToTry = [target.current_club, target.owner_club, target.loan_club]
+      .filter((c): c is string => !!c)
+      .filter((c, i, all) => all.indexOf(c) === i);
+
+    const leagueFor = (club: string) =>
+      club === target.owner_club ? (target.owner_league ?? null)
+      : club === target.loan_club ? (target.loan_league ?? null)
+      : (target.league ?? null);
+
+    let trRes: Patch = { tr_status: 'failed', tr_fail_reason: 'not_attempted' };
+    for (const club of clubsToTry) {
       trRes = await runTr({
-        name: target.name, club: target.current_club, league: target.league, dob: tmDob,
+        name: target.name,
+        club,
+        league: leagueFor(club),
+        dob,
+        trPlayerId: target.tr_player_id ?? null,
       });
+      if ((trRes as any)?.tr_status === 'ok') break;
     }
+
     await applyTrWithBackfill(target.id, trRes, tmKeys);
     result.tr = (trRes as any)?.tr_status === 'ok' ? 'ok' : 'failed';
   }

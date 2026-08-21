@@ -308,6 +308,25 @@ function trFailMessage(reason?: string | null): string {
   }
 }
 
+/**
+ * What we would ask for this player.
+ *
+ * xTV is TransferRoom's live expected transfer value and is what an agent
+ * negotiates against; Transfermarkt's market value is a crowd estimate and only
+ * stands in when xTV is absent. Both are stored in whole euros. The suffix says
+ * which one is on screen — the difference between them matters, so the column
+ * should never be ambiguous about what it is showing.
+ */
+function valueCell(t: ScoutedTarget) {
+  const eur = t.xtv ?? t.market_value;
+  if (!eur) return { text: '—', source: '' };
+  const m = eur / 1_000_000;
+  return {
+    text: m >= 1 ? `€${m.toFixed(1)}M` : `€${(m * 1000).toFixed(0)}K`,
+    source: t.xtv ? 'xTV' : 'TM',
+  };
+}
+
 function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, isRetrying }: {
   target: ScoutedTarget; onOpen: () => void; onEdit: () => void; onDelete: () => void; onCreatePitch: () => void;
   onRetry: (sources: ('tm' | 'tr')[]) => void; isRetrying: boolean;
@@ -791,7 +810,19 @@ export default function ScoutedTargetsPage() {
                           </div>
                         )}
                       </td>
-                      <td className="px-3 text-right text-foreground">{t.market_value ? `€${(t.market_value / 1000000).toFixed(1)}M` : '—'}</td>
+                      <td className="px-3 text-right text-foreground">
+                        {(() => {
+                          const v = valueCell(t);
+                          return (
+                            <>
+                              {v.text}
+                              {v.source && (
+                                <span className="ml-1 text-[9px] text-muted-foreground/70 font-mono">{v.source}</span>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </td>
                       <td className="px-3">
                         {(() => {
                           const b = tenureBadge(t.tenure);
