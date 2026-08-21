@@ -32,6 +32,18 @@ allow-list. The new domain works the moment it exists.
 Changing an environment variable does **not** affect the running site — the
 values are compiled in. Redeploy after any change.
 
+## Node version
+
+`engines.node` is `22.x`, and Vercel honours it over the project's own setting.
+`.nvmrc` names the same version so a local checkout matches the machine that
+builds it — `nvm use` in this directory.
+
+It matters because a `npm install` run on a different Node/npm can rewrite
+`package-lock.json`, and a lockfile that disagrees with `package.json` fails
+`npm ci` on Vercel with a wall of "Missing: ... from lock file". If you see
+`package-lock.json` modified after an install you did not intend, discard it
+(`git checkout -- package-lock.json`) rather than committing it.
+
 ## Why `installCommand` is pinned to npm
 
 `vercel.json` forces `npm ci`. The tree this repo was seeded from was built on
