@@ -4,7 +4,6 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
-import { CLIENT } from '@/config/client';
 import BrandMark from '@/components/BrandMark';
 
 const LoginPage = () => {
@@ -50,11 +49,8 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="w-full max-w-sm p-8 bg-card rounded-lg border border-border">
-        <div className="flex flex-col items-center text-center mb-8">
-          <BrandMark height={56} className="mb-4" />
-          <h1 className="text-xl font-medium text-foreground tracking-tight">
-            {CLIENT.deskName}
-          </h1>
+        <div className="flex flex-col items-center mb-8">
+          <BrandMark height={56} />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
