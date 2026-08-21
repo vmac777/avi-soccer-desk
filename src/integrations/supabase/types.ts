@@ -10,7 +10,32 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.4"
+    PostgrestVersion: "14.15"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -212,6 +237,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "buy_pitches_buying_contact_id_fkey"
+            columns: ["buying_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buy_pitches_buying_contact_id_fkey"
+            columns: ["buying_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts_enriched"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "buy_pitches_contact_id_fkey"
             columns: ["contact_id"]
             isOneToOne: false
@@ -228,7 +267,7 @@ export type Database = {
           {
             foreignKeyName: "buy_pitches_scouted_target_id_fkey"
             columns: ["scouted_target_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "scouted_targets"
             referencedColumns: ["id"]
           },
@@ -414,10 +453,24 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "club_requirements_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "club_requirements_contact_id_fkey"
             columns: ["contact_id"]
             isOneToOne: false
             referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_requirements_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts_enriched"
             referencedColumns: ["id"]
           },
         ]
@@ -1502,6 +1555,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "shortlist_entries_buy_pitch_id_fkey"
+            columns: ["buy_pitch_id"]
+            isOneToOne: false
+            referencedRelation: "buy_pitches"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "shortlist_entries_requirement_id_fkey"
             columns: ["requirement_id"]
             isOneToOne: false
@@ -1513,13 +1573,6 @@ export type Database = {
             columns: ["scouted_target_id"]
             isOneToOne: false
             referencedRelation: "scouted_targets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "shortlist_entries_buy_pitch_id_fkey"
-            columns: ["buy_pitch_id"]
-            isOneToOne: false
-            referencedRelation: "buy_pitches"
             referencedColumns: ["id"]
           },
         ]
@@ -1576,27 +1629,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      tr_club_rosters_cache: {
-        Row: {
-          club_id: string | null
-          fetched_at: string
-          players_json: Json
-          tr_team_id: number
-        }
-        Insert: {
-          club_id?: string | null
-          fetched_at?: string
-          players_json: Json
-          tr_team_id: number
-        }
-        Update: {
-          club_id?: string | null
-          fetched_at?: string
-          players_json?: Json
-          tr_team_id?: number
-        }
-        Relationships: []
       }
       tr_competition_players_cache: {
         Row: {
@@ -2033,6 +2065,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
