@@ -48,7 +48,7 @@ if (!URL || !KEY || !EMAIL || !PASSWORD) {
 /** Words that say what kind of club it is, not which club it is. */
 const CLUB_WORDS = new Set([
   'fc', 'cf', 'ca', 'sc', 'ec', 'ac', 'afc', 'cd', 'sd', 'ss', 'as', 'rc', 'sv', 'vfl', 'vfb',
-  'club', 'clube', 'futebol', 'football', 'futbol', 'atletico', 'atlético',
+  'club', 'clube', 'futebol', 'football', 'futbol',
   'de', 'do', 'da', 'of', 'the',
 ]);
 
@@ -71,12 +71,23 @@ function normalize(name) {
   return (kept.length ? kept : base).join(' ');
 }
 
-/** Cheap similarity for suggestions only — never for an automatic rename. */
+/**
+ * Similarity for suggestions only — never for an automatic rename.
+ *
+ * Scored by containment rather than overlap, because the usual shape of these
+ * mismatches is one name being the short form of the other: "Zenit" against
+ * "Zenit Sao Petersburgo", "Tottenham" against "Tottenham Hotspur". Dividing by
+ * the longer name buries exactly the matches worth seeing.
+ *
+ * Containment cuts both ways — "Al Ahli" is contained in three different clubs
+ * — so a perfect score here means "look at this", not "this is the one".
+ */
 function similarity(a, b) {
   const A = new Set(a.split(' '));
   const B = new Set(b.split(' '));
   const shared = [...A].filter((w) => B.has(w)).length;
-  return shared / Math.max(A.size, B.size);
+  if (shared === 0) return 0;
+  return shared / Math.min(A.size, B.size);
 }
 
 const supabase = createClient(URL, KEY, { auth: { persistSession: false, autoRefreshToken: false } });
@@ -101,6 +112,36 @@ for (const c of clubs) {
   if (!held || (!held.tr_team_id && c.tr_team_id)) byNormal.set(k, c);
 }
 
+
+/**
+ * Names a matcher cannot safely resolve, decided by hand.
+ *
+ * Everything here is either a typo in our own roster or a language difference,
+ * checked one at a time. It is deliberately separate from the automatic
+ * renames: those are provably the same string, these are a judgement.
+ *
+ * Read carefully before adding to it. The suggester offered several of these
+ * wrong, and they are the reason the automatic pass refuses to guess:
+ *
+ *   Botafogo FR      is NOT Botafogo-SP        — Rio and Ribeirao Preto
+ *   Miami FC         is NOT Inter Miami        — different clubs
+ *   Estrela Vermelha is NOT Estrela Amadora    — Red Star Belgrade
+ *   Spartak Praga    is NOT Spartak Moscou     — Sparta Prague
+ *   Shabab Al-Ahli   is NOT Al Ahli            — Shabab Al-Ahli Dubai
+ *
+ * Putting a player at the wrong club does not fail loudly. It quietly attaches
+ * another team's valuation and squad data to him.
+ */
+const ALIASES = {
+  'Notthigham Forest': 'Nottingham Forest',      // typo on our side
+  'Tottenham': 'Tottenham Hotspur',
+  'Athletico Paranaense': 'Athletico PR',
+  'Cuiabá': 'Cuiabá-MT',
+  'CRB': 'CRB-AL',
+  'Vasco': 'Vasco da Gama',
+  'Olympique de Marselha': 'Olympique Marseille', // pt -> the table's spelling
+};
+
 const COLUMNS = ['current_club', 'owner_club', 'loan_club'];
 
 const matched = [];
@@ -112,6 +153,16 @@ for (const p of players) {
     const raw = p[col];
     if (!raw) continue;
     if (byExact.has(raw)) { matched.push(raw); continue; }
+
+    const aliased = ALIASES[raw];
+    if (aliased && byExact.has(aliased)) {
+      const c = byExact.get(aliased);
+      renames.push({ id: p.id, player: p.name, column: col, from: raw, to: aliased, mapped: !!c.tr_team_id, byHand: true });
+      continue;
+    }
+    if (aliased) {
+      console.warn(`  !! alias "${raw}" -> "${aliased}" but no such club exists`);
+    }
 
     const hit = byNormal.get(normalize(raw));
     if (hit) {
@@ -125,7 +176,7 @@ for (const p of players) {
         .map((c) => ({ name: c.name, score: similarity(n, normalize(c.name)), mapped: !!c.tr_team_id }))
         .filter((g) => g.score >= 0.5)
         .sort((a, b) => b.score - a.score)
-        .slice(0, 3);
+        .slice(0, 5);
       unresolved.set(raw, { guesses, players: [] });
     }
     unresolved.get(raw).players.push(`${p.name} (${col})`);
@@ -138,7 +189,7 @@ console.log(`  same club, different spelling: ${renames.length}`);
 console.log(`  no match at all: ${[...unresolved.values()].reduce((n, u) => n + u.players.length, 0)} across ${unresolved.size} names\n`);
 
 if (renames.length) {
-  console.log('Renames — identical once accents and club words are removed:\n');
+  console.log('Renames — same string once accents and club words are removed, plus\nthe hand-checked aliases:\n');
   const grouped = new Map();
   for (const r of renames) {
     const k = `${r.from} -> ${r.to}`;
@@ -146,7 +197,7 @@ if (renames.length) {
     grouped.get(k).count++;
   }
   for (const g of grouped.values()) {
-    console.log(`  ${g.from}  ->  ${g.to}   (${g.count} ${g.count === 1 ? 'player' : 'players'})${g.mapped ? '' : '  [club has no TR mapping]'}`);
+    console.log(`  ${g.from}  ->  ${g.to}   (${g.count} ${g.count === 1 ? 'player' : 'players'})${g.byHand ? '  [by hand]' : ''}${g.mapped ? '' : '  [club has no TR mapping]'}`);
   }
   console.log('');
 }
@@ -159,6 +210,7 @@ if (unresolved.size) {
       for (const g of u.guesses) {
         console.log(`      did you mean: ${g.name}${g.mapped ? '' : '  [no TR mapping]'}`);
       }
+      console.log('      -- verify before adding to ALIASES; a close name is often a different club');
     } else {
       console.log('      nothing close in the clubs table — the club may need adding');
     }
