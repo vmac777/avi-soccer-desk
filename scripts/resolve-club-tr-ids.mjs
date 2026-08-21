@@ -125,25 +125,48 @@ if (authErr) { console.error(`Sign-in failed: ${authErr.message}`); process.exit
 
 // ── Direct mapping, decided by a human ──
 if (forceTeam != null) {
+  // The club may not be in the table at all — that is the usual reason it needs
+  // a mapping written by hand. So match on the roster first: that is where the
+  // name came from, and it carries the league to file the new club under.
+  const { data: onRoster } = await supabase
+    .from('scouted_targets')
+    .select('current_club, league, owner_club, owner_league, loan_club, loan_league');
+
+  const found = new Map();
+  for (const r of onRoster ?? []) {
+    for (const [club, league] of [
+      [r.current_club, r.league], [r.owner_club, r.owner_league], [r.loan_club, r.loan_league],
+    ]) {
+      if (club && club.toLowerCase().includes(only)) found.set(club, league || '');
+    }
+  }
+
+  if (found.size === 0) {
+    console.error(`No club on the roster matching "${only}".`);
+    process.exit(1);
+  }
+  if (found.size > 1) {
+    console.error(`"${only}" matches more than one club: ${[...found.keys()].join(', ')}`);
+    process.exit(1);
+  }
+
+  const [name, league] = [...found.entries()][0];
   const { data: existing } = await supabase
-    .from('clubs').select('*').ilike('name', `%${only}%`).limit(2);
+    .from('clubs').select('id, name, league, country, tier').eq('name', name).maybeSingle();
 
-  if (!existing?.length) {
-    console.error(`No club matching "${only}". Give the name as it appears on the roster.`);
-    process.exit(1);
-  }
-  if (existing.length > 1) {
-    console.error(`"${only}" matches more than one club: ${existing.map((c) => c.name).join(', ')}`);
-    process.exit(1);
-  }
-
-  const club = existing[0];
-  console.log(`${club.name}  ->  team ${forceTeam}, competition ${forceCompetition}`);
+  console.log(`${name}  ->  team ${forceTeam}, competition ${forceCompetition}`);
+  console.log(existing ? '  (updating the existing clubs row)' : `  (creating a clubs row, league "${league || '—'}")`);
   if (!apply) { console.log('\nRead-only. Add --apply to write it.'); process.exit(0); }
 
-  const { error } = await supabase.from('clubs')
-    .update({ tr_team_id: forceTeam, tr_competition_id: forceCompetition })
-    .eq('id', club.id);
+  const { error } = await supabase.from('clubs').upsert({
+    name,
+    league: existing?.league || league || null,
+    country: existing?.country ?? null,
+    tier: existing?.tier ?? null,
+    tr_team_id: forceTeam,
+    tr_competition_id: forceCompetition,
+  }, { onConflict: 'name' });
+
   if (error) { console.error(`Failed: ${error.message}`); process.exit(1); }
   console.log('Written. Re-run enrichment from the roster to pick it up.');
   process.exit(0);
