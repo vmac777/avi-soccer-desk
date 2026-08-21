@@ -140,6 +140,10 @@ const ALIASES = {
   'CRB': 'CRB-AL',
   'Vasco': 'Vasco da Gama',
   'Olympique de Marselha': 'Olympique Marseille', // pt -> the table's spelling
+  'Zenit': 'Zenit St Petersburg',
+  'Bragantino': 'Red Bull Bragantino',
+  'Atlético Mineiro': 'Atlético-MG',              // Mineiro = Minas Gerais; NOT Atlético-GO,
+                                                  // Atlético de Madrid or Atlético San Luis
 };
 
 const COLUMNS = ['current_club', 'owner_club', 'loan_club'];
