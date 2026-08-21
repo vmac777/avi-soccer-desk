@@ -10,25 +10,29 @@ Two steps: export from there, import here.
 ## 1. Export from the source project
 
 `scripts/export-backup.mjs` reads through the API as a signed-in admin. Run it
-against the **source** project, not this one:
+against the **source** project, not this one, and **ask it for only the two
+tables this import needs**:
 
 ```bash
-SUPABASE_URL=https://<source-project>.supabase.co \
-SUPABASE_ANON_KEY=<source publishable key> \
+cd ~/avi-soccer-desk
+
+SUPABASE_URL=https://<source-project-ref>.supabase.co \
+SUPABASE_ANON_KEY=<source publishable/anon key> \
 ADMIN_EMAIL=<your admin email there> \
 ADMIN_PASSWORD=<that password> \
-node scripts/export-backup.mjs
+node scripts/export-backup.mjs --tables=clubs,contacts --skip-storage
 ```
 
-This writes `backups/<timestamp>/tables/*.json`.
+`--tables=clubs,contacts` is the important part. Without it the script walks all
+thirty-five tables, including the multi-megabyte TransferRoom history blobs. An
+earlier full run of this script saturated that database and took the live CRM
+down with HTTP 522s for its users. Two small reference tables is a completely
+different amount of work — a few hundred rows, seconds, not minutes.
 
-**Run it off-peak.** A previous export of this database saturated it and took
-the live CRM down with HTTP 522s. The script now pages small, times each request
-out at 20s, throttles between calls, and skips the `tr_*` history tables unless
-you pass `--include-tr` — but it is still reading a production database that
-people are using. Off-hours, and watch the app while it runs.
+It still reads a production database people are using, so run it off-peak and
+keep the app open in another tab while it goes. If the app slows, Ctrl-C it.
 
-You only need two of the files it produces: `clubs.json` and `contacts.json`.
+Output lands in `backups/<timestamp>/tables/clubs.json` and `contacts.json`.
 
 ## 2. Import here
 
