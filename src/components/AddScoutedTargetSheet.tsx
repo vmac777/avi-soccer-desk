@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link as LinkIcon, ExternalLink, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { normaliseTmUrl } from '@/lib/tmUrl';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useContacts } from '@/hooks/useData';
@@ -170,7 +171,7 @@ export function AddScoutedTargetSheet({ open, onClose }: { open: boolean; onClos
         agent_contact: '',
         priority_ranking: 'Medium',
         notes: '',
-        tm_link: tmUrl.trim(),
+        tm_link: normaliseTmUrl(tmUrl) ?? tmUrl.trim(),
         has_valuation: false,
         valuation_url: '',
         tm_player_id: parsed.tmPlayerId,

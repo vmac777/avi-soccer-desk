@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Search, Plus, LayoutGrid, List, Trash2, Pencil, Link as LinkIcon, SendHorizonal, RefreshCw, AlertTriangle, Sparkles } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
+import { tmHref, normaliseTmUrl } from '@/lib/tmUrl';
 
 const POSITION_FILTERS = ['All', 'GK', 'DEF', 'MID', 'FWD'] as const;
 const PRIORITY_OPTIONS = ['High', 'Medium', 'Low'];
@@ -468,7 +469,7 @@ function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, 
         )}
         <div className="flex items-center gap-2 flex-wrap">
           {target.tm_link && (
-            <a href={target.tm_link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-[10px] text-primary hover:underline">
+            <a href={tmHref(target.tm_link)} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-[10px] text-primary hover:underline">
               Open TM
             </a>
           )}
@@ -664,7 +665,7 @@ export default function ScoutedTargetsPage() {
         agent_contact: form.agent_contact,
         priority_ranking: form.priority_ranking,
         notes: form.notes,
-        tm_link: form.tm_link,
+        tm_link: normaliseTmUrl(form.tm_link) ?? form.tm_link.trim(),
         has_valuation: form.has_valuation === 'Yes',
         valuation_url: form.valuation_url,
       });
@@ -836,7 +837,7 @@ export default function ScoutedTargetsPage() {
                       <td className="px-3 text-muted-foreground">{t.agent_name || '—'}</td>
                       <td className="px-3 text-center">
                         {t.tm_link ? (
-                          <a href={t.tm_link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-primary hover:underline text-[10px]">TM</a>
+                          <a href={tmHref(t.tm_link)} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-primary hover:underline text-[10px]">TM</a>
                         ) : '—'}
                       </td>
                       <td className="px-3 text-center">

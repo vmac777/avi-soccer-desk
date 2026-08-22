@@ -24,7 +24,23 @@ const BROWSER_HEADERS: Record<string, string> = {
   'Upgrade-Insecure-Requests': '1',
 };
 
+/**
+ * A pasted link arrives from a browser bar, an email or a spreadsheet, and any
+ * of those can drop the scheme. One stored as
+ * `transfermarkt.com.br/gabriel/profil/spieler/435338` was rejected here as
+ * `invalid_url` before a request was ever made — so the retry logic below sat
+ * behind a door that never opened, and the failure looked like Transfermarkt
+ * 404ing rather than like a missing "https://".
+ *
+ * Add the scheme instead of refusing: the address is right.
+ */
 const TM_URL_RE = /^https?:\/\/[^\s]*transfermarkt\.[a-z.]+\/.+\/spieler\/(\d+)/i;
+
+function normaliseTmUrl(raw: string): string {
+  const trimmed = (raw || '').trim();
+  if (!trimmed) return '';
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
 
 function decodeEntities(s: string): string {
   return s
@@ -141,7 +157,7 @@ Deno.serve(async (req) => {
 
   let body: { tmUrl?: string } = {};
   try { body = await req.json(); } catch { /* no body — handled by the checks below */ }
-  const tmUrl = (body.tmUrl || '').trim();
+  const tmUrl = normaliseTmUrl(body.tmUrl || '');
   const m = tmUrl.match(TM_URL_RE);
   if (!m) {
     return new Response(JSON.stringify({ ok: false, reason: 'invalid_url' }), {

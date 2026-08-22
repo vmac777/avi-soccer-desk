@@ -1,5 +1,6 @@
 import { RosterPlayer as Player, formatHeight, getPositionGroup, getAge, hasTrData, getLatestXtvM, getXtvChange6mPct } from '@/lib/rosterData';
 import { cn } from '@/lib/utils';
+import { tmHref } from '@/lib/tmUrl';
 import { ExternalLink } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
@@ -87,7 +88,7 @@ export default function PlayerHeader({ player }: { player: Player }) {
             <span className="px-2 py-0.5 rounded-md bg-accent text-xs text-foreground">🇪🇺 EU Passport</span>
           )}
           {player.tmLink && (
-            <a href={player.tmLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-accent text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <a href={tmHref(player.tmLink)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-accent text-xs text-muted-foreground hover:text-foreground transition-colors">
               <ExternalLink className="h-3 w-3" /> Transfermarkt
             </a>
           )}
