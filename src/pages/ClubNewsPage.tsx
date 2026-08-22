@@ -10,6 +10,9 @@ import { useClubs, type ClubSource } from '@/hooks/useClubsAndSources';
 import { useClubNewsReports, useGenerateClubNewsReport } from '@/hooks/useClubNewsReport';
 import { resolveClubNews } from '@/lib/clubNewsSources';
 import ClubNewsReport from '@/components/club/ClubNewsReport';
+import Crest from '@/components/board/Crest';
+import { crestUrl } from '@/lib/clubCrest';
+import { Input } from '@/components/ui/input';
 
 /**
  * One club's news: where we read about them, and what the last read said.
@@ -49,6 +52,8 @@ export default function ClubNewsPage() {
 
   const [showing, setShowing] = useState<string | null>(null);
   const [seeding, setSeeding] = useState(false);
+  const [crestOpen, setCrestOpen] = useState(false);
+  const [crestDraft, setCrestDraft] = useState('');
 
   const current = showing
     ? reports.find((r) => r.id === showing) ?? reports[0]
@@ -81,6 +86,25 @@ export default function ClubNewsPage() {
    * counts once it is a row somebody can see and edit.
    */
   const defaults = club ? resolveClubNews(club.name) : null;
+
+  const saveCrest = async () => {
+    if (!club) return;
+    const url = crestDraft.trim();
+    // Empty clears the override rather than storing '', so the derived crest
+    // comes back instead of the club rendering with a blank image forever.
+    try {
+      const { error } = await supabase
+        .from('clubs')
+        .update({ crest_url: url || null })
+        .eq('id', club.id);
+      if (error) throw error;
+      await qc.invalidateQueries({ queryKey: ['clubs-repo'] });
+      setCrestOpen(false);
+      toast.success(url ? 'Crest updated' : 'Back to the derived crest');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't save that crest");
+    }
+  };
 
   const seedDefaults = async () => {
     if (!club || !defaults) return;
@@ -135,11 +159,27 @@ export default function ClubNewsPage() {
       </button>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold md:text-2xl">{club.name}</h1>
-          <p className="text-xs text-muted-foreground">
-            {[club.league, club.country].filter(Boolean).join(' · ') || 'No league or country recorded'}
-          </p>
+        <div className="flex items-start gap-3">
+          {/*
+            Clicking the crest is how you fix it. Most clubs get one derived
+            from the Transfermarkt id the app already ships, so this is for the
+            ones that lookup misses and the ones where it picked the wrong
+            badge — a field on a settings page nobody visits would never get
+            used, whereas the wrong crest is annoying exactly here.
+          */}
+          <button
+            onClick={() => { setCrestDraft(club.crest_url ?? ''); setCrestOpen((v) => !v); }}
+            title="Set this club's crest"
+            className="mt-0.5 rounded-full transition-opacity hover:opacity-75"
+          >
+            <Crest club={club.name} crest={club.crest_url} size={38} />
+          </button>
+          <div>
+            <h1 className="text-xl font-semibold md:text-2xl">{club.name}</h1>
+            <p className="text-xs text-muted-foreground">
+              {[club.league, club.country].filter(Boolean).join(' · ') || 'No league or country recorded'}
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-col items-end gap-1">
@@ -158,6 +198,26 @@ export default function ClubNewsPage() {
           )}
         </div>
       </div>
+
+      {crestOpen && (
+        <div className="flex flex-wrap items-center gap-2 rounded border border-border p-3">
+          <Input
+            value={crestDraft}
+            onChange={(e) => setCrestDraft(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') void saveCrest(); }}
+            placeholder="https://…/crest.png"
+            className="h-8 flex-1 text-xs"
+            autoFocus
+          />
+          <Button onClick={() => void saveCrest()} className="h-8 text-xs">Save</Button>
+          <Button variant="outline" onClick={() => setCrestOpen(false)} className="h-8 text-xs">Cancel</Button>
+          <p className="w-full text-[10px] text-muted-foreground">
+            {crestUrl(club.name, club.crest_url)
+              ? 'Leave it empty to go back to the crest derived from Transfermarkt.'
+              : 'No crest found for this club — paste an image URL and it will replace the initials.'}
+          </p>
+        </div>
+      )}
 
       {/* Sources */}
       <div className="rounded border border-border p-3">

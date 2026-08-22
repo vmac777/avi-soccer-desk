@@ -577,6 +577,7 @@ export type Database = {
       clubs: {
         Row: {
           country: string | null
+          crest_url: string | null
           created_at: string
           id: string
           league: string | null
@@ -588,6 +589,7 @@ export type Database = {
         }
         Insert: {
           country?: string | null
+          crest_url?: string | null
           created_at?: string
           id?: string
           league?: string | null
@@ -599,6 +601,7 @@ export type Database = {
         }
         Update: {
           country?: string | null
+          crest_url?: string | null
           created_at?: string
           id?: string
           league?: string | null

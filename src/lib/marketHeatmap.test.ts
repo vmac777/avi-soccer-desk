@@ -14,7 +14,7 @@ const contact = (club: string, days: number | null, health: string): ContactEnri
   ({ club, days_since_contact: days, health_status: health }) as ContactEnriched;
 
 const club = (name: string, league: string | null): Club =>
-  ({ id: name, name, league, country: null, tier: null });
+  ({ id: name, name, league, country: null, tier: null, crest_url: null });
 
 describe('getTeamFreshness', () => {
   it('counts the league, not the contact book', () => {

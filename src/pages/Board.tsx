@@ -1,83 +1,53 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  ArrowRight, Clock, PhoneOff, Target, TrendingUp, CalendarClock, Inbox,
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useContacts } from '@/hooks/useData';
 import { useScoutedTargets, useBuyPitches, BUY_ACTIVE_STAGES } from '@/hooks/useBuyData';
 import { useAllRequirements } from '@/hooks/useClubRequirements';
 import { useShortlistEntries } from '@/hooks/useShortlist';
-import { useFollowUps } from '@/hooks/useFollowUps';
 import { useClubs } from '@/hooks/useClubsAndSources';
 import { toRosterPlayer } from '@/lib/rosterMapping';
-import { getAge, getLatestXtvM } from '@/lib/rosterData';
-import { formatMoneyShort } from '@/lib/money';
-import { buildBoard, rosterCoverage, type Opportunity, type OpportunityKind } from '@/lib/deskBoard';
+import { getLatestXtvM } from '@/lib/rosterData';
+import {
+  buildBoard, rosterCoverage, needsNobodyPitched, totalUnpitchedFits,
+  type Opportunity,
+} from '@/lib/deskBoard';
 import { todayKey, parseDateKey } from '@/lib/dateKeys';
+import BoardHero, { type HeroClub } from '@/components/board/BoardHero';
+import NeedCard from '@/components/board/NeedCard';
+import DeskStrip from '@/components/board/DeskStrip';
+import ContractRunway, { type RunwayPin } from '@/components/board/ContractRunway';
+import TheBook, { type BookCard } from '@/components/board/TheBook';
 
 /**
  * What to do next, rather than how tidy the book is.
  *
- * This replaced a contact-hygiene dashboard inherited from the club product it
- * was seeded from — market heatmap, staleness donuts, a count of contacts. All
- * true, none of it anybody's first question in the morning.
+ * The board used to rank six kinds of opportunity as equals, which read as a
+ * list to work through. It now leads with one thing — clubs that asked for a
+ * player, have someone of ours who fits, and have heard nothing back — because
+ * that is the only item on the page where the agency is the one holding things
+ * up. Everything else it used to rank above those is still here, demoted to a
+ * strip.
  *
- * An agent's first question is where money is about to move and what is late.
- * Every card here answers that by joining things no single screen held
- * together: what clubs asked for, who we represent, whose contracts are running
- * down, and who owes whom an answer. And every card links to the record it came
- * from, because a claim you cannot check is worth less than no claim.
+ * Desktop and mobile are one screen, not two: same sections, same order, same
+ * data. Hovering a need opens its fit panel and dims the book to the players
+ * who answer it; on a phone the same panel opens on tap and the book is
+ * off-screen anyway.
  */
 
-const KIND_ICON: Record<OpportunityKind, LucideIcon> = {
-  ball_in_court: Inbox,
-  deadline_near: CalendarClock,
-  unworked_match: Target,
-  contract_clock: Clock,
-  quiet_club: PhoneOff,
-  value_moved: TrendingUp,
-};
+const SECTION_LABEL = 'font-mono text-[9.5px] font-bold uppercase tracking-[0.18em]';
 
-/** Urgency as a left edge. The eye finds the top of the list without reading. */
-const edgeFor = (urgency: number) =>
-  urgency >= 90 ? 'border-l-status-cold'
-  : urgency >= 70 ? 'border-l-primary'
-  : 'border-l-border';
-
-/**
- * The first card is bigger.
- *
- * Six identical cards read as a list to work through. Something has to tell the
- * eye where to start, and the ranking already knows — so the top of it looks
- * like the top of it.
- */
-function OpportunityCard({ item, onOpen, hero = false }: {
-  item: Opportunity; onOpen: () => void; hero?: boolean;
+function Section({ label, helper, gold = true, children }: {
+  label: string; helper?: string; gold?: boolean; children: React.ReactNode;
 }) {
-  const Icon = KIND_ICON[item.kind];
   return (
-    <button
-      onClick={onOpen}
-      className={cn(
-        'group flex w-full items-start gap-3 rounded-lg border border-l-[3px] border-border bg-card text-left transition-colors hover:border-primary/40',
-        hero ? 'p-5 xl:col-span-2' : 'px-4 py-3',
-        edgeFor(item.urgency),
-      )}
-    >
-      <Icon className={cn('shrink-0 text-muted-foreground', hero ? 'mt-0.5 h-5 w-5' : 'mt-0.5 h-4 w-4')} />
-      <div className="min-w-0 flex-1">
-        <p className={cn('font-medium text-foreground', hero ? 'text-base' : 'text-sm')}>
-          {item.headline}
-        </p>
-        <p className={cn('mt-0.5 text-muted-foreground', hero ? 'text-xs' : 'text-[11px]')}>
-          {item.detail}
-        </p>
+    <section>
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <h2 className={`${SECTION_LABEL} ${gold ? 'text-primary' : 'text-foreground/45'}`}>{label}</h2>
+        {helper && <span className="hidden text-[11px] text-foreground/40 md:block">{helper}</span>}
       </div>
-      <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-    </button>
+      {children}
+    </section>
   );
 }
 
@@ -90,13 +60,20 @@ export default function BoardPage() {
   const { data: targets = [], isLoading: rosterLoading } = useScoutedTargets();
   const { data: pitches = [] } = useBuyPitches();
   const { data: contacts = [] } = useContacts();
-  const { data: followUps = [] } = useFollowUps();
   const { data: clubs = [] } = useClubs();
+
+  /**
+   * One id drives both the fit panel and the book dimming, on every input
+   * method. Hover sets it, focus sets it, a tap toggles it — so a keyboard and
+   * a thumb reach the same behaviour a mouse does rather than a lesser one.
+   */
+  const [openNeedId, setOpenNeedId] = useState<string | null>(null);
 
   const today = todayKey();
   const roster = useMemo(() => targets.map(toRosterPlayer), [targets]);
+  const clubById = useMemo(() => new Map(clubs.map((c) => [c.id, c])), [clubs]);
 
-  const board = useMemo(() => buildBoard({
+  const boardInput = useMemo(() => ({
     requirements,
     shortlistEntries,
     roster,
@@ -107,57 +84,93 @@ export default function BoardPage() {
     today,
   }), [requirements, shortlistEntries, roster, pitches, contacts, clubs, today]);
 
+  const needs = useMemo(() => needsNobodyPitched(boardInput), [boardInput]);
+  const board = useMemo(() => buildBoard(boardInput), [boardInput]);
   const coverage = useMemo(() => rosterCoverage(targets), [targets]);
 
-  /** Reminders actually due, not a count of them. */
-  const dueToday = useMemo(
-    () => followUps
-      .filter((f) => !f.completed && f.due_date <= today)
-      .sort((a, b) => a.due_date.localeCompare(b.due_date))
-      .slice(0, 5),
-    [followUps, today],
+  /** Everything the board ranks that is not one of the hero needs. */
+  const rest = useMemo(
+    () => board.filter((o) => o.kind !== 'unworked_match').slice(0, 4),
+    [board],
   );
+
+  const openNeed = needs.find((n) => n.requirementId === openNeedId) ?? null;
+  const fittingIds = useMemo(
+    () => new Set(openNeed?.rows.filter((r) => r.ok).map((r) => r.playerId) ?? []),
+    [openNeed],
+  );
+
+  const monthsLeftFor = useMemo(() => {
+    const now = parseDateKey(today).getTime();
+    return (end?: string) => {
+      if (!end) return null;
+      const m = Math.round((parseDateKey(end.slice(0, 10)).getTime() - now) / (86_400_000 * 30));
+      return m >= 0 ? m : null;
+    };
+  }, [today]);
+
+  const bookCards: BookCard[] = useMemo(() => roster
+    .map((p) => ({ p, xtv: getLatestXtvM(p) }))
+    .sort((a, b) => (b.xtv ?? -1) - (a.xtv ?? -1))
+    .slice(0, 4)
+    .map(({ p }) => ({
+      player: p,
+      monthsLeft: monthsLeftFor(p.contractEndDate),
+      flag: openNeed && fittingIds.has(p.id) ? openNeed.club : null,
+      dimmed: !!openNeed && !fittingIds.has(p.id),
+    })),
+  [roster, monthsLeftFor, openNeed, fittingIds]);
 
   /**
-   * The top of the book by valuation, with how long each contract has left.
+   * Contracts running down on players nobody is already working.
    *
-   * Sorted by value because that is the order an agent thinks in, and the
-   * contract chip is here rather than only in a card so the page shows
-   * leverage running out at a glance.
+   * Capped hard: past five, the pins on the desktop band overlap into an
+   * unreadable smear, so the rest are counted rather than crammed. Saying "+3
+   * more" is honest; drawing eight labels on top of each other is not.
    */
-  const topOfBook = useMemo(() => roster
-    .map((p) => {
-      const xtv = getLatestXtvM(p);
-      const monthsLeft = p.contractEndDate
-        ? Math.round(
-          (parseDateKey(p.contractEndDate.slice(0, 10)).getTime() - parseDateKey(today).getTime())
-          / (86_400_000 * 30))
-        : null;
-      return { player: p, xtv, monthsLeft: monthsLeft != null && monthsLeft >= 0 ? monthsLeft : null };
-    })
-    .sort((a, b) => (b.xtv ?? -1) - (a.xtv ?? -1))
-    .slice(0, 8),
-  [roster, today]);
+  const runway = useMemo(() => {
+    const beingWorked = new Set(
+      pitches
+        .filter((p) => (BUY_ACTIVE_STAGES as readonly string[]).includes(p.stage))
+        .map((p) => p.scouted_target_id),
+    );
+    const all: RunwayPin[] = roster
+      .filter((p) => !beingWorked.has(p.id))
+      .map((p) => ({ id: p.id, name: p.name, months: monthsLeftFor(p.contractEndDate) }))
+      .filter((p): p is RunwayPin => p.months != null && p.months <= 12)
+      .sort((a, b) => a.months - b.months);
+    return { pins: all.slice(0, 5), hidden: Math.max(0, all.length - 5) };
+  }, [roster, pitches, monthsLeftFor]);
 
-  const recentPitches = useMemo(
-    () => [...pitches].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 4),
-    [pitches],
+  const heroFitClubs: HeroClub[] = useMemo(() => needs.map((n) => ({
+    id: n.requirementId,
+    name: n.club,
+    crest: n.clubId ? clubById.get(n.clubId)?.crest_url : null,
+  })), [needs, clubById]);
+
+  /** Placements where they are waiting on us, not the other way round. */
+  const waiting = useMemo(() => pitches.filter((p) =>
+    p.ball_in_court === 'us' && (BUY_ACTIVE_STAGES as readonly string[]).includes(p.stage)),
+  [pitches]);
+
+  const waitingClubs: HeroClub[] = useMemo(() => waiting.slice(0, 4).map((p) => ({
+    id: p.id,
+    // The buying side is the counterparty on a placement; fall back to the
+    // selling club when nobody has been approached yet.
+    name: contacts.find((c) => c.id === (p.buying_contact_id ?? p.contact_id))?.club ?? '',
+    crest: null,
+  })).filter((c) => c.name), [waiting, contacts]);
+
+  const bookValue = useMemo(
+    () => roster.reduce((sum, p) => sum + (getLatestXtvM(p) ?? 0) * 1_000_000, 0),
+    [roster],
   );
 
-  /** The two sentences at the top. Numbers only where a number is the point. */
-  const line = useMemo(() => {
-    const due = followUps.filter((f) => !f.completed && f.due_date <= today).length;
-    const closing = pitches.filter((p) => p.stage === 'Closing').length;
-    const active = pitches.filter((p) =>
-      (BUY_ACTIVE_STAGES as readonly string[]).includes(p.stage)).length;
-    const quiet = new Set(
-      contacts.filter((c) => (c.days_since_contact ?? 0) > 90).map((c) => c.club),
-    ).size;
-    return { due, closing, active, quiet };
-  }, [followUps, pitches, contacts, today]);
+  const openNeedCount = requirements.filter((r) => r.status === 'open').length;
+  const fitCount = totalUnpitchedFits(needs);
+  const maxFits = Math.max(1, ...needs.map((n) => n.fitCount));
 
   const isLoading = reqLoading || rosterLoading;
-
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -167,206 +180,110 @@ export default function BoardPage() {
   }
 
   /**
-   * Greet by name, or not at all.
-   *
-   * `displayName` falls back to the email local-part when a profile has no
-   * full name, so this page opened with "Morning, vmachado194." An email handle
-   * is never the right way to address anybody — better to say nothing.
+   * Greet by name, or not at all. `displayName` used to fall back to the email
+   * local-part, so the desk opened with "MORNING, VMACHADO194".
    */
   const firstName = (profile?.full_name ?? '').trim().split(/\s+/)[0];
+  const nothingYet = needs.length === 0 && rest.length === 0 && roster.length === 0;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      {/* ── The line ── */}
-      <div>
-        <h1 className="text-lg font-medium tracking-tight text-foreground">
-          {firstName ? `Morning, ${firstName}.` : 'Morning.'}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {line.due > 0 ? (
-            <>
-              <button onClick={() => navigate('/pending-actions')} className="text-foreground underline-offset-2 hover:underline">
-                {line.due} {line.due === 1 ? 'thing needs' : 'things need'} you today
-              </button>
-              {' and '}
-            </>
-          ) : 'Nothing is late, and '}
-          <button onClick={() => navigate('/pitches')} className="text-foreground underline-offset-2 hover:underline">
-            {line.active} {line.active === 1 ? 'placement is' : 'placements are'} live
-          </button>
-          {line.closing > 0 && `, ${line.closing} at closing`}.
-          {line.quiet > 0 && (
-            <>
-              {' '}
-              <button onClick={() => navigate('/contacts')} className="text-foreground underline-offset-2 hover:underline">
-                {line.quiet} clubs
-              </button>
-              {' have gone quiet past ninety days.'}
-            </>
-          )}
-        </p>
-      </div>
+    <div className="mx-auto max-w-[1180px] space-y-7 pb-4 md:space-y-8">
+      <BoardHero
+        greeting={firstName ? `Morning, ${firstName}` : 'Morning'}
+        fitCount={fitCount}
+        fitClubs={heroFitClubs}
+        waitingCount={waiting.length}
+        waitingClubs={waitingClubs}
+        openNeeds={openNeedCount}
+        bookValue={bookValue}
+      />
 
-      {/* ── Opportunities ── */}
-      <div>
-        <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
-          WHERE TO SPEND TODAY
-        </h2>
-
-        {board.length === 0 ? (
-          <div className="rounded-lg border border-border bg-card p-4">
-            <p className="text-sm text-foreground">Nothing to flag yet.</p>
-            {/* Reads as a setup checklist rather than a blank screen: the page
-                has nothing to say because it has not been told anything. */}
-            <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
-              {requirements.filter((r) => r.status === 'open').length === 0 && (
-                <li>
-                  ·{' '}
-                  <button onClick={() => navigate('/contacts')} className="underline-offset-2 hover:text-foreground hover:underline">
-                    Record what a club is looking for
-                  </button>
-                  {' '}and the roster gets matched against it.
-                </li>
-              )}
-              {roster.length === 0 && (
-                <li>
-                  ·{' '}
-                  <button onClick={() => navigate('/roster')} className="underline-offset-2 hover:text-foreground hover:underline">
-                    Add a player
-                  </button>
-                  {' '}to represent.
-                </li>
-              )}
-              {coverage.missing > 0 && (
-                <li>
-                  · {coverage.missing} of {coverage.total} players have not been enriched,
-                  so contract dates and valuations are missing.
-                </li>
-              )}
-            </ul>
-          </div>
-        ) : (
-          <div className="grid gap-2 xl:grid-cols-2">
-            {board.map((item, i) => (
-              <OpportunityCard
-                key={item.id}
-                item={item}
-                hero={i === 0}
-                onOpen={() => navigate(item.href)}
+      {needs.length > 0 && (
+        <Section label="Needs nobody has pitched" helper="oldest ask first · every one links to the need">
+          <div className="grid gap-2.5 md:grid-cols-2 md:gap-3">
+            {needs.map((need, i) => (
+              <NeedCard
+                key={need.requirementId}
+                need={need}
+                rank={i}
+                maxFits={maxFits}
+                /* The first card opens on load so the interaction is
+                   discoverable — on a phone there is no hover to hint at it. */
+                open={openNeedId === null ? i === 0 : openNeedId === need.requirementId}
+                onOpen={() => setOpenNeedId(need.requirementId)}
+                onClose={() => setOpenNeedId(null)}
+                onToggle={() => setOpenNeedId(
+                  openNeedId === need.requirementId ? null : need.requirementId,
+                )}
+                onPutForward={() => navigate(`/needs/${need.requirementId}#shortlist`)}
+                onOpenNeed={() => navigate(`/needs/${need.requirementId}`)}
               />
             ))}
           </div>
-        )}
-
-        {/* ── What it could not see ── */}
-        {board.length > 0 && coverage.missing > 0 && (
-          <p className="mt-2 text-[10px] text-muted-foreground">
-            Working from {coverage.enriched} of {coverage.total} players — {coverage.missing} not
-            yet enriched, so contract dates and valuations may be missing.
-          </p>
-        )}
-      </div>
-
-      {/* ── The book ──
-          Who he actually represents, biggest first. Not a count of the roster —
-          the names, which is the thing an agent points at. It carries the
-          contract chip too, so the page shows leverage running out rather than
-          only telling you about it in a card. */}
-      {topOfBook.length > 0 && (
-        <div>
-          <div className="mb-2 flex items-baseline justify-between gap-2">
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
-              THE BOOK
-            </h2>
-            <button
-              onClick={() => navigate('/roster')}
-              className="text-[10px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-            >
-              all {roster.length} →
-            </button>
-          </div>
-          <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-4">
-            {topOfBook.map(({ player: p, xtv, monthsLeft }) => (
-              <button
-                key={p.id}
-                onClick={() => navigate(`/roster/${p.id}`)}
-                className="rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-primary/40"
-              >
-                <p className="truncate text-sm font-medium text-foreground">{p.name}</p>
-                <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
-                  {[p.position, getAge(p.dob) ?? p.age, p.currentClub].filter(Boolean).join(' · ')}
-                </p>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <span className="font-mono text-xs text-foreground">
-                    {xtv != null ? formatMoneyShort(xtv * 1_000_000) : '—'}
-                  </span>
-                  {monthsLeft != null && monthsLeft <= 12 && (
-                    <span className={cn(
-                      'shrink-0 rounded border px-1.5 py-0.5 text-[9px] uppercase tracking-wide',
-                      monthsLeft <= 6
-                        ? 'border-status-cold/30 bg-status-cold/10 text-status-cold'
-                        : 'border-primary/30 bg-primary/10 text-primary',
-                    )}>
-                      {monthsLeft}m left
-                    </span>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+        </Section>
       )}
 
-      {/* ── What is due, and what you were last in ──
-          A footer strip rather than a side rail: DUE is usually one line, and a
-          third of the screen given to one line reads worse than no rail. */}
-      <div className="grid gap-6 sm:grid-cols-2">
-        <div>
-          <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
-            DUE
-          </h2>
-          {dueToday.length === 0 ? (
-            <p className="font-mono text-xs text-muted-foreground">Nothing due.</p>
-          ) : (
-            <div className="space-y-1.5">
-              {dueToday.map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => navigate('/pending-actions')}
-                  className="w-full rounded-md border border-border bg-card px-3 py-2 text-left transition-colors hover:border-primary/40"
-                >
-                  <p className="truncate text-xs font-medium text-foreground">{f.target_label}</p>
-                  <p className="truncate text-[11px] text-muted-foreground">{f.action_text}</p>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+      {rest.length > 0 && (
+        <Section label="Also on the desk" gold={false}>
+          <DeskStrip items={rest} onOpen={(item: Opportunity) => navigate(item.href)} />
+        </Section>
+      )}
 
-        {recentPitches.length > 0 && (
-          <div>
-            <h2 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
-              LAST WORKED
-            </h2>
-            <div className="space-y-1.5">
-              {recentPitches.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => navigate('/pitches')}
-                  className="flex w-full items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-left transition-colors hover:border-primary/40"
-                >
-                  <span className="truncate text-xs font-medium text-foreground">
-                    {roster.find((r) => r.id === p.scouted_target_id)?.name ?? 'Placement'}
-                  </span>
-                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                    {p.stage}
-                  </span>
+      {runway.pins.length > 0 && (
+        <Section label="Contract runway · next 12 months" helper="leverage peaks inside six months">
+          <ContractRunway
+            pins={runway.pins}
+            hidden={runway.hidden}
+            onOpen={(id) => navigate(`/roster/${id}`)}
+          />
+        </Section>
+      )}
+
+      {bookCards.length > 0 && (
+        <Section
+          label={`The book · top of ${roster.length}`}
+          helper="hover a need above to see who fits it"
+        >
+          <TheBook cards={bookCards} onOpen={(id) => navigate(`/roster/${id}`)} />
+        </Section>
+      )}
+
+      {/* What it could not see. Said once, at the bottom, rather than hedged
+          into every card above it. */}
+      {coverage.missing > 0 && !nothingYet && (
+        <p className="text-[10px] text-foreground/40">
+          Working from {coverage.enriched} of {coverage.total} players — {coverage.missing} not yet
+          enriched, so contract dates and valuations may be missing.
+        </p>
+      )}
+
+      {/* The page has nothing to say because it has not been told anything.
+          A setup checklist reads better than a blank screen. */}
+      {nothingYet && (
+        <div className="rounded-lg border border-border bg-card p-4">
+          <p className="text-sm text-foreground">Nothing to flag yet.</p>
+          <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+            {openNeedCount === 0 && (
+              <li>
+                ·{' '}
+                <button onClick={() => navigate('/contacts')} className="underline-offset-2 hover:text-foreground hover:underline">
+                  Record what a club is looking for
                 </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+                {' '}and the roster gets matched against it.
+              </li>
+            )}
+            {roster.length === 0 && (
+              <li>
+                ·{' '}
+                <button onClick={() => navigate('/roster')} className="underline-offset-2 hover:text-foreground hover:underline">
+                  Add a player
+                </button>
+                {' '}to represent.
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

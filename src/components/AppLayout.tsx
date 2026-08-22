@@ -3,6 +3,7 @@ import AppSidebar from '@/components/AppSidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { CLIENT } from '@/config/client';
 import BrandMark from '@/components/BrandMark';
+import MobileTabBar from '@/components/MobileTabBar';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -25,11 +26,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             {CLIENT.deskName}
           </span>
         </header>
-        {/* Main */}
-        <main className="flex-1 overflow-auto p-4 sm:p-6">
+        {/* Main. The bottom padding on mobile is the tab bar's height plus the
+            home indicator — without it the bar covers the last row of every
+            page, which reads as content being cut off rather than as chrome. */}
+        <main className="flex-1 overflow-auto p-4 pb-24 sm:p-6 md:pb-6">
           {children}
         </main>
       </div>
+      <MobileTabBar />
     </div>
   );
 };

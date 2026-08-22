@@ -8,6 +8,8 @@ export type Club = {
   country: string | null;
   league: string | null;
   tier: number | null;
+  /** Override for the crest derived from the Transfermarkt id. Usually null. */
+  crest_url: string | null;
 };
 
 export type ClubSource = {
@@ -26,7 +28,7 @@ export function useClubs() {
       fetchAllRows<Club>((from, to) =>
         supabase
           .from('clubs')
-          .select('id, name, country, league, tier')
+          .select('id, name, country, league, tier, crest_url')
           .order('name', { ascending: true })
           .range(from, to)
       ),

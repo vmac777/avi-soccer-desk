@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, ChevronUp, ChevronDown, Printer, SendHorizonal, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -43,7 +43,34 @@ const verdictClass = (v: MatchReason['verdict']) => {
 const scoreColour = (score: number) =>
   score >= 80 ? 'text-status-hot' : score >= 55 ? 'text-status-warm' : 'text-muted-foreground';
 
+/**
+ * Scroll to the fragment in the URL once the page has content.
+ *
+ * React Router owns navigation and does not honour `#hash` — a link to
+ * `/needs/x#shortlist` lands at the top of the page, so the board's "Put N
+ * forward" would look like it had ignored the click. The frame's delay is not
+ * decoration: the target does not exist until the requirement query resolves
+ * and the column renders.
+ */
+function useScrollToHash() {
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (!hash) return;
+    const id = hash.slice(1);
+    let raf = 0;
+    let tries = 0;
+    const find = () => {
+      const el = document.getElementById(id);
+      if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+      if (tries++ < 40) raf = requestAnimationFrame(find);
+    };
+    raf = requestAnimationFrame(find);
+    return () => cancelAnimationFrame(raf);
+  }, [hash]);
+}
+
 export default function RequirementDetailPage() {
+  useScrollToHash();
   const { id = null } = useParams();
   const navigate = useNavigate();
 
@@ -372,8 +399,11 @@ export default function RequirementDetailPage() {
           )}
         </div>
 
-        {/* What we send */}
-        <div>
+        {/* What we send.
+            `id` is the board's target: its "Put N forward" links here rather
+            than to the top of the page, so the button lands on the thing it
+            names instead of somewhere the reader has to go looking. */}
+        <div id="shortlist" className="scroll-mt-20">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-[10px] font-bold uppercase tracking-[0.15em] text-primary">
               SHORTLIST ({entries.length})

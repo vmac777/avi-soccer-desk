@@ -16,6 +16,10 @@ export default {
       fontFamily: {
         sans: ["DM Sans", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
+        // Bebas is loaded in index.css but had no utility, so every use of it
+        // was a raw font-family in a style attribute. The board leans on it
+        // for club names and the hero numerals — it needs a class.
+        display: ["Bebas Neue", "Impact", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

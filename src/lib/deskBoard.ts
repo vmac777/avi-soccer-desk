@@ -53,8 +53,17 @@ const VALUE_MOVE_PCT = 15;
 /** A deadline further out than this is not yet today's problem. */
 const DEADLINE_DAYS = 21;
 
+/**
+ * The board needs to know when a club asked, and `ClubRequirement` does not
+ * carry it — the column exists on the row, the type just never surfaced it.
+ * Optional rather than required so every existing caller and test still
+ * compiles; a missing date sorts last and renders no age, which is the honest
+ * outcome rather than a guessed one.
+ */
+export type DatedRequirement = ClubRequirement & { created_at?: string };
+
 export interface BoardInput {
-  requirements: ClubRequirement[];
+  requirements: DatedRequirement[];
   /** Shortlist rows, only the two fields the joins need. */
   shortlistEntries: { requirement_id: string; scouted_target_id: string }[];
   roster: RosterPlayer[];
@@ -329,4 +338,170 @@ export function rosterCoverage(targets: { tm_status?: string | null; tr_status?:
   const total = targets.length;
   const enriched = targets.filter((t) => t.tm_status === 'ok' || t.tr_status === 'ok').length;
   return { total, enriched, missing: total - enriched };
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * Needs nobody has pitched, with the fits attached.
+ *
+ * `unworkedMatches` above answers "is this worth a card" and throws the
+ * evidence away — it keeps a count and writes a sentence. The board now leads
+ * with these needs and shows, per need, exactly who of ours fits and who does
+ * not, so the evidence has to survive the join.
+ *
+ * Every verdict below is quoted from a `MatchReason` the scorer produced, or
+ * from a fact on the row (the player is already at that club, his contract has
+ * three months left). Nothing here composes a new claim: an agent reads these
+ * lines out loud to a sporting director, and a plausible sentence we invented
+ * is worse than a blank.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+/** One of ours, measured against one club's ask. */
+export interface FitRow {
+  playerId: string;
+  name: string;
+  /** `CF · 24 · Fluminense` — whatever of it we actually hold. */
+  meta: string;
+  /** Asking price in EUR, or null when no valuation is held. */
+  value: number | null;
+  /** True when the scorer found no hard miss and he is not priced out. */
+  ok: boolean;
+  /** Quoted from the deciding reason. Null when nothing could be computed. */
+  verdict: string | null;
+  photoUrl?: string;
+  initials: string;
+}
+
+export interface UnpitchedNeed {
+  requirementId: string;
+  clubId: string | null;
+  club: string;
+  /** `Centre forward, ≤ €5.0m` */
+  want: string;
+  /** How long the club has been waiting. Null when we never recorded the ask. */
+  askedDaysAgo: number | null;
+  /** Everyone the scorer considered, those who fit first. */
+  rows: FitRow[];
+  /** How many of `rows` actually fit. The number in "put 6 forward". */
+  fitCount: number;
+  /** Other open, unpitched needs at the same club. */
+  alsoAtClub: number;
+}
+
+export function playerInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '—';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+/**
+ * The one line that explains this player against this need.
+ *
+ * Order matters: the most decisive thing is said first. A miss ends the
+ * argument, so it wins over everything; a "close" is the next most useful
+ * thing to know; otherwise the budget line is what an agent asks about. Each
+ * string is the scorer's own `detail`, never a rephrasing.
+ */
+function verdictFor(
+  match: { reasons: { factor: string; verdict: string; detail: string }[] },
+  player: RosterPlayer,
+  clubName: string,
+  today: string,
+): string | null {
+  // A fact, not a score: he already plays there. Said first because it makes
+  // every other line irrelevant.
+  if (clubName && player.currentClub && player.currentClub.trim().toLowerCase() === clubName.trim().toLowerCase()) {
+    return `already at ${clubName}`;
+  }
+
+  const miss = match.reasons.find((r) => r.verdict === 'misses');
+  if (miss) return miss.detail;
+
+  const close = match.reasons.find((r) => r.verdict === 'close');
+  if (close) return close.detail;
+
+  const budget = match.reasons.find((r) => r.factor === 'budget' && r.verdict === 'fits');
+  const base = budget?.detail ?? null;
+
+  // Contract runway is leverage, and it is the thing an agent volunteers next.
+  // Only when we hold a date — an absent one says nothing at all.
+  if (player.contractEndDate) {
+    const days = daysBetween(today, player.contractEndDate.slice(0, 10));
+    if (days >= 0 && days <= CONTRACT_CLOCK_MONTHS * 30) {
+      const months = Math.max(1, Math.round(days / 30));
+      return base ? `${base} · ${months}m contract left` : `${months}m contract left`;
+    }
+  }
+  return base;
+}
+
+/** How many of `rows` we could actually put forward, across every need. */
+export function totalUnpitchedFits(needs: UnpitchedNeed[]): number {
+  return needs.reduce((n, need) => n + need.fitCount, 0);
+}
+
+export function needsNobodyPitched(input: BoardInput, limit = 4): UnpitchedNeed[] {
+  const listed = new Set(input.shortlistEntries.map((e) => e.requirement_id));
+  const open = input.requirements.filter((r) => r.status === 'open' && !listed.has(r.id));
+
+  return open
+    .map((r) => {
+      const matches = matchRosterToRequirement(input.roster, r);
+      const club = clubOf(r, input);
+      const rows: FitRow[] = matches.flatMap((m) => {
+        const player = input.roster.find((p) => p.id === m.playerId);
+        if (!player) return [];
+        const age = getAge(player.dob) ?? player.age;
+        const xtvM = getLatestXtvM(player);
+        return [{
+          playerId: player.id,
+          name: player.name,
+          meta: [player.position, age, player.currentClub].filter(Boolean).join(' · '),
+          value: xtvM != null ? xtvM * 1_000_000 : null,
+          ok: !isPricedOut(m) && !m.reasons.some((x) => x.verdict === 'misses'),
+          verdict: verdictFor(m, player, club, input.today),
+          photoUrl: player.photoUrl,
+          initials: playerInitials(player.name),
+        }];
+      });
+      // Fits first, and within each group the scorer's own ranking survives.
+      rows.sort((a, b) => Number(b.ok) - Number(a.ok));
+      return { r, club, rows, fitCount: rows.filter((x) => x.ok).length };
+    })
+    // Silence beats invention: a need nobody of ours fits is not an opportunity,
+    // and a card that says so is a card nobody needed to read.
+    .filter(({ fitCount }) => fitCount > 0)
+    // One card per club. Two needs at one club is one conversation, and stacking
+    // "Bahia want…" twice reads as repetition rather than as demand.
+    .filter((x, _i, all) => all.findIndex((y) => y.club === x.club) === all.indexOf(x))
+    /**
+     * Oldest ask first.
+     *
+     * This used to sort by how many of ours fit, which put the easiest
+     * conversation at the top and let the club that has been waiting three
+     * weeks sit at the bottom. The queue an agent owes is a queue by time.
+     * A need with no recorded date sorts last rather than first — an unknown
+     * age is not the same as an old one.
+     */
+    .sort((a, b) => {
+      const at = a.r.created_at ?? '';
+      const bt = b.r.created_at ?? '';
+      if (!at && !bt) return 0;
+      if (!at) return 1;
+      if (!bt) return -1;
+      return at.localeCompare(bt);
+    })
+    .slice(0, limit)
+    .map(({ r, club, rows, fitCount }) => ({
+      requirementId: r.id,
+      clubId: r.club_id,
+      club,
+      want: requirementSummary(r),
+      askedDaysAgo: r.created_at
+        ? Math.max(0, daysBetween(r.created_at.slice(0, 10), input.today))
+        : null,
+      rows,
+      fitCount,
+      alsoAtClub: open.filter((o) => o.id !== r.id && clubOf(o, input) === club && club !== '').length,
+    }));
 }
