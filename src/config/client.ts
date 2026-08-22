@@ -19,13 +19,10 @@ export interface ClientConfig {
   shortName: string;
   /** Full legal entity name. */
   legalName: string;
-  /**
-   * Desk label shown beside the logo and on the login screen.
-   *
-   * Whose desk this is, not what kind of desk it is — an agency's book belongs
-   * to the agent who runs it.
-   */
-  deskName: string;
+  // `deskName` used to live here — a build-time string reading "Julio Taran"
+  // that the header showed to whoever was signed in. Whose desk this is is a
+  // property of the person looking at it, so the header reads
+  // `profiles.full_name` and this config no longer names anybody.
   /** Logo path, relative to the public/ root. */
   logoPath: string;
   /** Reversed logo, for dark surfaces. */
@@ -44,7 +41,6 @@ const aviSoccer: ClientConfig = {
   id: 'avi-soccer',
   shortName: 'AVI Soccer',
   legalName: 'AVI Soccer',
-  deskName: 'Julio Taran',
   logoPath: '/brand/avi-soccer-primary-horizontal.png',
   logoPathReversed: '/brand/avi-soccer-primary-horizontal-white.png',
   pdfBrandMark: 'AVI SOCCER',

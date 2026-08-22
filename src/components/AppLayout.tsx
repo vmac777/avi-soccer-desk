@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import AppSidebar, { MobileNavSheet } from '@/components/AppSidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { CLIENT } from '@/config/client';
+import { useAuth } from '@/hooks/useAuth';
 import BrandMark from '@/components/BrandMark';
 import MobileTabBar from '@/components/MobileTabBar';
 
@@ -11,6 +11,21 @@ interface AppLayoutProps {
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const isMobile = useIsMobile();
+  const { profile } = useAuth();
+
+  /**
+   * Whose desk this is — the person looking at it.
+   *
+   * It was `CLIENT.deskName`, a build-time constant reading "Julio Taran" on
+   * every screen including Vitor's. One instance per agency made that seem
+   * safe; more than one person at the agency makes it wrong.
+   *
+   * `profile.full_name` rather than `displayName`, which falls back to the
+   * email local-part — the same handle the greeting was fixed to stop showing.
+   * Nobody should be addressed as their login, so with no name set the header
+   * carries the mark alone.
+   */
+  const name = profile?.full_name?.trim();
 
   return (
     <div className="min-h-screen flex w-full bg-background">
@@ -22,10 +37,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           {/* The drawer trigger lives here rather than floating over the page. */}
           {isMobile && <MobileNavSheet />}
           <BrandMark height={isMobile ? 22 : 26} />
-          <span className="text-muted-foreground mx-2 sm:mx-3">|</span>
-          <span className="text-[11px] tracking-[0.15em] text-muted-foreground uppercase truncate min-w-0">
-            {CLIENT.deskName}
-          </span>
+          {name && (
+            <>
+              <span className="text-muted-foreground mx-2 sm:mx-3">|</span>
+              <span className="text-[11px] tracking-[0.15em] text-muted-foreground uppercase truncate min-w-0">
+                {name}
+              </span>
+            </>
+          )}
         </header>
         {/* Main. The bottom padding clears the tab bar and the home indicator.
             Computed rather than a round number: 6rem was a guess that is short

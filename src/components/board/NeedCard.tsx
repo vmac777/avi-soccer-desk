@@ -147,7 +147,11 @@ export default function NeedCard({
             <span className={cn('shrink-0 whitespace-nowrap font-mono text-[10px] font-semibold uppercase tracking-[0.12em]', text)}>
               {need.fitCount} of yours fit
             </span>
-            <span className="truncate text-[11px] text-foreground/40">
+            {/* `min-w-0` is load-bearing, not tidying. A flex item defaults to
+                `min-width: auto`, so `truncate` — which sets nowrap — cannot
+                shrink below its own text: the ellipsis never appears and the
+                row pushes the whole card wider than the phone. */}
+            <span className="min-w-0 truncate text-right text-[11px] text-foreground/40">
               {need.alsoAtClub > 0
                 ? `${need.alsoAtClub} more open need${need.alsoAtClub === 1 ? '' : 's'} at the club`
                 : 'nobody put forward'}
