@@ -10,7 +10,16 @@ export default defineConfig({
     setupFiles: ["./src/test/setup.ts"],
     // scripts/ too: check-schema-drift.mjs gates every build, and a
     // checker whose own regexes rot fails silently by passing.
-    include: ["src/**/*.{test,spec}.{ts,tsx}", "scripts/**/*.{test,spec}.{ts,tsx}"],
+    //
+    // supabase/functions/_shared/ too. Those modules run under Deno, so the
+    // suite can only reach the parts that touch no Deno global — which is
+    // deliberate: the HTML extraction is the half that rots when a publisher
+    // reshapes their markup, and it is pure string work.
+    include: [
+      "src/**/*.{test,spec}.{ts,tsx}",
+      "scripts/**/*.{test,spec}.{ts,tsx}",
+      "supabase/functions/**/*.{test,spec}.{ts,tsx}",
+    ],
     // The Supabase client throws at module load when these are missing, so any
     // test that transitively imports it needs them present. They came from a
     // local .env that is gitignored, which made the suite pass on a developer

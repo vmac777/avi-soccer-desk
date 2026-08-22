@@ -37,7 +37,10 @@ const RosterPage = lazyRoute(() => import("@/pages/Roster"));
 const RosterPlayerPage = lazyRoute(() => import("@/pages/RosterPlayerPage"));
 const PitchesPage = lazyRoute(() => import("@/pages/BuyPitches"));
 const NotFound = lazyRoute(() => import("@/pages/NotFound"));
+const RepositoryPage = lazyRoute(() => import("@/pages/news/Repository"));
+const ClubNewsPage = lazyRoute(() => import("@/pages/ClubNewsPage"));
 const Audit = lazyRoute(() => import("@/pages/admin/Audit"));
+const NewsSources = lazyRoute(() => import("@/pages/admin/NewsSources"));
 const SystemHealth = lazyRoute(() => import("@/pages/admin/SystemHealth"));
 
 const queryClient = new QueryClient({
@@ -118,7 +121,10 @@ const App = () => (
             <Route path="/roster" element={adminRoute(<RosterPage />)} />
             <Route path="/roster/:id" element={adminRoute(<RosterPlayerPage />)} />
             <Route path="/pitches" element={adminRoute(<PitchesPage />)} />
+            <Route path="/news/repository" element={adminRoute(<RepositoryPage />)} />
+            <Route path="/clubs/:id/news" element={adminRoute(<ClubNewsPage />)} />
 
+            <Route path="/admin/news-sources" element={adminRoute(<NewsSources />)} />
             <Route path="/admin/audit" element={superAdminRoute(<Audit />)} />
             <Route path="/admin/system-health" element={superAdminRoute(<SystemHealth />)} />
 
