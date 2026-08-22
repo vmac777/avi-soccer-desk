@@ -25,6 +25,27 @@ const corsHeaders = {
 /** Enough to be worth reading, few enough to finish inside the function's wall clock. */
 const MAX_SOURCES = 8;
 
+/**
+ * How many web searches the model may make.
+ *
+ * This is the single biggest cost lever in the function, and not for the
+ * obvious reason. A search is not one extra request — it is an extra *turn*,
+ * and every turn re-sends the whole context. Going from two searches to five
+ * roughly triples what a report costs. Two fills the gaps the club's own pages
+ * leave; raise it here if the reports come back thin.
+ */
+const MAX_WEB_SEARCHES = Number(Deno.env.get('NEWS_REPORT_MAX_SEARCHES') ?? '2');
+
+/**
+ * Hand back an existing report rather than paying for an identical one.
+ *
+ * Not a cache in the usual sense — a deliberate Regenerate always bypasses it.
+ * It exists for the clicks nobody meant: a double-click, a retry after a
+ * network blip, two agents opening the same club in the same hour. Each of
+ * those used to cost a full report.
+ */
+const REUSE_MINUTES = Number(Deno.env.get('NEWS_REPORT_REUSE_MINUTES') ?? '360');
+
 /** Leaves headroom under the edge runtime's limit, so we fail with a message rather than being killed. */
 const ANTHROPIC_TIMEOUT_MS = 110_000;
 
@@ -78,15 +99,27 @@ interface ClubRow {
   league: string | null;
 }
 
-function assembleContext(club: ClubRow, sources: SourceText[], today: string): string {
+/**
+ * The prompt, split where the cache breakpoint goes.
+ *
+ * `pages` is the bulk — tens of thousands of tokens of scraped text — and it is
+ * byte-identical on every turn of the search loop. `ask` is the short tail.
+ * Caching the first means turns two onward read the pages at a tenth of the
+ * price instead of paying full freight to re-send text that has not changed.
+ * Without the split there is nowhere to put the breakpoint that does not also
+ * cover the part we want cheap to vary.
+ */
+function assembleContext(club: ClubRow, sources: SourceText[], today: string): { pages: string; ask: string } {
   const usable = sources.filter((s) => !s.error && s.text.length > 0);
-  const parts = [
+  const ask = [
     `CLUB: ${club.name}`,
     `COUNTRY: ${club.country ?? 'unknown'}`,
     `LEAGUE: ${club.league ?? 'unknown'}`,
     `TODAY: ${today}`,
     '',
-  ];
+    'Write the report.',
+  ].join('\n');
+  const parts: string[] = [];
 
   if (usable.length === 0) {
     // Said plainly rather than left as an empty section. A model handed nothing
@@ -98,7 +131,7 @@ function assembleContext(club: ClubRow, sources: SourceText[], today: string): s
       'SOURCE FAILURES:',
       ...sources.map((s) => `- ${s.identifier} ${s.url} -> ${s.error ?? 'empty'}`),
     );
-    return parts.join('\n');
+    return { pages: parts.join('\n'), ask };
   }
 
   for (const s of usable) {
@@ -113,7 +146,7 @@ function assembleContext(club: ClubRow, sources: SourceText[], today: string): s
     );
   }
 
-  return parts.join('\n');
+  return { pages: parts.join('\n'), ask };
 }
 
 Deno.serve(async (req) => {
@@ -132,9 +165,10 @@ Deno.serve(async (req) => {
   if (!gate.ok) return gate.response;
   const { userClient, userId } = gate.caller;
 
-  let body: { club_id?: string } = {};
+  let body: { club_id?: string; force?: boolean } = {};
   try { body = await req.json(); } catch { /* handled below */ }
   const clubId = body.club_id;
+  const force = body.force === true;
   if (!clubId || typeof clubId !== 'string') {
     return json({ ok: false, reason: 'missing_club_id' }, 400);
   }
@@ -144,6 +178,28 @@ Deno.serve(async (req) => {
     // Checked before doing any work, so the failure names the cause instead of
     // arriving after eight page fetches.
     return json({ ok: false, reason: 'missing_anthropic_key' }, 500);
+  }
+
+  if (!force && REUSE_MINUTES > 0) {
+    const since = new Date(Date.now() - REUSE_MINUTES * 60_000).toISOString();
+    const { data: recent } = await userClient
+      .from('club_news_reports')
+      .select('id, generated_at, report_json, source_status')
+      .eq('club_id', clubId)
+      .gte('generated_at', since)
+      .order('generated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (recent?.report_json) {
+      return json({
+        ok: true,
+        reused: true,
+        id: recent.id,
+        generated_at: recent.generated_at,
+        report: recent.report_json,
+        source_status: recent.source_status ?? [],
+      });
+    }
   }
 
   const { data: club, error: clubErr } = await userClient
@@ -188,15 +244,25 @@ Deno.serve(async (req) => {
   const model = Deno.env.get('ANTHROPIC_MODEL') ?? 'claude-opus-5';
   const client = new Anthropic({ apiKey: anthropicKey, timeout: ANTHROPIC_TIMEOUT_MS });
 
+  const { pages, ask } = assembleContext(club as ClubRow, sources, today);
+
   let response;
   try {
     response = await client.messages.parse({
       model,
       max_tokens: 16000,
       system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: assembleContext(club as ClubRow, sources, today) }],
+      messages: [{
+        role: 'user',
+        content: [
+          // The breakpoint sits after the scraped pages, so every turn of the
+          // search loop reads them from cache instead of re-sending them.
+          { type: 'text', text: pages, cache_control: { type: 'ephemeral' } },
+          { type: 'text', text: ask },
+        ],
+      }],
       output_config: { effort: 'medium', format: zodOutputFormat(ReportSchema) },
-      tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 5 }],
+      tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: MAX_WEB_SEARCHES }],
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -222,6 +288,22 @@ Deno.serve(async (req) => {
   const searchCalls = response.usage?.server_tool_use?.web_search_requests ?? 0;
   const durationMs = Date.now() - started;
 
+  /**
+   * Whether the cache actually worked, in the logs.
+   *
+   * A cache breakpoint fails silently: a byte drifts in the prefix, every turn
+   * pays full price, and the only visible symptom is a bill. `cache_read` at
+   * zero across runs with more than one turn means the breakpoint is not doing
+   * its job.
+   */
+  const cacheWrite = response.usage?.cache_creation_input_tokens ?? 0;
+  const cacheRead = response.usage?.cache_read_input_tokens ?? 0;
+  console.log(
+    `club-news-report ${club.name}: ${searchCalls} searches, ` +
+    `in ${response.usage?.input_tokens ?? 0} / cache write ${cacheWrite} / cache read ${cacheRead}, ` +
+    `out ${response.usage?.output_tokens ?? 0}, ${durationMs}ms`,
+  );
+
   const { data: saved, error: insertErr } = await userClient
     .from('club_news_reports')
     .insert({
@@ -245,11 +327,13 @@ Deno.serve(async (req) => {
 
   return json({
     ok: true,
+    reused: false,
     id: saved?.id ?? null,
     generated_at: saved?.generated_at ?? new Date().toISOString(),
     report,
     source_status: sourceStatus,
     duration_ms: durationMs,
     web_search_calls: searchCalls,
+    cache_read_tokens: cacheRead,
   });
 });

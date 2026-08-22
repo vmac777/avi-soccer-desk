@@ -55,6 +55,25 @@ export default function ClubNewsPage() {
     : reports[0];
 
   /**
+   * How stale the newest report is, in words.
+   *
+   * The button used to say "Generate report" whether or not one existed from an
+   * hour ago, so the cheapest click and the most expensive one looked
+   * identical. Every report costs real money; the label should say which one
+   * you are about to make.
+   */
+  const latestAgeMinutes = reports[0]
+    ? Math.max(0, Math.round((Date.now() - new Date(reports[0].generated_at).getTime()) / 60_000))
+    : null;
+  const ageLabel =
+    latestAgeMinutes === null ? null
+      : latestAgeMinutes < 1 ? 'just now'
+      : latestAgeMinutes < 60 ? `${latestAgeMinutes}m ago`
+      : latestAgeMinutes < 60 * 24 ? `${Math.round(latestAgeMinutes / 60)}h ago`
+      : `${Math.round(latestAgeMinutes / (60 * 24))}d ago`;
+  const hasReport = reports.length > 0;
+
+  /**
    * The bundled Sky / BBC / ESPN URLs for this club, if we have them.
    *
    * They are written into `club_sources` rather than passed to the function at
@@ -123,16 +142,21 @@ export default function ClubNewsPage() {
           </p>
         </div>
 
-        <Button
-          onClick={() => generate.mutate()}
-          disabled={generate.isPending || sources.length === 0}
-          className="h-9 gap-1.5 text-xs"
-          title={sources.length === 0 ? 'Add a source first' : undefined}
-        >
-          {generate.isPending
-            ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Reading the sources…</>
-            : <><Sparkles className="h-3.5 w-3.5" /> Generate report</>}
-        </Button>
+        <div className="flex flex-col items-end gap-1">
+          <Button
+            onClick={() => generate.mutate({ force: hasReport })}
+            disabled={generate.isPending || sources.length === 0}
+            className="h-9 gap-1.5 text-xs"
+            title={sources.length === 0 ? 'Add a source first' : undefined}
+          >
+            {generate.isPending
+              ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Reading the sources…</>
+              : <><Sparkles className="h-3.5 w-3.5" /> {hasReport ? 'Regenerate' : 'Generate report'}</>}
+          </Button>
+          {ageLabel && (
+            <span className="text-[10px] text-muted-foreground">Last run {ageLabel}</span>
+          )}
+        </div>
       </div>
 
       {/* Sources */}

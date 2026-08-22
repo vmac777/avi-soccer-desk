@@ -84,9 +84,15 @@ function messageFor(reason: string | undefined, detail?: string | null): string 
 export function useGenerateClubNewsReport(clubId: string | undefined) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async () => {
+    /**
+     * `force` is the difference between "show me this club's news" and "spend a
+     * dollar writing it again". Without it the server hands back any report from
+     * the last few hours, which is what a double-click or a second agent on the
+     * same club should get.
+     */
+    mutationFn: async (opts?: { force?: boolean }) => {
       const { data, error } = await supabase.functions.invoke('club-news-report', {
-        body: { club_id: clubId },
+        body: { club_id: clubId, force: opts?.force === true },
       });
       /**
        * The function answers a refusal with a non-2xx status carrying a body
@@ -106,11 +112,11 @@ export function useGenerateClubNewsReport(clubId: string | undefined) {
 
       const report = parseReport(data.report);
       if (!report) throw new Error(messageFor('report_parse_failed'));
-      return report;
+      return { report, reused: data.reused === true };
     },
-    onSuccess: () => {
+    onSuccess: ({ reused }) => {
       qc.invalidateQueries({ queryKey: reportsKey(clubId ?? '') });
-      toast.success('Report ready');
+      toast.success(reused ? 'Showing the report from earlier today' : 'Report ready');
     },
     onError: (e: Error) => toast.error(e.message),
   });
