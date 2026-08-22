@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import {
   positionMatches,
+  positionLabel,
   isPricedOut,
+  isUnderBand,
+  isOutsideFeeBand,
+  feeBandLabel,
   scoreMatch,
   matchRosterToRequirement,
   matchRequirementsToPlayer,
@@ -139,6 +143,113 @@ describe('isPricedOut', () => {
 
   it('is false when the club stated no ceiling', () => {
     expect(isPricedOut(at(80_000_000, null))).toBe(false);
+  });
+
+  it('does not call a cheap player priced out', () => {
+    // The distinction the `direction` marker exists for. Both are misses, but
+    // filing a €350k player under "priced out" is the reverse of the truth.
+    const m = scoreMatch(
+      player({ marketValue: 350_000 }),
+      requirement({ budget_min: 5_000_000, budget_max: 10_000_000 }),
+    )!;
+    expect(isPricedOut(m)).toBe(false);
+    expect(isUnderBand(m)).toBe(true);
+    expect(isOutsideFeeBand(m)).toBe(true);
+  });
+});
+
+describe('the fee band', () => {
+  const against = (valueEur: number, band: { min?: number | null; max?: number | null }) =>
+    scoreMatch(
+      player({ marketValue: valueEur }),
+      requirement({ budget_min: band.min ?? null, budget_max: band.max ?? null }),
+    )!;
+  const budget = (m: ReturnType<typeof against>) =>
+    m.reasons.find((r) => r.factor === 'budget')!;
+
+  it('rejects a player well under the level the club named', () => {
+    // The bug this exists for: `budget_min` was written to the database as null
+    // on every save and read by nothing, so a €350k right-back cleared a €10m
+    // ask and came back at the top of the shortlist.
+    const m = against(350_000, { min: 5_000_000, max: 10_000_000 });
+    expect(budget(m).verdict).toBe('misses');
+    expect(budget(m).direction).toBe('under');
+    expect(budget(m).detail).toBe('€350k, well under €5.0m–€10.0m');
+  });
+
+  it('takes a floor on its own seriously', () => {
+    const m = against(350_000, { min: 5_000_000 });
+    expect(budget(m).verdict).toBe('misses');
+    expect(isUnderBand(m)).toBe(true);
+  });
+
+  it('accepts a player inside the band and names it', () => {
+    const m = against(7_000_000, { min: 5_000_000, max: 10_000_000 });
+    expect(budget(m).verdict).toBe('fits');
+    expect(budget(m).detail).toBe('€7.0m within €5.0m–€10.0m');
+  });
+
+  it('counts the floor itself as inside', () => {
+    expect(budget(against(5_000_000, { min: 5_000_000, max: 10_000_000 })).verdict).toBe('fits');
+  });
+
+  it('leaves a ceiling-only requirement exactly as it was', () => {
+    // Every requirement saved before today has budget_min null. If this drifts,
+    // the change has quietly rewritten the desk's existing needs.
+    const m = against(7_000_000, { max: 10_000_000 });
+    expect(budget(m).verdict).toBe('fits');
+    expect(budget(m).detail).toBe('€7.0m within €10.0m');
+    expect(budget(m).direction).toBeUndefined();
+  });
+
+  it('marks an over-budget miss as over', () => {
+    const m = against(30_000_000, { max: 10_000_000 });
+    expect(budget(m).direction).toBe('over');
+    expect(isPricedOut(m)).toBe(true);
+    expect(isUnderBand(m)).toBe(false);
+  });
+
+  it('never rejects a player for being cheap when we do not know his value', () => {
+    const m = scoreMatch(player(), requirement({ budget_min: 5_000_000 }))!;
+    expect(budget(m).verdict).toBe('unknown');
+    expect(isUnderBand(m)).toBe(false);
+  });
+});
+
+describe('feeBandLabel', () => {
+  it('states both ends when the club gave both', () => {
+    expect(feeBandLabel({ budget_min: 5_000_000, budget_max: 10_000_000 })).toBe('€5.0m–€10.0m');
+  });
+  it('states whichever end it has', () => {
+    expect(feeBandLabel({ budget_min: null, budget_max: 10_000_000 })).toBe('≤ €10.0m');
+    expect(feeBandLabel({ budget_min: 5_000_000, budget_max: null })).toBe('≥ €5.0m');
+  });
+  it('is null when the club named no figure', () => {
+    expect(feeBandLabel({ budget_min: null, budget_max: null })).toBeNull();
+  });
+});
+
+describe('positionLabel', () => {
+  it('says the word an agent uses for the position the matcher already had', () => {
+    // ST has bucketed to CF since the position rules were written; the picker
+    // simply never said so, so a striker looked impossible to ask for.
+    expect(positionLabel('CF')).toBe('ST / CF');
+    expect(positionMatches(player({ position: 'ST' }), requirement({ position: 'CF' }))).toBe(true);
+  });
+
+  it('leaves every other code alone', () => {
+    expect(positionLabel('CB')).toBe('CB');
+    expect(positionLabel('LWB')).toBe('LWB');
+  });
+
+  it('still renders a code that is no longer offered', () => {
+    // Requirements saved as SS before the chip was folded into ST / CF.
+    expect(positionLabel('SS')).toBe('SS');
+  });
+
+  it('never renders empty', () => {
+    expect(positionLabel(null)).toBe('');
+    expect(positionLabel('')).toBe('');
   });
 });
 

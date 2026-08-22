@@ -49,6 +49,16 @@ export interface MatchReason {
   factor: 'age' | 'budget' | 'salary' | 'foot' | 'eu_passport' | 'league';
   verdict: 'fits' | 'close' | 'misses' | 'unknown';
   detail: string;
+  /**
+   * Which side of a stated fee band the player fell off, on budget misses only.
+   *
+   * Both directions are misses, but they are opposite facts and the desk labels
+   * them differently: "priced out" is true of one and the reverse of the truth
+   * about the other. Absent on every other reason, and absent on rows scored
+   * before fee floors existed — which is why `isPricedOut` treats a missing
+   * direction as "over".
+   */
+  direction?: 'over' | 'under';
 }
 
 export interface MatchResult {
@@ -108,6 +118,31 @@ const POSITION_BUCKET: Record<string, string> = {
   LWB: 'LB', RWB: 'RB',
 };
 
+/**
+ * What to call a position on screen.
+ *
+ * It lives here, against the bucket table, because the two must never disagree.
+ * `ST` and `CF` are the same search — the bucket has said so since the position
+ * rules were written — but the need dialog only ever offered the letters `CF`,
+ * so an agent looking to sign a striker found no striker in the list and
+ * reasonably concluded the desk could not do it.
+ *
+ * Only the forward line is renamed. `LWB`/`LB` and `DM`/`CM` are the same kind
+ * of pair and would benefit from the same treatment, but reshaping the whole
+ * picker is a bigger decision than the one that was asked for.
+ */
+const POSITION_LABEL: Record<string, string> = {
+  CF: 'ST / CF',
+  // Legacy rows saved before the second-striker chip was folded in. Never
+  // offered as a choice now, but it must still render as itself.
+  SS: 'SS',
+};
+
+export function positionLabel(code: string | null | undefined): string {
+  const key = (code || '').toUpperCase().trim();
+  return POSITION_LABEL[key] ?? code ?? '';
+}
+
 /** Split "DM/CM" or "RB-CB" and reduce each part to its bucket. */
 function positionCodes(position: string | null | undefined): string[] {
   const raw = (position || '').toUpperCase().trim();
@@ -150,7 +185,28 @@ export function positionMatches(player: RosterPlayer, requirement: ClubRequireme
  * either; not knowing what a player is worth is not evidence he is too dear.
  */
 export function isPricedOut(match: MatchResult): boolean {
-  return match.reasons.some((r) => r.factor === 'budget' && r.verdict === 'misses');
+  return match.reasons.some((r) =>
+    r.factor === 'budget' && r.verdict === 'misses' && r.direction !== 'under');
+}
+
+/**
+ * Below the level the club said it was shopping at.
+ *
+ * The opposite fact to `isPricedOut`, and it has to be nameable separately or
+ * the desk files a three-hundred-thousand-euro player under "priced out" — a
+ * heading that is not merely unhelpful but the reverse of true.
+ *
+ * Both are misses, and both keep a player off a shortlist. The distinction is
+ * for the human reading the reason, which is the whole reason reasons exist.
+ */
+export function isUnderBand(match: MatchResult): boolean {
+  return match.reasons.some((r) =>
+    r.factor === 'budget' && r.verdict === 'misses' && r.direction === 'under');
+}
+
+/** Either side of a stated fee band — the players a shortlist should not carry. */
+export function isOutsideFeeBand(match: MatchResult): boolean {
+  return isPricedOut(match) || isUnderBand(match);
 }
 
 function ageOf(player: RosterPlayer): number | undefined {
@@ -230,6 +286,17 @@ function scoreAge(
   };
 }
 
+/** `€5.0m–€10.0m`, or whichever end of it the club actually stated. */
+export function feeBandLabel(req: Pick<ClubRequirement, 'budget_min' | 'budget_max'>): string | null {
+  const m = formatMoneyShort;
+  if (req.budget_min != null && req.budget_max != null) {
+    return `${m(req.budget_min)}–${m(req.budget_max)}`;
+  }
+  if (req.budget_max != null) return `≤ ${m(req.budget_max)}`;
+  if (req.budget_min != null) return `≥ ${m(req.budget_min)}`;
+  return null;
+}
+
 function scoreBudget(
   player: RosterPlayer,
   req: ClubRequirement,
@@ -241,20 +308,58 @@ function scoreBudget(
       reason: { factor: 'budget', verdict: 'unknown', detail: 'No valuation held' },
     };
   }
+  const m = formatMoneyShort;
+
+  /**
+   * Below the floor the club named.
+   *
+   * Checked before the ceiling, because a club that says "five to ten million"
+   * is describing the level it is shopping at, not just the most it will spend.
+   * A three-hundred-thousand right-back clears a ten-million ceiling and is not
+   * remotely the player they asked for — which is exactly what the desk was
+   * putting at the top of its shortlists, because `budget_min` was written to
+   * the database as null on every save and read by nothing.
+   *
+   * A floor with no ceiling still counts. It is the half of the band that says
+   * "we are not shopping in the bargain bin", and it is the half that was
+   * missing.
+   */
+  if (req.budget_min != null && value < req.budget_min) {
+    const band = feeBandLabel(req);
+    return {
+      points: 0,
+      reason: {
+        factor: 'budget',
+        verdict: 'misses',
+        direction: 'under',
+        detail: `${m(value)}, well under ${band ?? m(req.budget_min)}`,
+      },
+    };
+  }
+
   if (req.budget_max == null) {
     return {
       points: WEIGHTS.budget,
-      reason: { factor: 'budget', verdict: 'fits', detail: 'No budget stated' },
+      reason: {
+        factor: 'budget',
+        verdict: 'fits',
+        detail: req.budget_min != null
+          ? `${m(value)}, at or above ${m(req.budget_min)}`
+          : 'No budget stated',
+      },
     };
   }
-  const m = formatMoneyShort;
   if (value <= req.budget_max) {
     return {
       points: WEIGHTS.budget,
       reason: {
         factor: 'budget',
         verdict: 'fits',
-        detail: `${m(value)} within ${m(req.budget_max)}`,
+        // Names the band when the club stated one, and the ceiling alone when
+        // that is all they gave us. "within ≤ €30.0m" is not English.
+        detail: req.budget_min != null
+          ? `${m(value)} within ${m(req.budget_min)}–${m(req.budget_max)}`
+          : `${m(value)} within ${m(req.budget_max)}`,
       },
     };
   }
@@ -274,6 +379,7 @@ function scoreBudget(
     reason: {
       factor: 'budget',
       verdict: 'misses',
+      direction: 'over',
       detail: `${m(value)} over ${m(req.budget_max)}`,
     },
   };

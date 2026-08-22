@@ -33,7 +33,7 @@ const need: UnpitchedNeed = {
 function mount(over: Partial<Parameters<typeof NeedCard>[0]> = {}) {
   const props = {
     need, rank: 0, maxFits: 3, open: false,
-    onOpen: vi.fn(), onClose: vi.fn(), onToggle: vi.fn(),
+    onHover: vi.fn(), onUnhover: vi.fn(), onToggle: vi.fn(),
     onPutForward: vi.fn(), onOpenNeed: vi.fn(),
     ...over,
   };
@@ -89,18 +89,28 @@ describe('NeedCard — the panel', () => {
   });
 });
 
-describe('NeedCard — every way in', () => {
-  it('opens on hover, for a pointer', () => {
+describe('NeedCard — hover points, click decides', () => {
+  it('reports the hover so the book can dim, and opens nothing', () => {
+    // Panels unfolding as the pointer crosses the grid reads as the page
+    // twitching. Hover is a hint; the panel is a decision.
     const { props } = mount();
     fireEvent.mouseEnter(screen.getByRole('button', { name: /Palmeiras/ }));
-    expect(props.onOpen).toHaveBeenCalled();
+    expect(props.onHover).toHaveBeenCalled();
+    expect(props.onToggle).not.toHaveBeenCalled();
   });
 
-  it('opens on focus, so a keyboard is not a lesser experience', () => {
-    // Hover-only would strand both keyboard users and the touch demo.
+  it('treats focus the same as hover, not as an open', () => {
+    // Tabbing four cards must not leave four panels open behind you.
     const { props } = mount();
     fireEvent.focus(screen.getByRole('button', { name: /Palmeiras/ }));
-    expect(props.onOpen).toHaveBeenCalled();
+    expect(props.onHover).toHaveBeenCalled();
+    expect(props.onToggle).not.toHaveBeenCalled();
+  });
+
+  it('clears the hover on the way out', () => {
+    const { props } = mount();
+    fireEvent.mouseLeave(screen.getByRole('button', { name: /Palmeiras/ }));
+    expect(props.onUnhover).toHaveBeenCalled();
   });
 
   it('toggles on tap, which is all a phone has', () => {

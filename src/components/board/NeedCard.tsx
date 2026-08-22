@@ -52,8 +52,8 @@ export default function NeedCard({
   rank,
   maxFits,
   open,
-  onOpen,
-  onClose,
+  onHover,
+  onUnhover,
   onToggle,
   onPutForward,
   onOpenNeed,
@@ -62,8 +62,10 @@ export default function NeedCard({
   rank: number;
   maxFits: number;
   open: boolean;
-  onOpen: () => void;
-  onClose: () => void;
+  /** Pointer or focus. Dims the book to this need's fits; opens nothing. */
+  onHover: () => void;
+  onUnhover: () => void;
+  /** A deliberate click, Enter or Space. The only thing that opens the panel. */
   onToggle: () => void;
   onPutForward: () => void;
   onOpenNeed: () => void;
@@ -80,10 +82,17 @@ export default function NeedCard({
       role="button"
       tabIndex={0}
       aria-expanded={open}
-      onMouseEnter={onOpen}
-      onMouseLeave={onClose}
-      onFocus={onOpen}
-      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) onClose(); }}
+      /*
+        Hover dims the book; it does not open anything. Panels unfolding as the
+        pointer crosses the grid read as the page twitching, and focus is worse:
+        tabbing four cards would leave four panels open behind you. Enter is
+        right there for a keyboard, and it goes through the same path a click
+        and a tap do.
+      */
+      onMouseEnter={onHover}
+      onMouseLeave={onUnhover}
+      onFocus={onHover}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) onUnhover(); }}
       onClick={onToggle}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); }
@@ -119,8 +128,10 @@ export default function NeedCard({
               title={r.name}
               className="-ml-2 flex h-[34px] w-[34px] items-center justify-center overflow-hidden rounded-full border-2 border-background bg-[#152744] shadow-[inset_0_0_0_1px_rgba(240,235,221,0.14)] first:ml-0 md:h-[38px] md:w-[38px]"
             >
+              {/* Same crop anchor as the book, so a face is framed the same way
+                  wherever it appears on the page. */}
               {r.photoUrl
-                ? <img src={r.photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+                ? <img src={r.photoUrl} alt="" className="h-full w-full object-cover object-[center_22%]" loading="lazy" />
                 : <span className="font-mono text-[11px] font-semibold text-foreground/70">{r.initials}</span>}
             </span>
           ))}
@@ -145,8 +156,9 @@ export default function NeedCard({
           </p>
         </div>
 
-        {/* The mobile affordance. Hidden on desktop, where hover already says it. */}
-        <span className="shrink-0 font-mono text-xl leading-none text-foreground/40 md:hidden" aria-hidden>
+        {/* On every screen now. With nothing opening on hover, this is the only
+            thing saying the card has more inside it. */}
+        <span className="shrink-0 font-mono text-xl leading-none text-foreground/40" aria-hidden>
           {open ? '−' : '+'}
         </span>
       </div>

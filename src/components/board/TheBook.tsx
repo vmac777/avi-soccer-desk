@@ -61,10 +61,16 @@ function Card({ card, onOpen, compact = false }: {
   const meta = [p.position, getAge(p.dob) ?? p.age, p.currentClub].filter(Boolean).join(' · ');
   const spark = compact ? null : sparkPoints(p);
 
+  /*
+    A head-and-shoulders portrait in a 2:1 letterbox is a band across the eyes,
+    whatever the crop anchor — the design's 126px area in a ~270px cell left no
+    room for a face. Two changes together fix it: the frame goes to 4:3, and the
+    crop is pulled up to where a head actually is rather than centred on a chest.
+  */
   const photo = (
-    <div className={cn('relative w-full overflow-hidden bg-sidebar', compact ? 'h-[188px]' : 'h-[126px]')}>
+    <div className={cn('relative w-full overflow-hidden bg-sidebar', compact ? 'h-[188px]' : 'aspect-[4/3]')}>
       {p.photoUrl
-        ? <img src={p.photoUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+        ? <img src={p.photoUrl} alt="" className="h-full w-full object-cover object-[center_22%]" loading="lazy" />
         : (
           <span className="flex h-full w-full items-center justify-center font-display text-3xl text-foreground/25">
             {playerInitials(p.name)}

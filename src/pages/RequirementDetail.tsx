@@ -15,7 +15,7 @@ import { useClubs } from '@/hooks/useClubsAndSources';
 import { useContacts } from '@/hooks/useData';
 import { useScoutedTargets, useAddBuyPitch } from '@/hooks/useBuyData';
 import { toRosterPlayer } from '@/lib/rosterMapping';
-import { matchRosterToRequirement, unmatchableFields, isPricedOut, type MatchReason } from '@/lib/matching';
+import { matchRosterToRequirement, unmatchableFields, isOutsideFeeBand, type MatchReason } from '@/lib/matching';
 import { getAge, getLatestXtvM, type RosterPlayer } from '@/lib/rosterData';
 import { pitchArgsFromShortlist, requirementSummary } from '@/lib/shortlistToPitch';
 import { formatMoneyShort } from '@/lib/money';
@@ -123,10 +123,15 @@ export default function RequirementDetailPage() {
    * misses go — a player inside the negotiable band still shows, and a player
    * we hold no valuation for is never hidden, because not knowing what he is
    * worth is not evidence he is too dear.
+   *
+   * Both directions now, since a club can state a floor: a €350k player against
+   * a €5–10m brief is the same kind of non-match from the other end. The heading
+   * says "outside the fee band" rather than "over the fee" because filing him
+   * under the latter would be the reverse of true.
    */
-  const pricedOut = useMemo(() => allMatches.filter(isPricedOut), [allMatches]);
+  const pricedOut = useMemo(() => allMatches.filter(isOutsideFeeBand), [allMatches]);
   const matches = useMemo(
-    () => (showPricedOut ? allMatches : allMatches.filter((m) => !isPricedOut(m))),
+    () => (showPricedOut ? allMatches : allMatches.filter((m) => !isOutsideFeeBand(m))),
     [allMatches, showPricedOut],
   );
 
@@ -316,8 +321,8 @@ export default function RequirementDetailPage() {
                 className="text-[10px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
               >
                 {showPricedOut
-                  ? `hide ${pricedOut.length} over the fee`
-                  : `${pricedOut.length} over the fee — show`}
+                  ? `hide ${pricedOut.length} outside the fee band`
+                  : `${pricedOut.length} outside the fee band — show`}
               </button>
             )}
           </div>
@@ -328,7 +333,7 @@ export default function RequirementDetailPage() {
           ) : matches.length === 0 ? (
             <p className="font-mono text-xs text-muted-foreground">
               {pricedOut.length > 0
-                ? `Everyone who plays this position is over the fee ceiling (${pricedOut.length}).`
+                ? `Everyone who plays this position is outside the fee band (${pricedOut.length}).`
                 : 'Nobody on the roster plays this position.'}
             </p>
           ) : (

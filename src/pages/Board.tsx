@@ -63,11 +63,19 @@ export default function BoardPage() {
   const { data: clubs = [] } = useClubs();
 
   /**
-   * One id drives both the fit panel and the book dimming, on every input
-   * method. Hover sets it, focus sets it, a tap toggles it — so a keyboard and
-   * a thumb reach the same behaviour a mouse does rather than a lesser one.
+   * Two ids, because these are two different intentions.
+   *
+   * `hovered` is the cheap one — pointer or focus, it only dims the book to the
+   * players who answer that need. `open` is a decision: a click, Enter, Space or
+   * a tap, and the panel stays until it is dismissed. Driving both from one id
+   * meant cards unfolded as the pointer crossed the grid, which reads as the
+   * page twitching rather than as a page answering you.
+   *
+   * The book dims from `hovered ?? open`, so a card that is open keeps its link
+   * to the book after the mouse has gone somewhere else.
    */
   const [openNeedId, setOpenNeedId] = useState<string | null>(null);
+  const [hoveredNeedId, setHoveredNeedId] = useState<string | null>(null);
 
   const today = todayKey();
   const roster = useMemo(() => targets.map(toRosterPlayer), [targets]);
@@ -94,10 +102,11 @@ export default function BoardPage() {
     [board],
   );
 
-  const openNeed = needs.find((n) => n.requirementId === openNeedId) ?? null;
+  const focusedNeedId = hoveredNeedId ?? openNeedId;
+  const focusedNeed = needs.find((n) => n.requirementId === focusedNeedId) ?? null;
   const fittingIds = useMemo(
-    () => new Set(openNeed?.rows.filter((r) => r.ok).map((r) => r.playerId) ?? []),
-    [openNeed],
+    () => new Set(focusedNeed?.rows.filter((r) => r.ok).map((r) => r.playerId) ?? []),
+    [focusedNeed],
   );
 
   const monthsLeftFor = useMemo(() => {
@@ -116,17 +125,18 @@ export default function BoardPage() {
     .map(({ p }) => ({
       player: p,
       monthsLeft: monthsLeftFor(p.contractEndDate),
-      flag: openNeed && fittingIds.has(p.id) ? openNeed.club : null,
-      dimmed: !!openNeed && !fittingIds.has(p.id),
+      flag: focusedNeed && fittingIds.has(p.id) ? focusedNeed.club : null,
+      dimmed: !!focusedNeed && !fittingIds.has(p.id),
     })),
-  [roster, monthsLeftFor, openNeed, fittingIds]);
+  [roster, monthsLeftFor, focusedNeed, fittingIds]);
 
   /**
    * Contracts running down on players nobody is already working.
    *
-   * Capped hard: past five, the pins on the desktop band overlap into an
-   * unreadable smear, so the rest are counted rather than crammed. Saying "+3
-   * more" is honest; drawing eight labels on top of each other is not.
+   * The cap here used to be five, to keep the desktop band's labels apart. That
+   * was the wrong lever — the collision is density, not count, and four players
+   * expiring in the same month overlapped anyway. `assignLanes` now decides what
+   * the band can draw, so this only limits how long the mobile list gets.
    */
   const runway = useMemo(() => {
     const beingWorked = new Set(
@@ -139,7 +149,7 @@ export default function BoardPage() {
       .map((p) => ({ id: p.id, name: p.name, months: monthsLeftFor(p.contractEndDate) }))
       .filter((p): p is RunwayPin => p.months != null && p.months <= 12)
       .sort((a, b) => a.months - b.months);
-    return { pins: all.slice(0, 5), hidden: Math.max(0, all.length - 5) };
+    return { pins: all.slice(0, 10), hidden: Math.max(0, all.length - 10) };
   }, [roster, pitches, monthsLeftFor]);
 
   const heroFitClubs: HeroClub[] = useMemo(() => needs.map((n) => ({
@@ -207,11 +217,12 @@ export default function BoardPage() {
                 need={need}
                 rank={i}
                 maxFits={maxFits}
-                /* The first card opens on load so the interaction is
-                   discoverable — on a phone there is no hover to hint at it. */
-                open={openNeedId === null ? i === 0 : openNeedId === need.requirementId}
-                onOpen={() => setOpenNeedId(need.requirementId)}
-                onClose={() => setOpenNeedId(null)}
+                /* Everything shut on arrival. The board's job is to show four
+                   clubs waiting on us; one of them pre-opened its evidence
+                   before being asked. */
+                open={openNeedId === need.requirementId}
+                onHover={() => setHoveredNeedId(need.requirementId)}
+                onUnhover={() => setHoveredNeedId(null)}
                 onToggle={() => setOpenNeedId(
                   openNeedId === need.requirementId ? null : need.requirementId,
                 )}

@@ -19,7 +19,33 @@ import type { RequirementInput, RequirementRow } from '@/hooks/useClubRequiremen
  * half-filled requirement is a working requirement, not a broken one.
  */
 
-const POSITIONS = ['GK', 'CB', 'LB', 'RB', 'LWB', 'RWB', 'DM', 'CM', 'AM', 'LW', 'RW', 'CF', 'SS'];
+/**
+ * The chips, and what each one stores.
+ *
+ * `CF` is labelled "ST / CF" because that is what the matcher has always done —
+ * `POSITION_BUCKET` maps `ST` onto `CF` — while the list only ever showed the
+ * letters `CF`. An agent looking to sign a striker found no striker here and
+ * concluded the desk could not do it.
+ *
+ * `SS` is gone as a separate chip for the same reason in reverse: it buckets to
+ * `CF` too, so it ran the identical search and was a decision with no
+ * consequence. Rows already saved as `SS` keep working — the value is only
+ * dropped from the offered list, never from the data.
+ */
+const POSITIONS: { value: string; label: string }[] = [
+  { value: 'GK', label: 'GK' },
+  { value: 'CB', label: 'CB' },
+  { value: 'LB', label: 'LB' },
+  { value: 'RB', label: 'RB' },
+  { value: 'LWB', label: 'LWB' },
+  { value: 'RWB', label: 'RWB' },
+  { value: 'DM', label: 'DM' },
+  { value: 'CM', label: 'CM' },
+  { value: 'AM', label: 'AM' },
+  { value: 'LW', label: 'LW' },
+  { value: 'RW', label: 'RW' },
+  { value: 'CF', label: 'ST / CF' },
+];
 
 /**
  * "Both" sat next to Left and Right and read as "either is fine", which is not
@@ -62,6 +88,7 @@ export default function RequirementDialog({
   const [position, setPosition] = useState(initial?.position ?? '');
   const [ageMin, setAgeMin] = useState(initial?.age_min != null ? String(initial.age_min) : '');
   const [ageMax, setAgeMax] = useState(initial?.age_max != null ? String(initial.age_max) : '');
+  const [budgetMin, setBudgetMin] = useState(toDigits(initial?.budget_min ?? null));
   const [budgetMax, setBudgetMax] = useState(toDigits(initial?.budget_max ?? null));
   const [salaryMax, setSalaryMax] = useState(toDigits(initial?.salary_max ?? null));
   const [foot, setFoot] = useState(initial?.foot ?? '');
@@ -76,7 +103,12 @@ export default function RequirementDialog({
   const min = toInt(ageMin);
   const max = toInt(ageMax);
   const ageReversed = min != null && max != null && min > max;
-  const canSave = position.trim().length > 0 && !ageReversed && !saving;
+
+  const feeMin = parseMoney(budgetMin);
+  const feeMax = parseMoney(budgetMax);
+  const feeReversed = feeMin != null && feeMax != null && feeMin > feeMax;
+
+  const canSave = position.trim().length > 0 && !ageReversed && !feeReversed && !saving;
 
   /**
    * Back to a blank need, keeping the club.
@@ -88,7 +120,7 @@ export default function RequirementDialog({
   const reset = () => {
     setPosition('');
     setAgeMin(''); setAgeMax('');
-    setBudgetMax(''); setSalaryMax('');
+    setBudgetMin(''); setBudgetMax(''); setSalaryMax('');
     setFoot(''); setNeedsEu(false);
     setLeagues(''); setWindowTarget(''); setNotes('');
   };
@@ -103,8 +135,8 @@ export default function RequirementDialog({
         position: position.trim(),
         age_min: min,
         age_max: max,
-        budget_min: null,
-        budget_max: parseMoney(budgetMax),
+        budget_min: feeMin,
+        budget_max: feeMax,
         salary_max: parseMoney(salaryMax),
         foot: foot || null,
         needs_eu_passport: needsEu,
@@ -137,18 +169,25 @@ export default function RequirementDialog({
             <div className="flex flex-wrap gap-1">
               {POSITIONS.map((p) => (
                 <button
-                  key={p}
-                  onClick={() => setPosition(p)}
+                  key={p.value}
+                  onClick={() => setPosition(p.value)}
                   className={cn(
                     'px-2 py-1 rounded text-[11px] font-medium border transition-colors',
-                    position === p
+                    position === p.value
                       ? 'bg-primary text-primary-foreground border-primary'
                       : 'bg-card border-border text-muted-foreground hover:text-foreground',
                   )}
                 >
-                  {p}
+                  {p.label}
                 </button>
               ))}
+              {/* A requirement saved before a chip was retired still has to show
+                  what it is set to, rather than looking like nothing is chosen. */}
+              {position && !POSITIONS.some((p) => p.value === position) && (
+                <span className="rounded border border-primary bg-primary px-2 py-1 text-[11px] font-medium text-primary-foreground">
+                  {position}
+                </span>
+              )}
             </div>
           </Field>
 
@@ -159,7 +198,20 @@ export default function RequirementDialog({
             <Field label="Age to">
               <Input value={ageMax} onChange={(e) => setAgeMax(e.target.value)} type="number" placeholder="—" className="h-8 text-xs" />
             </Field>
-            <Field label="Fee ceiling">
+            {/*
+              A band, not a ceiling. "Up to ten million" was the only half of
+              the ask the desk recorded, so a three-hundred-thousand right-back
+              cleared it and came back top of the shortlist. What a club spends
+              says which level it is shopping at, and the floor is the half that
+              says it.
+
+              Both ends stay optional — a club that only names a ceiling still
+              gets exactly the behaviour it had before.
+            */}
+            <Field label="Fee from">
+              <MoneyInput value={budgetMin} onChange={setBudgetMin} />
+            </Field>
+            <Field label="Fee to">
               <MoneyInput value={budgetMax} onChange={setBudgetMax} />
             </Field>
             <Field label="Wage ceiling">
@@ -169,6 +221,9 @@ export default function RequirementDialog({
 
           {ageReversed && (
             <p className="text-xs text-destructive">Age from cannot be greater than age to.</p>
+          )}
+          {feeReversed && (
+            <p className="text-xs text-destructive">Fee from cannot be greater than fee to.</p>
           )}
 
           <div className="grid grid-cols-2 gap-3">

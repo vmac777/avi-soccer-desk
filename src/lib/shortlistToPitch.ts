@@ -1,4 +1,4 @@
-import { formatMoneyShort } from '@/lib/money';
+import { feeBandLabel, positionLabel } from '@/lib/matching';
 
 /**
  * Turning a shortlisted player into a pitch.
@@ -96,16 +96,22 @@ export function requirementSummary(req: {
   position: string;
   age_min: number | null;
   age_max: number | null;
+  budget_min?: number | null;
   budget_max: number | null;
   foot: string | null;
 }): string {
-  const bits: string[] = [req.position || 'Any position'];
+  // The label the agent clicked, not the code we store — a card reading "CF"
+  // for a chip that said "ST / CF" makes the reader check whether it took.
+  const bits: string[] = [positionLabel(req.position) || 'Any position'];
 
   if (req.age_min != null && req.age_max != null) bits.push(`${req.age_min}–${req.age_max}`);
   else if (req.age_max != null) bits.push(`under ${req.age_max + 1}`);
   else if (req.age_min != null) bits.push(`${req.age_min}+`);
 
-  if (req.budget_max != null) bits.push(`≤ ${formatMoneyShort(req.budget_max)}`);
+  // The band, when the club gave one. "≤ €10m" hides the half of the ask that
+  // says which players are too small for it.
+  const fee = feeBandLabel({ budget_min: req.budget_min ?? null, budget_max: req.budget_max });
+  if (fee) bits.push(fee);
   if (req.foot) bits.push(`${req.foot}-footed`);
 
   return bits.join(', ');

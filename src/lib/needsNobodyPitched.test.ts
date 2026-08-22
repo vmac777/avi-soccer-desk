@@ -172,6 +172,25 @@ describe('needsNobodyPitched — the fit rows', () => {
     expect(without.rows[0].verdict).toBe('€5.0m within €30.0m');
   });
 
+  it('carries a below-floor player with an × and the band, out of the fit count', () => {
+    // The complaint this exists for: "we are getting players so cheap they
+    // aren't actually good fits." He still appears, so it is visible that we
+    // considered him — he just is not someone to put forward.
+    const [n] = needsNobodyPitched(input({
+      requirements: [need({ budget_min: 5_000_000, budget_max: 10_000_000 })],
+      roster: [
+        player({ id: 'cheap', name: 'Léo Mana', xtvHistory: [{ year: 2026, month: 8, xtv: 350_000 }] }),
+        player({ id: 'right', name: 'Ana Costa', xtvHistory: [{ year: 2026, month: 8, xtv: 7_000_000 }] }),
+      ],
+    }));
+    expect(n.fitCount).toBe(1);
+    expect(n.rows.find((r) => r.playerId === 'right')!.ok).toBe(true);
+
+    const cheap = n.rows.find((r) => r.playerId === 'cheap')!;
+    expect(cheap.ok).toBe(false);
+    expect(cheap.verdict).toBe('€350k, well under €5.0m–€10.0m');
+  });
+
   it('leaves the value null rather than guessing one', () => {
     const [n] = needsNobodyPitched(input({
       requirements: [need()],
