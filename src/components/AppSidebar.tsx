@@ -8,6 +8,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
 import { useFollowUpBadgeCount } from '@/hooks/useFollowUps';
 import BrandMark from '@/components/BrandMark';
+import ProfileNameDialog from '@/components/ProfileNameDialog';
 
 interface NavItem {
   to: string;
@@ -56,6 +57,7 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
   const navigate = useNavigate();
   const { signOut, displayName, isAdmin, isSuperAdmin } = useAuth();
   const badgeCount = useFollowUpBadgeCount();
+  const [nameOpen, setNameOpen] = useState(false);
 
   const sections = isAdmin
     ? adminSections.map((s) =>
@@ -118,7 +120,15 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
       {/* User footer */}
       <div className="p-3 border-t border-border">
         <div className="flex items-center justify-between px-3 py-2">
-          <span className="text-xs text-muted-foreground">{displayName}</span>
+          {/* The name is the control: it is the one place it already appears,
+              so that is where somebody looks to change it. */}
+          <button
+            onClick={() => setNameOpen(true)}
+            className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+            title="Change your name"
+          >
+            {displayName}
+          </button>
           <button
             onClick={handleSignOut}
             className="text-muted-foreground hover:text-foreground transition-colors"
@@ -128,6 +138,8 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
           </button>
         </div>
       </div>
+
+      {nameOpen && <ProfileNameDialog open={nameOpen} onClose={() => setNameOpen(false)} />}
     </>
   );
 };

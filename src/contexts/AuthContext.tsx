@@ -24,6 +24,14 @@ interface AuthContextValue {
   userName: string;
   signIn: (email: string, password: string) => Promise<{ error: Error | null; profile?: Profile | null }>;
   signOut: () => Promise<void>;
+  /**
+   * Re-read the profile after it changes.
+   *
+   * It is fetched once when the session appears and then held, so setting your
+   * own name updated the row and left the greeting saying the old one until a
+   * reload. Nothing else can invalidate it — this is not react-query.
+   */
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -96,6 +104,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null, profile: p };
   }, []);
 
+  const refreshProfile = useCallback(async () => {
+    const id = session?.user?.id;
+    if (!id) return;
+    const p = await fetchProfile(id);
+    setProfile(p);
+  }, [session?.user?.id]);
+
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
     setProfile(null);
@@ -123,6 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     userName,
     signIn,
     signOut,
+    refreshProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

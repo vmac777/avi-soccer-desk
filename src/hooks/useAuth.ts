@@ -10,6 +10,7 @@ export function useAuth() {
       return { error: res.error };
     },
     signOut: ctx.signOut,
+    refreshProfile: ctx.refreshProfile,
     userName: ctx.userName,
     displayName: ctx.displayName,
     isAdmin: ctx.isAdmin,

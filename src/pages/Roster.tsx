@@ -340,6 +340,12 @@ function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, 
     ...(tmFailed ? ['tm' as const] : []),
     ...(trFailed ? ['tr' as const] : []),
   ];
+  const [showRawFailure, setShowRawFailure] = useState(false);
+  const rawFailure = [
+    target.tm_fail_reason ? `TM ${target.tm_fail_reason}` : null,
+    target.tr_fail_reason ? `TR ${target.tr_fail_reason}` : null,
+    target.tm_link ? `link ${target.tm_link}` : 'link (none stored)',
+  ].filter(Boolean).join('\n');
 
   return (
     <div
@@ -438,25 +444,50 @@ function TargetCard({ target, onOpen, onEdit, onDelete, onCreatePitch, onRetry, 
 
         {/* Failure banner + retry */}
         {anyFailed && (
-          <div
-            className="flex items-center gap-1.5 pt-1 text-[10px] text-amber-500/90"
-            title={target.tm_fail_reason ?? target.tr_fail_reason ?? undefined}
-          >
-            <AlertTriangle className="h-3 w-3" />
-            <span className="truncate">
-              {tmFailed
-                ? `TM: ${target.tm_fail_reason?.startsWith('http_error 404')
-                    ? 'Transfermarkt has no page at that link'
-                    : target.tm_fail_reason ?? "couldn't fetch"}`
-                : trFailMessage(target.tr_fail_reason)}
-            </span>
-            <button
-              onClick={(e) => { e.stopPropagation(); onRetry(failedSources); }}
-              disabled={isRetrying}
-              className="ml-auto inline-flex items-center gap-1 text-primary hover:underline disabled:opacity-50"
-            >
-              <RefreshCw className={cn('h-3 w-3', isRetrying && 'animate-spin')} /> Retry
-            </button>
+          <div className="pt-1 text-[10px] text-amber-500/90">
+            <div className="flex items-center gap-1.5">
+              <AlertTriangle className="h-3 w-3 shrink-0" />
+              <span className="truncate">
+                {tmFailed
+                  ? `TM: ${target.tm_fail_reason?.startsWith('http_error 404')
+                      ? 'Transfermarkt has no page at that link'
+                      : target.tm_fail_reason ?? "couldn't fetch"}`
+                  : trFailMessage(target.tr_fail_reason)}
+              </span>
+              {rawFailure && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setShowRawFailure((v) => !v); }}
+                  className="shrink-0 text-primary hover:underline"
+                >
+                  {showRawFailure ? 'less' : 'why'}
+                </button>
+              )}
+              <button
+                onClick={(e) => { e.stopPropagation(); onRetry(failedSources); }}
+                disabled={isRetrying}
+                className="ml-auto inline-flex shrink-0 items-center gap-1 text-primary hover:underline disabled:opacity-50"
+              >
+                <RefreshCw className={cn('h-3 w-3', isRetrying && 'animate-spin')} /> Retry
+              </button>
+            </div>
+
+            {/*
+              The summary line truncates, and the full reason used to live only
+              in a `title` tooltip — so the one string that says whether the
+              link is wrong, the page does not exist, or Transfermarkt is
+              refusing this server was the one thing nobody could read. It is
+              the difference between a fix that takes a second and a week of
+              guessing, so it gets to be text on the page, wrapped and
+              selectable.
+            */}
+            {showRawFailure && rawFailure && (
+              <p
+                onClick={(e) => e.stopPropagation()}
+                className="mt-1 select-text whitespace-pre-wrap break-all rounded bg-muted/40 px-1.5 py-1 font-mono text-[9px] leading-relaxed text-muted-foreground"
+              >
+                {rawFailure}
+              </p>
+            )}
           </div>
         )}
 
