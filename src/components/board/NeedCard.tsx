@@ -98,7 +98,7 @@ export default function NeedCard({
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); }
       }}
       className={cn(
-        'board-rise cursor-pointer rounded-[10px] border border-l-[3px] p-[15px_16px] transition-colors duration-200 md:rounded-lg md:p-[18px_20px]',
+        'board-rise cursor-pointer rounded-[10px] border border-l-[3px] p-3 transition-colors duration-200 md:rounded-lg md:p-[18px_20px]',
         'bg-gradient-to-br from-primary/10 via-transparent to-transparent',
         edge,
         open ? 'border-primary/70 from-primary/[0.17]' : 'border-border',
@@ -106,7 +106,9 @@ export default function NeedCard({
       )}
     >
       <div className="flex items-baseline justify-between gap-3">
-        <p className="font-display text-[27px] leading-none tracking-[0.03em] text-foreground md:text-[30px]">
+        {/* Display type, not copy — it can lose a few pixels on a phone without
+            costing anyone legibility, which the body text cannot. */}
+        <p className="font-display text-[24px] leading-none tracking-[0.03em] text-foreground md:text-[30px]">
           {need.club || 'A club'}
         </p>
         {/* Silence rather than a guess: a need with no recorded ask date says
@@ -120,7 +122,7 @@ export default function NeedCard({
 
       <p className="mt-2 text-sm text-foreground/[0.78]">{need.want}</p>
 
-      <div className="mt-4 flex items-center gap-3">
+      <div className="mt-3 flex items-center gap-3 md:mt-4">
         <div className="flex shrink-0">
           {avatars.map((r) => (
             <span
@@ -139,10 +141,13 @@ export default function NeedCard({
 
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
-            <span className={cn('font-mono text-[10px] font-semibold uppercase tracking-[0.12em]', text)}>
+            {/* The label is the number, and the number must never be the thing
+                that wraps — "4 OF YOURS / FIT" across two lines was the note
+                beside it taking the width. It truncates instead. */}
+            <span className={cn('shrink-0 whitespace-nowrap font-mono text-[10px] font-semibold uppercase tracking-[0.12em]', text)}>
               {need.fitCount} of yours fit
             </span>
-            <span className="shrink-0 text-[11px] text-foreground/40">
+            <span className="truncate text-[11px] text-foreground/40">
               {need.alsoAtClub > 0
                 ? `${need.alsoAtClub} more open need${need.alsoAtClub === 1 ? '' : 's'} at the club`
                 : 'nobody put forward'}
@@ -151,7 +156,7 @@ export default function NeedCard({
           <span className="mt-[7px] block h-1 bg-foreground/10">
             <span className={cn('board-grow block h-1', bar)} style={{ width: `${barPct}%` }} />
           </span>
-          <p className="mt-2 truncate text-[11.5px] text-foreground/50">
+          <p className="mt-1.5 truncate text-[11.5px] text-foreground/50">
             {fits.map((r) => r.name).join(', ')}
           </p>
         </div>
@@ -163,29 +168,37 @@ export default function NeedCard({
         </span>
       </div>
 
+      {/*
+        The evidence and the actions arrive together.
+
+        Two full-width buttons were forty per cent of a collapsed card — the
+        largest thing on a summary nobody had decided to act on yet — so two
+        cards filled a phone. They now sit under the panel, which also means
+        nobody puts four players forward without having seen which four.
+      */}
       {open && (
-        <div className="board-panel mt-3.5 border-t border-foreground/[0.14] pt-3">
+        <div className="board-panel mt-3 border-t border-foreground/[0.14] pt-3">
           <p className="mb-2 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-primary">
             Who of yours fits
           </p>
           {need.rows.map((r) => <FitLine key={r.playerId} row={r} />)}
+
+          <div className="mt-3 flex gap-2">
+            <button
+              onClick={(e) => { e.stopPropagation(); onPutForward(); }}
+              className="flex-1 rounded-md bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 md:flex-none md:rounded-[5px] md:py-[9px] md:text-[11.5px]"
+            >
+              Put {need.fitCount} forward
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); onOpenNeed(); }}
+              className="flex-1 rounded-md border border-foreground/20 px-4 py-3 text-sm font-medium text-foreground/75 transition-colors hover:border-primary hover:text-primary md:flex-none md:rounded-[5px] md:px-3.5 md:py-[9px] md:text-[11.5px]"
+            >
+              Open the need
+            </button>
+          </div>
         </div>
       )}
-
-      <div className="mt-4 flex flex-col gap-2 md:flex-row">
-        <button
-          onClick={(e) => { e.stopPropagation(); onPutForward(); }}
-          className="rounded-md bg-primary px-4 py-3.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 md:rounded-[5px] md:px-4 md:py-[9px] md:text-[11.5px]"
-        >
-          Put {need.fitCount} forward
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); onOpenNeed(); }}
-          className="rounded-md border border-foreground/20 px-4 py-3 text-sm font-medium text-foreground/75 transition-colors hover:border-primary hover:text-primary md:rounded-[5px] md:px-3.5 md:py-[9px] md:text-[11.5px]"
-        >
-          Open the need
-        </button>
-      </div>
     </div>
   );
 }

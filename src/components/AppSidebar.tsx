@@ -145,29 +145,46 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
   );
 };
 
-const AppSidebar = () => {
-  const isMobile = useIsMobile();
+/**
+ * The secondary navigation on a phone, and the trigger that opens it.
+ *
+ * Split out of `AppSidebar` because the trigger used to be `fixed top-3 left-3`
+ * — the only way to reach the top of the page from a component rendered beside
+ * the main column — and a fixed button floats over whatever you scroll past. It
+ * was sitting on top of the first need card's club name.
+ *
+ * `AppLayout` now places this inside the header, where a `w-10` spacer was
+ * already being held for it, so it scrolls with the header like a header
+ * control should. It does not need to follow the page: `MobileTabBar` carries
+ * the four screens an agent uses, and this is the drawer for everything else.
+ */
+export const MobileNavSheet = () => {
   const [open, setOpen] = useState(false);
 
-  if (isMobile) {
-    return (
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger asChild>
-          <button
-            className="fixed top-3 left-3 z-50 p-2 rounded-md bg-sidebar border border-border text-foreground hover:bg-accent transition-colors"
-            aria-label="Open menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-        </SheetTrigger>
-        <SheetContent side="left" className="w-[240px] p-0 bg-sidebar border-border [&>button]:hidden">
-          <div className="min-h-screen flex flex-col">
-            <SidebarContent onNavigate={() => setOpen(false)} />
-          </div>
-        </SheetContent>
-      </Sheet>
-    );
-  }
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <button
+          className="-ml-1 mr-1 shrink-0 rounded-md p-2 text-foreground transition-colors hover:bg-accent"
+          aria-label="Open menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-[240px] p-0 bg-sidebar border-border [&>button]:hidden">
+        <div className="min-h-screen flex flex-col">
+          <SidebarContent onNavigate={() => setOpen(false)} />
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+};
+
+const AppSidebar = () => {
+  const isMobile = useIsMobile();
+  // The mobile drawer lives in the header now, so there is nothing to render
+  // beside the main column at this width.
+  if (isMobile) return null;
 
   return (
     <aside className="w-[240px] min-h-screen bg-sidebar border-r border-border flex flex-col shrink-0">

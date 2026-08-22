@@ -42,7 +42,7 @@ function Section({ label, helper, gold = true, children }: {
 }) {
   return (
     <section>
-      <div className="mb-3 flex items-baseline justify-between gap-3">
+      <div className="mb-2 flex items-baseline justify-between gap-3 md:mb-3">
         <h2 className={`${SECTION_LABEL} ${gold ? 'text-primary' : 'text-foreground/45'}`}>{label}</h2>
         {helper && <span className="hidden text-[11px] text-foreground/40 md:block">{helper}</span>}
       </div>
@@ -197,7 +197,7 @@ export default function BoardPage() {
   const nothingYet = needs.length === 0 && rest.length === 0 && roster.length === 0;
 
   return (
-    <div className="mx-auto max-w-[1180px] space-y-7 pb-4 md:space-y-8">
+    <div className="mx-auto max-w-[1180px] space-y-5 pb-4 md:space-y-8">
       <BoardHero
         greeting={firstName ? `Morning, ${firstName}` : 'Morning'}
         fitCount={fitCount}

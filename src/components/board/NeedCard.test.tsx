@@ -61,6 +61,21 @@ describe('NeedCard — what it says when closed', () => {
     expect(screen.queryByText('€90.0m over €30.0m')).toBeNull();
   });
 
+  it('carries no actions at all until it is open', () => {
+    // Two full-width buttons were forty per cent of a collapsed card, so two
+    // cards filled a phone screen. They belong with the evidence: nobody should
+    // put four players forward from a card that has not shown them which four.
+    mount();
+    expect(screen.queryByText('Put 1 forward')).toBeNull();
+    expect(screen.queryByText('Open the need')).toBeNull();
+  });
+
+  it('brings both actions with the panel', () => {
+    mount({ open: true });
+    expect(screen.getByText('Put 1 forward')).toBeTruthy();
+    expect(screen.getByText('Open the need')).toBeTruthy();
+  });
+
   it('says nothing about age when the ask was never dated', () => {
     mount({ need: { ...need, askedDaysAgo: null } });
     expect(screen.queryByText(/asked/)).toBeNull();
