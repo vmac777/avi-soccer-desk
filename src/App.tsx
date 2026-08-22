@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -10,6 +10,7 @@ import RouteErrorBoundary from "@/components/RouteErrorBoundary";
 import RequireAdmin from "@/components/auth/RequireAdmin";
 import RequireSuperAdmin from "@/components/auth/RequireSuperAdmin";
 import LoginPage from "@/pages/Login";
+import { lazyRoute } from "@/lib/lazyRoute";
 
 /**
  * Every page was in the entry chunk: 1.6 MB, 435 kB gzipped, downloaded before
@@ -20,19 +21,24 @@ import LoginPage from "@/pages/Login";
  *
  * Login stays eager because it is the first paint for anyone signed out, and a
  * spinner in front of a password field is a worse trade than a few kilobytes.
+ *
+ * `lazyRoute` rather than `lazy`: a tab left open across a deploy asks for a
+ * chunk filename the new build no longer has, and the route dies with "Failed
+ * to fetch dynamically imported module" — which reads as the platform being
+ * down when the page is simply out of date.
  */
-const BoardPage = lazy(() => import("@/pages/Board"));
-const Dashboard = lazy(() => import("@/pages/Dashboard"));
-const ContactsPage = lazy(() => import("@/pages/Contacts"));
-const PendingActionsPage = lazy(() => import("@/pages/PendingActions"));
-const ClubNeedsPage = lazy(() => import("@/pages/ClubNeeds"));
-const RequirementDetailPage = lazy(() => import("@/pages/RequirementDetail"));
-const RosterPage = lazy(() => import("@/pages/Roster"));
-const RosterPlayerPage = lazy(() => import("@/pages/RosterPlayerPage"));
-const PitchesPage = lazy(() => import("@/pages/BuyPitches"));
-const NotFound = lazy(() => import("@/pages/NotFound"));
-const Audit = lazy(() => import("@/pages/admin/Audit"));
-const SystemHealth = lazy(() => import("@/pages/admin/SystemHealth"));
+const BoardPage = lazyRoute(() => import("@/pages/Board"));
+const Dashboard = lazyRoute(() => import("@/pages/Dashboard"));
+const ContactsPage = lazyRoute(() => import("@/pages/Contacts"));
+const PendingActionsPage = lazyRoute(() => import("@/pages/PendingActions"));
+const ClubNeedsPage = lazyRoute(() => import("@/pages/ClubNeeds"));
+const RequirementDetailPage = lazyRoute(() => import("@/pages/RequirementDetail"));
+const RosterPage = lazyRoute(() => import("@/pages/Roster"));
+const RosterPlayerPage = lazyRoute(() => import("@/pages/RosterPlayerPage"));
+const PitchesPage = lazyRoute(() => import("@/pages/BuyPitches"));
+const NotFound = lazyRoute(() => import("@/pages/NotFound"));
+const Audit = lazyRoute(() => import("@/pages/admin/Audit"));
+const SystemHealth = lazyRoute(() => import("@/pages/admin/SystemHealth"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
