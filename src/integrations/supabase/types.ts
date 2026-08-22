@@ -390,6 +390,63 @@ export type Database = {
           },
         ]
       }
+      club_news_reports: {
+        Row: {
+          club_id: string
+          duration_ms: number | null
+          generated_at: string
+          generated_by: string | null
+          id: string
+          input_tokens: number | null
+          model: string | null
+          output_tokens: number | null
+          report_json: Json | null
+          source_status: Json | null
+          web_search_calls: number | null
+        }
+        Insert: {
+          club_id: string
+          duration_ms?: number | null
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          input_tokens?: number | null
+          model?: string | null
+          output_tokens?: number | null
+          report_json?: Json | null
+          source_status?: Json | null
+          web_search_calls?: number | null
+        }
+        Update: {
+          club_id?: string
+          duration_ms?: number | null
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          input_tokens?: number | null
+          model?: string | null
+          output_tokens?: number | null
+          report_json?: Json | null
+          source_status?: Json | null
+          web_search_calls?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_news_reports_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_news_reports_generated_by_fkey"
+            columns: ["generated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_requirements: {
         Row: {
           age_max: number | null
@@ -471,63 +528,6 @@ export type Database = {
             columns: ["contact_id"]
             isOneToOne: false
             referencedRelation: "contacts_enriched"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      club_news_reports: {
-        Row: {
-          club_id: string
-          duration_ms: number | null
-          generated_at: string
-          generated_by: string | null
-          id: string
-          input_tokens: number | null
-          model: string | null
-          output_tokens: number | null
-          report_json: Json | null
-          source_status: Json | null
-          web_search_calls: number | null
-        }
-        Insert: {
-          club_id: string
-          duration_ms?: number | null
-          generated_at?: string
-          generated_by?: string | null
-          id?: string
-          input_tokens?: number | null
-          model?: string | null
-          output_tokens?: number | null
-          report_json?: Json | null
-          source_status?: Json | null
-          web_search_calls?: number | null
-        }
-        Update: {
-          club_id?: string
-          duration_ms?: number | null
-          generated_at?: string
-          generated_by?: string | null
-          id?: string
-          input_tokens?: number | null
-          model?: string | null
-          output_tokens?: number | null
-          report_json?: Json | null
-          source_status?: Json | null
-          web_search_calls?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "club_news_reports_club_id_fkey"
-            columns: ["club_id"]
-            isOneToOne: false
-            referencedRelation: "clubs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "club_news_reports_generated_by_fkey"
-            columns: ["generated_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
